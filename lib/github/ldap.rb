@@ -14,8 +14,8 @@ module GitHub
 
       @ldap.authenticate(options[:admin_user], options[:admin_password])
 
-      if encryptation = check_encryptation(options[:encryptation])
-        @ldap.encryptation(encryptation)
+      if encryption = check_encryption(options[:encryptation])
+        @ldap.encryption(encryption)
       end
     end
 
@@ -87,10 +87,10 @@ module GitHub
     # encryptation: is the encryptation method, either 'ssl', 'tls', 'simple_tls' or 'start_tls'.
     #
     # Returns the real encryptation type.
-    def check_encryptation(encryptation)
-      return unless encryptation
+    def check_encryption(encryption)
+      return unless encryption
 
-      case auth_method.downcase.to_sym
+      case encryption.downcase.to_sym
       when :ssl, :simple_tls
         :simple_tls
       when :tls, :start_tls
