@@ -1,0 +1,70 @@
+version: 1
+
+# Organizations
+dn: dc=github,dc=com
+objectClass: dcObject
+objectClass: organization
+dc: github
+o: GitHub Inc.
+
+dn: ou=Group,dc=github,dc=com
+objectclass: organizationalUnit
+ou: Group
+
+# Groups
+dn: cn=People,ou=Group,dc=github,dc=com
+cn: People
+objectClass: groupOfNames
+member: uid=sean,dc=github,dc=com
+
+dn: cn=Enterprise,ou=Group,dc=github,dc=com
+cn: Enterprise
+objectClass: groupOfNames
+member: uid=calavera,dc=github,dc=com
+
+# Users
+dn: uid=admin,dc=github,dc=com
+objectClass: top
+objectClass: person
+objectClass: organizationalPerson
+objectClass: inetOrgPerson
+cn: system administrator
+sn: administrator
+displayName: Directory Superuser
+uid: admin
+userPassword: secret
+
+dn: uid=sean,dc=github,dc=com
+cn: Sean Bryant
+cn: Sean
+sn: Bryant
+uid: sean
+userPassword: secret
+mail: sean@github.com
+mail: sbryant@github.com
+objectClass: inetOrgPerson
+
+dn: uid=calavera,dc=github,dc=com
+cn: David Calavera
+cn: David
+sn: Calavera
+uid: calavera
+userPassword: secret
+mail: calavera@github.com
+objectClass: inetOrgPerson
+
+dn: uid=ldaptest,dc=github,dc=com
+cn: LDAP
+sn: Test
+uid: ldaptest
+userPassword: secret
+mail: ldaptest@github.com
+objectClass: inetOrgPerson
+
+dn: uid=newuserindb,dc=github,dc=com
+cn: LDAP
+sn: Test
+uid: newuserindb
+userPassword: secret
+mail: newuserindb@github.com
+objectClass: inetOrgPerson
