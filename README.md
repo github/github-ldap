@@ -20,6 +20,8 @@ Or install it yourself as:
 
 ## Usage
 
+### Initialization
+
 GitHub-Ldap let you use an external ldap server to authenticate your users with.
 
 There are a few configuration options required to use this adapter:
@@ -29,7 +31,6 @@ There are a few configuration options required to use this adapter:
 * admin_user: is the the ldap administrator user. Required to perform search operation.
 * admin_password: is the password for the administrator user. Simple authentication is required on the server.
 * encryptation: is the encryptation protocol, disabled by default. The valid options are `ssl` and `tls`.
-* user_domain: is the default ldap domain base.
 * uid: is the field name in the ldap server used to authenticate your users, in ActiveDirectory this is `sAMAccountName`.
 
 Initialize a new adapter using those required options:
@@ -38,7 +39,28 @@ Initialize a new adapter using those required options:
   ldap = GitHub::Ldap.new options
 ```
 
-## Testing
+### Quering
+
+Searches are performed against an individual domain base, so the first step is to get a new `GitHub::Ldap::Domain` object for the connection:
+
+```ruby
+  ldap = GitHub::Ldap.new options
+  domain = ldap.domain("dc=github,dc=com")
+```
+
+When we have the domain, we can check if a user can log in with a given password:
+
+```ruby
+  domain.valid_login? 'calavera', 'secret'
+```
+
+Or whether a user is member of the given groups:
+
+```ruby
+  domain.is_member? 'uid=calavera,dc=github,dc=com', %w(Enterprise)
+```
+
+### Testing support
 
 GitHub-Ldap uses [ladle](https://github.com/NUBIC/ladle) for testing. Ladle is not required by default, so you'll need to add it to your gemfile separatedly and require it.
 
