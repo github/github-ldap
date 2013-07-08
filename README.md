@@ -1,3 +1,5 @@
+![Build Status](https://travis-ci.org/github/github-ldap.png)
+
 # Github::Ldap
 
 GitHub-Ldap is a wrapper on top of Net::LDAP to make it human friendly.
