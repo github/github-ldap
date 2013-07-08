@@ -38,7 +38,8 @@ module GitHub
         ldif:            server_options[:user_fixtures],
         domain:          server_options[:user_domain],
         port:            server_options[:port],
-        quiet:           server_options[:quiet])
+        quiet:           server_options[:quiet],
+        tmpdir:          server_tmp)
 
       @ldap_server.start
     end
@@ -47,6 +48,21 @@ module GitHub
     # If there is no server started this method doesn't do anything.
     def self.stop_server
       ldap_server && ldap_server.stop
+    end
+
+    # Determine the temporal directory where the ldap server lives.
+    # If there is no temporal directory in the environment we create one in the base path.
+    #
+    # Returns the path to the temporal directory.
+    def self.server_tmp
+      tmp = ENV['TMPDIR'] || ENV['TEMPDIR']
+
+      if tmp.nil?
+        tmp = 'tmp'
+        Dir.mkdir(tmp)
+      end
+
+      tmp
     end
   end
 end
