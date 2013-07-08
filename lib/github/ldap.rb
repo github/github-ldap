@@ -53,9 +53,9 @@ module GitHub
       or_filters    = group_names.map {|g| Net::LDAP::Filter.eq("cn", g)}.reduce(:|)
       member_filter = Net::LDAP::Filter.eq("member", user_dn) & or_filters
 
-       @ldap.search(base: @user_domain,
-          attributes: %w{ou cn dn sAMAccountName member},
-          filter: member_filter)
+      @ldap.search(base: @user_domain,
+         attributes: %w{ou cn dn sAMAccountName member},
+         filter: member_filter)
     end
 
 
