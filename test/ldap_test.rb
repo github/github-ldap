@@ -35,34 +35,27 @@ class GitHubLdapTest < Minitest::Test
   end
 
   def test_groups_in_server
-    options = @options.merge(:user_groups => %w(Enterprise People))
-    assert_equal 2, GitHub::Ldap.new(options).groups.size
+    assert_equal 2, @ldap.groups(%w(Enterprise People)).size
   end
 
   def test_user_in_group
-    options = @options.merge(:user_groups => %w(Enterprise People))
-    ldap = GitHub::Ldap.new(options)
-    user = ldap.valid_login?('calavera', 'secret')
+    user = @ldap.valid_login?('calavera', 'secret')
 
-    assert ldap.groups_contain_user?(user.dn),
+    assert @ldap.is_member?(user.dn, %w(Enterprise People)),
       "Expected `Enterprise` or `Poeple` to include the member `#{user.dn}`"
   end
 
   def test_user_not_in_different_group
-    options = @options.merge(:user_groups => %w(People))
-    ldap = GitHub::Ldap.new(options)
-    user = ldap.valid_login?('calavera', 'secret')
+    user = @ldap.valid_login?('calavera', 'secret')
 
-    assert !ldap.groups_contain_user?(user.dn),
+    assert !@ldap.is_member?(user.dn, %w(People)),
       "Expected `Poeple` not to include the member `#{user.dn}`"
   end
 
   def test_user_without_group
-    options = @options.merge(:user_groups => %w(People))
-    ldap = GitHub::Ldap.new(options)
-    user = ldap.valid_login?('ldaptest', 'secret')
+    user = @ldap.valid_login?('ldaptest', 'secret')
 
-    assert !ldap.groups_contain_user?(user.dn),
+    assert !@ldap.is_member?(user.dn, %w(People)),
       "Expected `Poeple` not to include the member `#{user.dn}`"
   end
 
@@ -77,18 +70,13 @@ class GitHubLdapTest < Minitest::Test
   end
 
   def test_authenticate_check_valid_user_and_groups
-    options = @options.merge(:user_groups => %w(Enterprise People))
-    ldap = GitHub::Ldap.new(options)
-    user = ldap.authenticate!('calavera', 'secret')
+    user = @ldap.authenticate!('calavera', 'secret', %w(Enterprise People))
 
     assert_equal 'uid=calavera,dc=github,dc=com', user.dn
   end
 
   def test_authenticate_doesnt_return_valid_users_in_different_groups
-    options = @options.merge(:user_groups => %w(People))
-    ldap = GitHub::Ldap.new(options)
-
-    assert !ldap.authenticate!('calavera', 'secret'),
+    assert !@ldap.authenticate!('calavera', 'secret', %w(People)),
       "Expected `authenticate!` to not return an user"
   end
 

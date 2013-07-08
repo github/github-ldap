@@ -36,10 +36,6 @@ Initialize a new adapter using those required options:
   ldap = GitHub::Ldap.new options
 ```
 
-There is also an optional configuration setting that you can add:
-
-* user_groups: is an array of groups used to restrict access to users only in those groups.
-
 ## Testing
 
 GitHub-Ldap uses [ladle](https://github.com/NUBIC/ladle) for testing. Ladle is not required by default, so you'll need to add it to your gemfile separatedly and require it.

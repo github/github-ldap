@@ -4,7 +4,6 @@ module GitHub
 
     def initialize(options = {})
       @user_domain = options[:user_domain]
-      @user_groups = Array(options[:user_groups])
       @uid         = options[:uid] || "sAMAccountName"
 
       @ldap = Net::LDAP.new({
@@ -23,32 +22,46 @@ module GitHub
     # Takes the list of the group names and generate a filter for the groups
     # with cn that match and also include members:
     #
+    # group_names: is an array of group CNs.
+    #
     # Returns the ldap filter.
-    def group_filter
-      or_filters = @user_groups.map {|g| Net::LDAP::Filter.eq("cn", g)}.reduce(:|)
+    def group_filter(group_names)
+      or_filters = group_names.map {|g| Net::LDAP::Filter.eq("cn", g)}.reduce(:|)
       Net::LDAP::Filter.pres("member") & or_filters
     end
 
     # List the groups in the ldap server that match the configured ones.
     #
+    # group_names: is an array of group CNs.
+    #
     # Returns a list of ldap entries for the configured groups.
-    def groups
+    def groups(group_names)
+      filter = group_filter(group_names)
+
       @ldap.search(base: @user_domain,
                   attributes: %w{ou cn dn sAMAccountName member},
-                  filter: group_filter)
+                  filter: filter)
     end
 
     # Check if the user is include in any of the configured groups.
     #
     # user_dn: is the dn for the user ldap entry.
+    # group_names: is an array of group CNs.
     #
     # Returns true if the user belongs to any of the groups.
     # Returns false otherwise.
-    def groups_contain_user?(user_dn)
-      return true if @user_groups.empty?
+    def is_member?(user_dn, group_names)
+      return true if group_names.nil?
+      return true if group_names.empty?
 
-      members = groups.map(&:member).reduce(:+).uniq
-      members.include?(user_dn)
+      or_filters    = group_names.map {|g| Net::LDAP::Filter.eq("cn", g)}.reduce(:|)
+      member_filter = Net::LDAP::Filter.eq("member", user_dn) & or_filters
+
+      result = @ldap.search(base: @user_domain,
+                  attributes: %w{ou cn dn sAMAccountName member},
+                  filter: member_filter)
+
+      !result.empty?
     end
 
     # Check if the user credentials are valid.
@@ -72,13 +85,15 @@ module GitHub
     #
     # login: is the user's login. This method doesn't accept email identifications.
     # password: is the user's password.
+    # group_names: is an array of group CNs.
     #
     # Returns the user info if the credentials are valid and there are no groups configured.
     # Returns the user info if the credentials are valid and the user belongs to a configured group.
     # Returns nil if the credentials are invalid
-    def authenticate!(login, password)
+    def authenticate!(login, password, group_names = nil)
       user = valid_login?(login, password)
-      return user if user && groups_contain_user?(user.dn)
+
+      return user if user && is_member?(user.dn, group_names)
     end
 
     # Check the legacy auth configuration options (before David's war with omniauth)
