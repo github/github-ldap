@@ -89,4 +89,16 @@ class GitHubLdapTest < Minitest::Test
     assert_equal :start_tls, @ldap.check_encryption(:tls)
     assert_equal :start_tls, @ldap.check_encryption(:start_tls)
   end
+
+  def test_membership_empty_for_non_members
+    assert @ldap.membership('uid=calavera,dc=github,dc=com', %w(People)).empty?,
+      "Expected `calavera` not to be a member of `People`."
+  end
+
+  def test_membership_groups_for_members
+    groups = @ldap.membership('uid=calavera,dc=github,dc=com', %w(Enterprise People))
+
+    assert_equal 1, groups.size
+    assert_equal 'cn=Enterprise,ou=Group,dc=github,dc=com', groups.first.dn
+  end
 end

@@ -43,6 +43,22 @@ module GitHub
                   filter: filter)
     end
 
+    # List the groups that a user is member of.
+    #
+    # user_dn: is the dn for the user ldap entry.
+    # group_names: is an array of group CNs.
+    #
+    # Return an Array with the groups that the given user is member of that belong to the given group list.
+    def membership(user_dn, group_names)
+      or_filters    = group_names.map {|g| Net::LDAP::Filter.eq("cn", g)}.reduce(:|)
+      member_filter = Net::LDAP::Filter.eq("member", user_dn) & or_filters
+
+       @ldap.search(base: @user_domain,
+          attributes: %w{ou cn dn sAMAccountName member},
+          filter: member_filter)
+    end
+
+
     # Check if the user is include in any of the configured groups.
     #
     # user_dn: is the dn for the user ldap entry.
@@ -54,14 +70,9 @@ module GitHub
       return true if group_names.nil?
       return true if group_names.empty?
 
-      or_filters    = group_names.map {|g| Net::LDAP::Filter.eq("cn", g)}.reduce(:|)
-      member_filter = Net::LDAP::Filter.eq("member", user_dn) & or_filters
+      user_membership = membership(user_dn, group_names)
 
-      result = @ldap.search(base: @user_domain,
-                  attributes: %w{ou cn dn sAMAccountName member},
-                  filter: member_filter)
-
-      !result.empty?
+      !user_membership.empty?
     end
 
     # Check if the user credentials are valid.
