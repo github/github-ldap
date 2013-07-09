@@ -59,7 +59,7 @@ module GitHub
 
       if tmp.nil?
         tmp = 'tmp'
-        Dir.mkdir(tmp)
+        Dir.mkdir(tmp) unless File.directory?('tmp')
       end
 
       tmp
