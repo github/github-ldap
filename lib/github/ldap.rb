@@ -13,17 +13,16 @@ module GitHub
 
       @connection.authenticate(options[:admin_user], options[:admin_password])
 
-      if encryption = check_encryption(options[:encryptation])
+      if encryption = check_encryption(options[:encryption])
         @connection.encryption(encryption)
       end
     end
 
-    # Check the legacy auth configuration options (before David's war with omniauth)
-    # to determine whether to use encryptation or not.
+    # Determine whether to use encryption or not.
     #
-    # encryptation: is the encryptation method, either 'ssl', 'tls', 'simple_tls' or 'start_tls'.
+    # encryption: is the encryption method, either 'ssl', 'tls', 'simple_tls' or 'start_tls'.
     #
-    # Returns the real encryptation type.
+    # Returns the real encryption type.
     def check_encryption(encryption)
       return unless encryption
 
