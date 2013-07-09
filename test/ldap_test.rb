@@ -21,11 +21,13 @@ class GitHubLdapTest < Minitest::Test
 
   def test_simple_tls
     assert_equal :simple_tls, @ldap.check_encryption(:ssl)
+    assert_equal :simple_tls, @ldap.check_encryption('SSL')
     assert_equal :simple_tls, @ldap.check_encryption(:simple_tls)
   end
 
   def test_start_tls
     assert_equal :start_tls, @ldap.check_encryption(:tls)
+    assert_equal :start_tls, @ldap.check_encryption('TLS')
     assert_equal :start_tls, @ldap.check_encryption(:start_tls)
   end
 end
