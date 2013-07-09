@@ -37,11 +37,19 @@ module GitHub
     # Utility method to check if the connection with the server can be stablished.
     # It tries to bind with the ldap auth default configuration.
     #
-    # Return true if the connection is successful.
-    # Return false if the authentication settings are not valid.
-    # Raises an Net::LDAP::LdapError if the connection fails.
+    # Returns an OpenStruct with `code` and `message`.
+    # If `code` is 0, the operation succeeded and there is no message.
     def test_connection
       @connection.bind
+      get_last_operation_result
+    end
+
+    # Utility method to get the last operation result with a human friendly message.
+    #
+    # Returns an OpenStruct with `code` and `message`.
+    # If `code` is 0, the operation succeeded and there is no message.
+    def get_last_operation_result
+      @connection.get_operation_result
     end
 
     # Creates a new domain object to perform operations
