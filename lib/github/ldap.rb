@@ -3,13 +3,12 @@ module GitHub
     require 'net/ldap'
     require 'github/ldap/domain'
 
+    attr_reader :connection
+
     def initialize(options = {})
       @uid = options[:uid] || "sAMAccountName"
 
-      @connection = Net::LDAP.new({
-        host: options[:host],
-        port: options[:port]
-      })
+      @connection = Net::LDAP.new({host: options[:host], port: options[:port]})
 
       @connection.authenticate(options[:admin_user], options[:admin_password])
 
