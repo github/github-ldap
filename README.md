@@ -39,7 +39,7 @@ Initialize a new adapter using those required options:
   ldap = GitHub::Ldap.new options
 ```
 
-### Quering
+### Querying
 
 Searches are performed against an individual domain base, so the first step is to get a new `GitHub::Ldap::Domain` object for the connection:
 
