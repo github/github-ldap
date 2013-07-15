@@ -1,6 +1,7 @@
 module GitHub
   class Ldap
     require 'net/ldap'
+    require 'forwardable'
     require 'github/ldap/domain'
 
     extend Forwardable
