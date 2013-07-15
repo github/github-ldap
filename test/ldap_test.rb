@@ -30,4 +30,15 @@ class GitHubLdapTest < Minitest::Test
     assert_equal :start_tls, @ldap.check_encryption('TLS')
     assert_equal :start_tls, @ldap.check_encryption(:start_tls)
   end
+
+  def test_search_delegator
+    user = @ldap.domain('dc=github,dc=com').valid_login? 'calavera', 'secret'
+
+    result = @ldap.search(
+        {:base      => 'dc=github,dc=com',
+        :attributes => %w(uid),
+        :filter     => Net::LDAP::Filter.eq('uid', 'calavera')})
+
+    assert_equal 'calavera', result.first[:uid].first
+  end
 end

@@ -3,7 +3,21 @@ module GitHub
     require 'net/ldap'
     require 'github/ldap/domain'
 
-    attr_reader :connection
+    extend Forwardable
+
+    # Utility method to perform searches against the ldap server.
+    #
+    # It takes the same arguments than Net:::LDAP#search.
+    # Returns an Array with the entries that match the search.
+    # Returns nil if there are no entries that match the search.
+    def_delegator :@connection, :search
+
+    # Utility method to get the last operation result with a human friendly message.
+    #
+    # Returns an OpenStruct with `code` and `message`.
+    # If `code` is 0, the operation succeeded and there is no message.
+    def_delegator :@connection, :get_operation_result, :last_operation_result
+
 
     def initialize(options = {})
       @uid = options[:uid] || "sAMAccountName"
@@ -40,15 +54,7 @@ module GitHub
     # If `code` is 0, the operation succeeded and there is no message.
     def test_connection
       @connection.bind
-      get_last_operation_result
-    end
-
-    # Utility method to get the last operation result with a human friendly message.
-    #
-    # Returns an OpenStruct with `code` and `message`.
-    # If `code` is 0, the operation succeeded and there is no message.
-    def get_last_operation_result
-      @connection.get_operation_result
+      last_operation_result
     end
 
     # Creates a new domain object to perform operations
