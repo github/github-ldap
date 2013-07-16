@@ -36,9 +36,7 @@ module GitHub
       def groups(group_names)
         filter = group_filter(group_names)
 
-        @connection.search(base: @base_name,
-          attributes: %w{ou cn dn sAMAccountName member},
-          filter: filter)
+        search(attributes: %w{ou cn dn sAMAccountName member}, filter: filter)
       end
 
       # List the groups that a user is member of.
@@ -51,9 +49,7 @@ module GitHub
         or_filters    = group_names.map {|g| Net::LDAP::Filter.eq("cn", g)}.reduce(:|)
         member_filter = Net::LDAP::Filter.eq("member", user_dn) & or_filters
 
-        @connection.search(base: @base_name,
-          attributes: %w{ou cn dn sAMAccountName member},
-          filter: member_filter)
+        search(attributes: %w{ou cn dn sAMAccountName member}, filter: member_filter)
       end
 
       # Check if the user is include in any of the configured groups.
@@ -102,6 +98,19 @@ module GitHub
         user = valid_login?(login, password)
 
         return user if user && is_member?(user.dn, group_names)
+      end
+
+      # Search entries using this domain as base.
+      #
+      # options: is a Hash with the options for the search.
+      # The base option is always overriden.
+      #
+      # Returns an array with the entries found.
+      # Returns nil if there are no entries.
+      def search(options)
+        options[:base] = @base_name
+
+        @connection.search(options)
       end
     end
   end

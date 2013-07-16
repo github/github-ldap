@@ -87,5 +87,18 @@ class GitHubLdapDomainTest < Minitest::Test
     assert_equal 1, groups.size
     assert_equal 'cn=Enterprise,ou=Group,dc=github,dc=com', groups.first.dn
   end
+
+  def test_search
+    assert 1, @domain.search(
+      attributes: %w(uid),
+      filter: Net::LDAP::Filter.eq('uid', 'calavera')).size
+  end
+
+  def test_search_override_base_name
+    assert 1, @domain.search(
+      base: "this base name is incorrect",
+      attributes: %w(uid),
+      filter: Net::LDAP::Filter.eq('uid', 'calavera')).size
+  end
 end
 
