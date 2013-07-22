@@ -1,4 +1,4 @@
-![Build Status](https://travis-ci.org/github/github-ldap.png)
+<a href="https://travis-ci.org/github/github-ldap">![Build Status](https://travis-ci.org/github/github-ldap.png)</a>
 
 # Github::Ldap
 
