@@ -100,5 +100,23 @@ class GitHubLdapDomainTest < Minitest::Test
       attributes: %w(uid),
       filter: Net::LDAP::Filter.eq('uid', 'calavera')).size
   end
+
+  def test_user_exists
+    assert_equal 'uid=calavera,dc=github,dc=com', @domain.user?('calavera').dn
+  end
+
+  def test_user_does_not_exist
+    assert !@domain.user?('foobar'), 'Expected uid `foobar` to not exist.'
+  end
+
+  def test_auth_binds
+    user = @domain.user?('calavera')
+    assert @domain.auth(user, 'secret'), 'Expected user to be bound.'
+  end
+
+  def test_auth_does_not_bind
+    user = @domain.user?('calavera')
+    assert !@domain.auth(user, 'foo'), 'Expected user not to be bound.'
+  end
 end
 

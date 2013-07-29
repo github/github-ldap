@@ -12,20 +12,10 @@ module GitHub
     # domain = GitHub::Ldap.new(options).domain("dc=github,dc=com")
     #
     class Domain
+      include Filter
+
       def initialize(base_name, connection, uid)
         @base_name, @connection, @uid = base_name, connection, uid
-      end
-
-      # Generate a filter to get the configured groups in the ldap server.
-      # Takes the list of the group names and generate a filter for the groups
-      # with cn that match and also include members:
-      #
-      # group_names: is an array of group CNs.
-      #
-      # Returns the ldap filter.
-      def group_filter(group_names)
-        or_filters = group_names.map {|g| Net::LDAP::Filter.eq("cn", g)}.reduce(:|)
-        Net::LDAP::Filter.pres("member") & or_filters
       end
 
       # List the groups in the ldap server that match the configured ones.
@@ -34,9 +24,7 @@ module GitHub
       #
       # Returns a list of ldap entries for the configured groups.
       def groups(group_names)
-        filter = group_filter(group_names)
-
-        search(attributes: %w{ou cn dn sAMAccountName member}, filter: filter)
+        search(filter: group_filter(group_names))
       end
 
       # List the groups that a user is member of.
@@ -46,10 +34,7 @@ module GitHub
       #
       # Return an Array with the groups that the given user is member of that belong to the given group list.
       def membership(user_dn, group_names)
-        or_filters    = group_names.map {|g| Net::LDAP::Filter.eq("cn", g)}.reduce(:|)
-        member_filter = Net::LDAP::Filter.eq("member", user_dn) & or_filters
-
-        search(attributes: %w{ou cn dn sAMAccountName member}, filter: member_filter)
+        search(filter: group_filter(group_names, user_dn))
       end
 
       # Check if the user is include in any of the configured groups.
@@ -76,13 +61,30 @@ module GitHub
       # Returns a Ldap::Entry if the credentials are valid.
       # Returns nil if the credentials are invalid.
       def valid_login?(login, password)
-        result = @connection.bind_as(
-          base:     @base_name,
-          limit:    1,
-          filter:   Net::LDAP::Filter.eq(@uid, login),
-          password: password)
+        if user = user?(login) and auth(user, password)
+          return user
+        end
+      end
 
-        return result.first if result.is_a?(Array)
+      # Check if a user exists based in the `uid`.
+      #
+      # login: is the user's login
+      #
+      # Returns the user if the login matches any `uid`.
+      # Returns nil if there are no matches.
+      def user?(login)
+        rs = search(limit: 1, filter: Net::LDAP::Filter.eq(@uid, login))
+        rs and rs.first
+      end
+
+      # Check if a user can be bound with a password.
+      #
+      # user: is a ldap entry representing the user.
+      # password: is the user's password.
+      #
+      # Returns true if the user can be bound.
+      def auth(user, password)
+        @connection.bind(method: :simple, username: user.dn, password: password)
       end
 
       # Authenticate a user with the ldap server.
@@ -109,6 +111,7 @@ module GitHub
       # Returns nil if there are no entries.
       def search(options)
         options[:base] = @base_name
+        options[:attributes] ||= %w{ou cn dn sAMAccountName member}
 
         @connection.search(options)
       end
