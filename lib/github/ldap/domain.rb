@@ -73,7 +73,10 @@ module GitHub
       # Returns the user if the login matches any `uid`.
       # Returns nil if there are no matches.
       def user?(login)
-        rs = search(limit: 1, filter: Net::LDAP::Filter.eq(@uid, login))
+        rs = search(
+          filter: Net::LDAP::Filter.eq(@uid, login),
+          attributes: [],
+          limit: 1)
         rs and rs.first
       end
 

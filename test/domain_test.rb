@@ -109,6 +109,10 @@ class GitHubLdapDomainTest < Minitest::Test
     assert !@domain.user?('foobar'), 'Expected uid `foobar` to not exist.'
   end
 
+  def test_user_returns_every_attribute
+    assert_equal ['calavera@github.com'], @domain.user?('calavera')[:mail]
+  end
+
   def test_auth_binds
     user = @domain.user?('calavera')
     assert @domain.auth(user, 'secret'), 'Expected user to be bound.'
