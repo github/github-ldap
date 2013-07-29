@@ -12,20 +12,10 @@ module GitHub
     # domain = GitHub::Ldap.new(options).domain("dc=github,dc=com")
     #
     class Domain
+      include Filter
+
       def initialize(base_name, connection, uid)
         @base_name, @connection, @uid = base_name, connection, uid
-      end
-
-      # Generate a filter to get the configured groups in the ldap server.
-      # Takes the list of the group names and generate a filter for the groups
-      # with cn that match and also include members:
-      #
-      # group_names: is an array of group CNs.
-      #
-      # Returns the ldap filter.
-      def group_filter(group_names)
-        or_filters = group_names.map {|g| Net::LDAP::Filter.eq("cn", g)}.reduce(:|)
-        Net::LDAP::Filter.pres("member") & or_filters
       end
 
       # List the groups in the ldap server that match the configured ones.
@@ -34,9 +24,7 @@ module GitHub
       #
       # Returns a list of ldap entries for the configured groups.
       def groups(group_names)
-        filter = group_filter(group_names)
-
-        search(attributes: %w{ou cn dn sAMAccountName member}, filter: filter)
+        search(filter: group_filter(group_names))
       end
 
       # List the groups that a user is member of.
@@ -46,10 +34,7 @@ module GitHub
       #
       # Return an Array with the groups that the given user is member of that belong to the given group list.
       def membership(user_dn, group_names)
-        or_filters    = group_names.map {|g| Net::LDAP::Filter.eq("cn", g)}.reduce(:|)
-        member_filter = Net::LDAP::Filter.eq("member", user_dn) & or_filters
-
-        search(attributes: %w{ou cn dn sAMAccountName member}, filter: member_filter)
+        search(filter: group_filter(group_names, user_dn))
       end
 
       # Check if the user is include in any of the configured groups.
@@ -109,6 +94,7 @@ module GitHub
       # Returns nil if there are no entries.
       def search(options)
         options[:base] = @base_name
+        options[:attributes] ||= %w{ou cn dn sAMAccountName member}
 
         @connection.search(options)
       end
