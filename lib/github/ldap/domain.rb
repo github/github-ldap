@@ -61,13 +61,30 @@ module GitHub
       # Returns a Ldap::Entry if the credentials are valid.
       # Returns nil if the credentials are invalid.
       def valid_login?(login, password)
-        result = @connection.bind_as(
-          base:     @base_name,
-          limit:    1,
-          filter:   Net::LDAP::Filter.eq(@uid, login),
-          password: password)
+        if user = user?(login) and auth(user, password)
+          return user
+        end
+      end
 
-        return result.first if result.is_a?(Array)
+      # Check if a user exists based in the `uid`.
+      #
+      # login: is the user's login
+      #
+      # Returns the user if the login matches any `uid`.
+      # Returns nil if there are no matches.
+      def user?(login)
+        rs = search(limit: 1, filter: Net::LDAP::Filter.eq(@uid, login))
+        rs and rs.first
+      end
+
+      # Check if a user can be bound with a password.
+      #
+      # user: is a ldap entry representing the user.
+      # password: is the user's password.
+      #
+      # Returns true if the user can be bound.
+      def auth(user, password)
+        @connection.bind(method: :simple, username: user.dn, password: password)
       end
 
       # Authenticate a user with the ldap server.
