@@ -37,6 +37,6 @@ class GitHubLdapTest < GitHub::Ldap::Test
   include GitHubLdapTestCases
 end
 
-class GitHubLdapUnauthenticatedTest < GitHub::Ldap::Test
+class GitHubLdapUnauthenticatedTest < GitHub::Ldap::UnauthenticatedTest
   include GitHubLdapTestCases
 end
