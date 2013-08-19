@@ -33,10 +33,10 @@ module GitHub
     def self.start_server(options = {})
       @server_options = DEFAULT_SERVER_OPTIONS.merge(options)
 
-      @server_options[:allow_anonymous] = false
-      @server_options[:ldif]            = @server_options[:user_fixtures]
-      @server_options[:domain]          = @server_options[:user_domain]
-      @server_options[:tmpdir]        ||= server_tmp
+      @server_options[:allow_anonymous] ||= false
+      @server_options[:ldif]              = @server_options[:user_fixtures]
+      @server_options[:domain]            = @server_options[:user_domain]
+      @server_options[:tmpdir]          ||= server_tmp
 
       @ldap_server = Ladle::Server.new(@server_options)
       @ldap_server.start
