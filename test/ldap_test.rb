@@ -1,18 +1,8 @@
 require 'test_helper'
 
-class GitHubLdapTest < Minitest::Test
+module GitHubLdapTestCases
   def setup
-    GitHub::Ldap.start_server
-
-    @options = GitHub::Ldap.server_options.merge \
-      host: 'localhost',
-      uid:  'uid'
-
-    @ldap = GitHub::Ldap.new(@options)
-  end
-
-  def teardown
-    GitHub::Ldap.stop_server
+    @ldap = GitHub::Ldap.new(options)
   end
 
   def test_connection_with_default_options
@@ -32,7 +22,7 @@ class GitHubLdapTest < Minitest::Test
   end
 
   def test_search_delegator
-    user = @ldap.domain('dc=github,dc=com').valid_login? 'calavera', 'secret'
+    @ldap.domain('dc=github,dc=com').valid_login? 'calavera', 'secret'
 
     result = @ldap.search(
         {:base      => 'dc=github,dc=com',
@@ -41,4 +31,12 @@ class GitHubLdapTest < Minitest::Test
 
     assert_equal 'calavera', result.first[:uid].first
   end
+end
+
+class GitHubLdapTest < GitHub::Ldap::Test
+  include GitHubLdapTestCases
+end
+
+class GitHubLdapUnauthenticatedTest < GitHub::Ldap::Test
+  include GitHubLdapTestCases
 end

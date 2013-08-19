@@ -1,18 +1,8 @@
 require 'test_helper'
 
-class GitHubLdapDomainTest < Minitest::Test
+module GitHubLdapDomainTestCases
   def setup
-    GitHub::Ldap.start_server
-
-    @options = GitHub::Ldap.server_options.merge \
-      host: 'localhost',
-      uid:  'uid'
-
-    @domain = GitHub::Ldap.new(@options).domain("dc=github,dc=com")
-  end
-
-  def teardown
-    GitHub::Ldap.stop_server
+    @domain = GitHub::Ldap.new(options).domain("dc=github,dc=com")
   end
 
   def test_user_valid_login
@@ -124,3 +114,10 @@ class GitHubLdapDomainTest < Minitest::Test
   end
 end
 
+class GitHubLdapDomainTest < GitHub::Ldap::Test
+  include GitHubLdapDomainTestCases
+end
+
+class GitHubLdapDomainUnauthenticatedTest < GitHub::Ldap::UnauthenticatedTest
+  include GitHubLdapDomainTestCases
+end

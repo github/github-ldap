@@ -26,7 +26,9 @@ module GitHub
 
       @connection = Net::LDAP.new({host: options[:host], port: options[:port]})
 
-      @connection.authenticate(options[:admin_user], options[:admin_password])
+      if options[:admin_user] && options[:admin_password]
+        @connection.authenticate(options[:admin_user], options[:admin_password])
+      end
 
       if encryption = check_encryption(options[:encryption])
         @connection.encryption(encryption)

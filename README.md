@@ -28,10 +28,13 @@ There are a few configuration options required to use this adapter:
 
 * host: is the host address where the ldap server lives.
 * port: is the port where the ldap server lives.
-* admin_user: is the the ldap administrator user. Required to perform search operation.
-* admin_password: is the password for the administrator user. Simple authentication is required on the server.
 * encryption: is the encryption protocol, disabled by default. The valid options are `ssl` and `tls`.
 * uid: is the field name in the ldap server used to authenticate your users, in ActiveDirectory this is `sAMAccountName`.
+
+Using administrator credentials is optional but recommended. You can pass those credentials with these two options:
+
+* admin_user: is the the ldap administrator user dn.
+* admin_password: is the password for the administrator user.
 
 Initialize a new adapter using those required options:
 
