@@ -86,7 +86,7 @@ GitHub-Ldap includes a set of configured users for testing, but you can provide 
 ```ruby
 def setup
   GitHub::Ldap.start_server \
-    users_fixtures: ldif_path
+    user_fixtures: ldif_path
 end
 ```
 
