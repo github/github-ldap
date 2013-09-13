@@ -115,6 +115,7 @@ module GitHub
       def search(options)
         options[:base] = @base_name
         options[:attributes] ||= %w{ou cn dn sAMAccountName member}
+        options[:ignore_server_caps] ||= true
 
         @connection.search(options)
       end
