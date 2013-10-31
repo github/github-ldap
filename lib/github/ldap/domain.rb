@@ -73,7 +73,7 @@ module GitHub
       # Returns the user if the login matches any `uid`.
       # Returns nil if there are no matches.
       def user?(login)
-        escaped_login = Net::LDAP::escape(login)
+        escaped_login = Net::LDAP::Filter.escape(login)
         rs = search(
           filter: Net::LDAP::Filter.eq(@uid, escaped_login),
           attributes: [],
