@@ -96,7 +96,7 @@ module GitHubLdapDomainTestCases
   end
 
   def test_user_wildcards_are_filtered
-    assert_equal !@domain.user?('cal*'), 'Expected uid `cal*` to not complete'
+    assert !@domain.user?('cal*'), 'Expected uid `cal*` to not complete'
   end
 
   def test_user_does_not_exist
