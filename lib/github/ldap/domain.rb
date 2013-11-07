@@ -120,6 +120,16 @@ module GitHub
 
         @connection.search(options)
       end
+
+      # Provide a meaningful result after a protocol operation (for example,
+      # bind or search) has completed.
+      #
+      # Returns an OpenStruct containing an LDAP result code and a
+      # human-readable string.
+      # See http://tools.ietf.org/html/rfc4511#appendix-A
+      def get_operation_result
+        @connection.get_operation_result
+      end
     end
   end
 end
