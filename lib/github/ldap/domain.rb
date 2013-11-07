@@ -117,6 +117,7 @@ module GitHub
         options[:base] = @base_name
         options[:attributes] ||= %w{ou cn dn sAMAccountName member}
         options[:ignore_server_caps] ||= true
+        options[:paged_searches_supported] ||= true
 
         @connection.search(options)
       end
