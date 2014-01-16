@@ -21,9 +21,9 @@ module GitHub
       # Returns a Net::LDAP::Filter.
       def member_filter(user_dn = nil)
         if user_dn
-          Net::LDAP::Filter.eq("member", user_dn)
+          Net::LDAP::Filter.eq("member", user_dn) | Net::LDAP::Filter.eq("uniqueMember", user_dn)
         else
-          Net::LDAP::Filter.pres("member")
+          Net::LDAP::Filter.pres("member") | Net::LDAP::Filter.pres("uniqueMember")
         end
       end
     end
