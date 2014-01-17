@@ -115,7 +115,7 @@ module GitHub
       # Returns nil if there are no entries.
       def search(options)
         options[:base] = @base_name
-        options[:attributes] ||= %w{ou cn dn sAMAccountName member}
+        options[:attributes] ||= %w{ou cn dn sAMAccountName member uniqueMember}
         options[:ignore_server_caps] ||= true
 
         @connection.search(options)
