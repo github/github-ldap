@@ -49,7 +49,7 @@ cn: David Calavera
 cn: David
 sn: Calavera
 uid: calavera
-userPassword: secret
+userPassword: passworD1
 mail: calavera@github.com
 objectClass: inetOrgPerson
 
