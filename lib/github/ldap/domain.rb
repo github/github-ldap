@@ -76,7 +76,6 @@ module GitHub
         escaped_login = Net::LDAP::Filter.escape(login)
         rs = search(
           filter: Net::LDAP::Filter.eq(@uid, escaped_login),
-          attributes: [],
           limit: 1)
         rs and rs.first
       end
@@ -115,7 +114,7 @@ module GitHub
       # Returns nil if there are no entries.
       def search(options)
         options[:base] = @base_name
-        options[:attributes] ||= %w{ou cn dn sAMAccountName member uniqueMember}
+        options[:attributes] ||= []
         options[:ignore_server_caps] ||= true
         options[:paged_searches_supported] ||= true
 

@@ -6,7 +6,7 @@ module GitHubLdapDomainTestCases
   end
 
   def test_user_valid_login
-    user = @domain.valid_login?('calavera', 'secret')
+    user = @domain.valid_login?('calavera', 'passworD1')
     assert_equal 'uid=calavera,dc=github,dc=com', user.dn
   end
 
@@ -25,14 +25,14 @@ module GitHubLdapDomainTestCases
   end
 
   def test_user_in_group
-    user = @domain.valid_login?('calavera', 'secret')
+    user = @domain.valid_login?('calavera', 'passworD1')
 
     assert @domain.is_member?(user.dn, %w(Enterprise People)),
       "Expected `Enterprise` or `Poeple` to include the member `#{user.dn}`"
   end
 
   def test_user_not_in_different_group
-    user = @domain.valid_login?('calavera', 'secret')
+    user = @domain.valid_login?('calavera', 'passworD1')
 
     assert !@domain.is_member?(user.dn, %w(People)),
       "Expected `Poeple` not to include the member `#{user.dn}`"
@@ -46,7 +46,7 @@ module GitHubLdapDomainTestCases
   end
 
   def test_authenticate_doesnt_return_invalid_users
-    user = @domain.authenticate!('calavera', 'secret')
+    user = @domain.authenticate!('calavera', 'passworD1')
     assert_equal 'uid=calavera,dc=github,dc=com', user.dn
   end
 
@@ -56,13 +56,13 @@ module GitHubLdapDomainTestCases
   end
 
   def test_authenticate_check_valid_user_and_groups
-    user = @domain.authenticate!('calavera', 'secret', %w(Enterprise People))
+    user = @domain.authenticate!('calavera', 'passworD1', %w(Enterprise People))
 
     assert_equal 'uid=calavera,dc=github,dc=com', user.dn
   end
 
   def test_authenticate_doesnt_return_valid_users_in_different_groups
-    assert !@domain.authenticate!('calavera', 'secret', %w(People)),
+    assert !@domain.authenticate!('calavera', 'passworD1', %w(People)),
       "Expected `authenticate!` to not return an user"
   end
 
@@ -109,7 +109,7 @@ module GitHubLdapDomainTestCases
 
   def test_auth_binds
     user = @domain.user?('calavera')
-    assert @domain.auth(user, 'secret'), 'Expected user to be bound.'
+    assert @domain.auth(user, 'passworD1'), 'Expected user to be bound.'
   end
 
   def test_auth_does_not_bind
