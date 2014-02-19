@@ -18,6 +18,13 @@ module GitHub
         @base_name, @connection, @uid = base_name, connection, uid
       end
 
+      # List all the groups under this tree, including subgroups
+      #
+      # Returns a list of ldap entries.
+      def all_groups
+        search(filter: ALL_GROUPS_FILTER)
+      end
+
       # List the groups in the ldap server that match the configured ones.
       #
       # group_names: is an array of group CNs.

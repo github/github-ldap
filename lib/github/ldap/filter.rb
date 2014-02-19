@@ -1,6 +1,9 @@
 module GitHub
   class Ldap
     module Filter
+      ALL_GROUPS_FILTER = Net::LDAP::Filter.eq("objectClass", "groupOfNames") |
+                          Net::LDAP::Filter.eq("objectClass", "groupOfUniqueNames")
+
       # Filter to get the configured groups in the ldap server.
       # Takes the list of the group names and generate a filter for the groups
       # with cn that match and also include members:

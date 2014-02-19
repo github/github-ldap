@@ -16,4 +16,9 @@ class GitHubLdapGroupTest < GitHub::Ldap::Test
   def test_members_from_subgroups
     assert_equal 4, @group.members.size
   end
+
+  def test_all_domain_groups
+    groups = GitHub::Ldap.new(options).domain("ou=groups,dc=github,dc=com").all_groups
+    assert_equal 4, groups.size
+  end
 end
