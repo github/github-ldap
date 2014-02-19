@@ -73,11 +73,7 @@ module GitHub
       # Returns the user if the login matches any `uid`.
       # Returns nil if there are no matches.
       def user?(login)
-        escaped_login = Net::LDAP::Filter.escape(login)
-        rs = search(
-          filter: Net::LDAP::Filter.eq(@uid, escaped_login),
-          limit: 1)
-        rs and rs.first
+        search(filter: login_filter(@uid, escaped_login), limit: 1).first
       end
 
       # Check if a user can be bound with a password.
@@ -111,14 +107,13 @@ module GitHub
       # The base option is always overriden.
       #
       # Returns an array with the entries found.
-      # Returns nil if there are no entries.
       def search(options)
         options[:base] = @base_name
         options[:attributes] ||= []
         options[:ignore_server_caps] ||= true
         options[:paged_searches_supported] ||= true
 
-        @connection.search(options)
+        Array(@connection.search(options))
       end
 
       # Provide a meaningful result after a protocol operation (for example,

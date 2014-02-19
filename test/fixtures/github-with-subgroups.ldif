@@ -1,0 +1,89 @@
+version: 1
+
+# Organizations
+
+dn: dc=github,dc=com
+cn: github
+objectClass: dcObject
+objectClass: organization
+dc: github
+o: GitHub Inc.
+
+# Admin user
+
+dn: uid=admin,dc=github,dc=com
+objectClass: top
+objectClass: person
+objectClass: organizationalPerson
+objectClass: inetOrgPerson
+cn: system administrator
+sn: administrator
+displayName: Directory Superuser
+uid: admin
+userPassword: secret
+
+# Groups
+
+dn: ou=groups,dc=github,dc=com
+objectclass: organizationalUnit
+
+dn: cn=enterprise,ou=groups,dc=github,dc=com
+cn: Enterprise
+objectClass: groupOfNames
+member: uid=calavera,ou=users,dc=github,dc=com
+member: cn=enterprise-devs,ou=groups,dc=github,dc=com
+member: cn=enterprise-ops,ou=groups,dc=github,dc=com
+
+dn: cn=enterprise-devs,ou=groups,dc=github,dc=com
+cn: enterprise-devs
+objectClass: groupOfNames
+member: uid=benburkert,ou=users,dc=github,dc=com
+
+dn: cn=enterprise-ops,ou=groups,dc=github,dc=com
+cn: enterprise-devs
+objectClass: groupOfNames
+member: uid=sbryant,ou=users,dc=github,dc=com
+member: cn=spaniards,ou=groups,dc=github,dc=com
+
+dn: cn=spaniards,ou=groups,dc=github,dc=com
+cn: spaniards
+objectClass: groupOfNames
+member: uid=calavera,ou=users,dc=github,dc=com
+member: uid=rubiojr,ou=users,dc=github,dc=com
+# Users
+
+dn: ou=users,dc=github,dc=com
+objectclass: organizationalUnit
+
+dn: uid=calavera,ou=users,dc=github,dc=com
+cn: David Calavera
+cn: David
+sn: Calavera
+uid: calavera
+userPassword: passworD1
+mail: calavera@github.com
+objectClass: inetOrgPerson
+
+dn: uid=benburkert,ou=users,dc=github,dc=com
+cn: benburkert
+sn: benburkert
+uid: benburkert
+userPassword: passworD1
+mail: benburkert@github.com
+objectClass: inetOrgPerson
+
+dn: uid=sbryant,ou=users,dc=github,dc=com
+cn: sbryant
+sn: sbryant
+uid: sbryant
+userPassword: passworD1
+mail: sbryant@github.com
+objectClass: inetOrgPerson
+
+dn: uid=rubiojr,ou=users,dc=github,dc=com
+cn: rubiojr
+sn: rubiojr
+uid: rubiojr
+userPassword: passworD1
+mail: rubiojr@github.com
+objectClass: inetOrgPerson

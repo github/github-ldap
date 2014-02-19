@@ -4,6 +4,7 @@ module GitHub
     require 'forwardable'
     require 'github/ldap/filter'
     require 'github/ldap/domain'
+    require 'github/ldap/group'
 
     extend Forwardable
 
@@ -68,6 +69,15 @@ module GitHub
     # Returns a new Domain object.
     def domain(base_name)
       Domain.new(base_name, @connection, @uid)
+    end
+
+    # Creates a new group object to perform operations
+    #
+    # base_name: is the dn of the base root.
+    #
+    # Returns a new Group object.
+    def group(base_name)
+      Group.new(base_name, @connection, @uid)
     end
   end
 end

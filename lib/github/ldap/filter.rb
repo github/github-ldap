@@ -26,6 +26,17 @@ module GitHub
           Net::LDAP::Filter.pres("member") | Net::LDAP::Filter.pres("uniqueMember")
         end
       end
+
+      # Filter to map a uid with a login.
+      # It escapes the login before creating the filter.
+      #
+      # uid: the entry field to map.
+      # login: the login to map.
+      #
+      # Returns a Net::LDAP::Filter.
+      def login_filter(uid, login)
+        Net::LDAP::Filter.eq(uid, Net::LDAP::Filter.escape(login))
+      end
     end
   end
 end

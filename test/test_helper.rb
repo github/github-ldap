@@ -4,6 +4,9 @@ __lib__ = File.expand_path('lib', File.dirname(__FILE__))
 $LOAD_PATH << __dir__ unless $LOAD_PATH.include?(__dir__)
 $LOAD_PATH << __lib__ unless $LOAD_PATH.include?(__lib__)
 
+require 'pathname'
+FIXTURES = Pathname(File.expand_path('fixtures', __dir__))
+
 require 'github/ldap'
 require 'github/ldap/server'
 
@@ -21,7 +24,8 @@ class GitHub::Ldap::Test < Minitest::Test
   end
 
   def self.start_server
-    GitHub::Ldap.start_server
+    server_opts = respond_to?(:test_server_options) ? test_server_options : {}
+    GitHub::Ldap.start_server(server_opts)
   end
 
   def options
