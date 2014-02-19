@@ -1,16 +1,20 @@
 module GitHub
   class Ldap
-    # A group is a specialized version of a domain.
+    # This class represents an LDAP group.
     # It encapsulates operations that you can perform against a group, like retrieving its members.
     #
-    # To get a group, you'll need to create a `Ldap` object and then call the method `group` with the name of the base.
+    # To get a group, you'll need to create a `Ldap` object and then call the method `group` with the name of its base.
     #
     # For example:
     #
     # domain = GitHub::Ldap.new(options).group("cn=enterprise,dc=github,dc=com")
     #
-    class Group < Domain
+    class Group
       GROUP_CLASS_NAMES = %w(groupOfNames groupOfUniqueNames)
+
+      def initialize(ldap, entry)
+        @ldap, @entry = ldap, entry
+      end
 
       # Get all members that belong to a group.
       # This list also includes the members of subgroups.
@@ -21,7 +25,7 @@ module GitHub
         results = members
 
         groups.each do |result|
-          results += Group.new(result.dn, @connection, @uid).members
+          results.concat @ldap.group(result.dn).members
         end
 
         results.uniq {|m| m.dn }
@@ -35,7 +39,7 @@ module GitHub
         results = groups
 
         groups.each do |result|
-          results += Group.new(result.dn, @connection, @uid).subgroups
+          results.concat @ldap.group(result.dn).subgroups
         end
 
         results
@@ -45,12 +49,16 @@ module GitHub
       #
       # Returns an array of Net::LDAP::Entry.
       def member_entries
-        rs = search({}).first
-
-        members = rs[:member] + rs[:uniqueMember]
-        members.map do |m|
-          Domain.new(m, @connection, @uid).search({}).first
+        @member_entries ||= member_names.map do |m|
+          @ldap.domain(m).bind
         end
+      end
+
+      # Get all the names under `member` and `uniqueMember`.
+      #
+      # Returns an array with all the DN members.
+      def member_names
+        @entry[:member] + @entry[:uniqueMember]
       end
 
       # Check if an object class includes the member names

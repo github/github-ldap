@@ -77,7 +77,7 @@ module GitHub
     #
     # Returns a new Group object.
     def group(base_name)
-      Group.new(base_name, @connection, @uid)
+      Group.new(self, domain(base_name).bind)
     end
   end
 end

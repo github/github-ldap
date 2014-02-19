@@ -132,6 +132,13 @@ module GitHub
       def get_operation_result
         @connection.get_operation_result
       end
+
+      # Get the entry for this domain.
+      #
+      # Returns a Net::LDAP::Entry
+      def bind
+        search({}).first
+      end
     end
   end
 end
