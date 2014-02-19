@@ -73,7 +73,7 @@ module GitHub
       # Returns the user if the login matches any `uid`.
       # Returns nil if there are no matches.
       def user?(login)
-        search(filter: login_filter(@uid, escaped_login), limit: 1).first
+        search(filter: login_filter(@uid, login), limit: 1).first
       end
 
       # Check if a user can be bound with a password.
