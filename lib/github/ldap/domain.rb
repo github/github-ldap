@@ -18,6 +18,20 @@ module GitHub
         @base_name, @connection, @uid = base_name, connection, uid
       end
 
+      # List all groups under this tree, including subgroups.
+      #
+      # Returns a list of ldap entries.
+      def all_groups
+        search(filter: ALL_GROUPS_FILTER)
+      end
+
+      # List all groups under this tree that match the query.
+      #
+      # Returns a list of ldap entries.
+      def filter_groups(query)
+        search(filter: group_contains_filter(query))
+      end
+
       # List the groups in the ldap server that match the configured ones.
       #
       # group_names: is an array of group CNs.
@@ -73,11 +87,7 @@ module GitHub
       # Returns the user if the login matches any `uid`.
       # Returns nil if there are no matches.
       def user?(login)
-        escaped_login = Net::LDAP::Filter.escape(login)
-        rs = search(
-          filter: Net::LDAP::Filter.eq(@uid, escaped_login),
-          limit: 1)
-        rs and rs.first
+        search(filter: login_filter(@uid, login), limit: 1).first
       end
 
       # Check if a user can be bound with a password.
@@ -111,14 +121,13 @@ module GitHub
       # The base option is always overriden.
       #
       # Returns an array with the entries found.
-      # Returns nil if there are no entries.
       def search(options)
         options[:base] = @base_name
         options[:attributes] ||= []
         options[:ignore_server_caps] ||= true
         options[:paged_searches_supported] ||= true
 
-        @connection.search(options)
+        Array(@connection.search(options))
       end
 
       # Provide a meaningful result after a protocol operation (for example,
@@ -129,6 +138,13 @@ module GitHub
       # See http://tools.ietf.org/html/rfc4511#appendix-A
       def get_operation_result
         @connection.get_operation_result
+      end
+
+      # Get the entry for this domain.
+      #
+      # Returns a Net::LDAP::Entry
+      def bind
+        search({}).first
       end
     end
   end

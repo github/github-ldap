@@ -1,6 +1,9 @@
 module GitHub
   class Ldap
     module Filter
+      ALL_GROUPS_FILTER = Net::LDAP::Filter.eq("objectClass", "groupOfNames") |
+                          Net::LDAP::Filter.eq("objectClass", "groupOfUniqueNames")
+
       # Filter to get the configured groups in the ldap server.
       # Takes the list of the group names and generate a filter for the groups
       # with cn that match and also include members:
@@ -25,6 +28,26 @@ module GitHub
         else
           Net::LDAP::Filter.pres("member") | Net::LDAP::Filter.pres("uniqueMember")
         end
+      end
+
+      # Filter to map a uid with a login.
+      # It escapes the login before creating the filter.
+      #
+      # uid: the entry field to map.
+      # login: the login to map.
+      #
+      # Returns a Net::LDAP::Filter.
+      def login_filter(uid, login)
+        Net::LDAP::Filter.eq(uid, Net::LDAP::Filter.escape(login))
+      end
+
+      # Filter groups that match a query cn.
+      #
+      # query: is a string to match the cn with.
+      #
+      # Returns a Net::LDAP::Filter.
+      def group_contains_filter(query)
+        Net::LDAP::Filter.contains("cn", query) & ALL_GROUPS_FILTER
       end
     end
   end
