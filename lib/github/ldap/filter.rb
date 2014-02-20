@@ -40,6 +40,15 @@ module GitHub
       def login_filter(uid, login)
         Net::LDAP::Filter.eq(uid, Net::LDAP::Filter.escape(login))
       end
+
+      # Filter groups that match a query cn.
+      #
+      # query: is a string to match the cn with.
+      #
+      # Returns a Net::LDAP::Filter.
+      def group_contains_filter(query)
+        Net::LDAP::Filter.contains("cn", query) & ALL_GROUPS_FILTER
+      end
     end
   end
 end

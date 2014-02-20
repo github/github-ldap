@@ -40,7 +40,7 @@ objectClass: groupOfNames
 member: uid=benburkert,ou=users,dc=github,dc=com
 
 dn: cn=enterprise-ops,ou=groups,dc=github,dc=com
-cn: enterprise-devs
+cn: enterprise-ops
 objectClass: groupOfNames
 member: uid=sbryant,ou=users,dc=github,dc=com
 member: cn=spaniards,ou=groups,dc=github,dc=com
@@ -50,6 +50,7 @@ cn: spaniards
 objectClass: groupOfNames
 member: uid=calavera,ou=users,dc=github,dc=com
 member: uid=rubiojr,ou=users,dc=github,dc=com
+
 # Users
 
 dn: ou=users,dc=github,dc=com

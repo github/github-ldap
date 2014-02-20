@@ -18,11 +18,18 @@ module GitHub
         @base_name, @connection, @uid = base_name, connection, uid
       end
 
-      # List all the groups under this tree, including subgroups
+      # List all groups under this tree, including subgroups.
       #
       # Returns a list of ldap entries.
       def all_groups
         search(filter: ALL_GROUPS_FILTER)
+      end
+
+      # List all groups under this tree that match the query.
+      #
+      # Returns a list of ldap entries.
+      def filter_groups(query)
+        search(filter: group_contains_filter(query))
       end
 
       # List the groups in the ldap server that match the configured ones.
