@@ -21,11 +21,13 @@ module GitHub
       #
       # Returns an array with all the member entries.
       def members
-        groups, members = member_entries.partition {|e| group?(e[:objectclass])}
+        groups, members = groups_and_members
         results = members
 
-        groups.each do |result|
-          results.concat @ldap.group(result.dn).members
+        cache = load_cache(groups)
+
+        loop_cached_groups(groups, cache) do |_, users|
+          results.concat users
         end
 
         results.uniq {|m| m.dn }
@@ -35,11 +37,13 @@ module GitHub
       #
       # Returns an array with all the subgroup entries.
       def subgroups
-        groups, _ = member_entries.partition {|e| group?(e[:objectclass])}
+        groups, _ = groups_and_members
         results = groups
 
-        groups.each do |result|
-          results.concat @ldap.group(result.dn).subgroups
+        cache = load_cache(groups)
+
+        loop_cached_groups(groups, cache) do |subgroups, _|
+          results.concat subgroups
         end
 
         results
@@ -67,6 +71,42 @@ module GitHub
       # Returns true if the object class includes one of the group class names.
       def group?(object_class)
         !(GROUP_CLASS_NAMES & object_class).empty?
+      end
+
+      # Internal - Generate a hash with all the group DNs for caching purposes.
+      #
+      # groups: is an array of group entries.
+      #
+      # Returns a hash with the cache groups.
+      def load_cache(groups)
+        groups.each_with_object({}) {|entry, h| h[entry.dn] = true }
+      end
+
+      # Internal - Iterate over a collection of groups recursively.
+      # Remove groups already inspected before iterating over subgroups.
+      #
+      # groups: is an array of group entries.
+      # cache: is a hash where the keys are group dns.
+      # block: is a block to call with the groups and members of subgroups.
+      #
+      # Returns nothing.
+      def loop_cached_groups(groups, cache, &block)
+        groups.each do |result|
+          subgroups, members = @ldap.group(result.dn).groups_and_members
+
+          subgroups.delete_if {|entry| cache[entry.dn]}
+          subgroups.each {|entry| cache[entry.dn] = true}
+
+          block.call(subgroups, members)
+          loop_cached_groups(subgroups, cache, &block)
+        end
+      end
+
+      # Internal - Divide members of a group in user and subgroups.
+      #
+      # Returns two arrays, the first one with subgroups and the second one with users.
+      def groups_and_members
+        member_entries.partition {|e| group?(e[:objectclass])}
       end
     end
   end
