@@ -14,8 +14,8 @@ module GitHub
     class Domain
       include Filter
 
-      def initialize(base_name, connection, uid)
-        @base_name, @connection, @uid = base_name, connection, uid
+      def initialize(ldap, base_name, uid)
+        @ldap, @base_name, @uid = ldap, base_name, uid
       end
 
       # List all groups under this tree, including subgroups.
@@ -97,7 +97,7 @@ module GitHub
       #
       # Returns true if the user can be bound.
       def auth(user, password)
-        @connection.bind(method: :simple, username: user.dn, password: password)
+        @ldap.bind(method: :simple, username: user.dn, password: password)
       end
 
       # Authenticate a user with the ldap server.
@@ -127,7 +127,7 @@ module GitHub
         options[:ignore_server_caps] ||= true
         options[:paged_searches_supported] ||= true
 
-        Array(@connection.search(options))
+        Array(@ldap.search(options))
       end
 
       # Provide a meaningful result after a protocol operation (for example,
@@ -137,7 +137,7 @@ module GitHub
       # human-readable string.
       # See http://tools.ietf.org/html/rfc4511#appendix-A
       def get_operation_result
-        @connection.get_operation_result
+        @ldap.get_operation_result
       end
 
       # Get the entry for this domain.

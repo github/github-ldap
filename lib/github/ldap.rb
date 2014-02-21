@@ -11,7 +11,7 @@ module GitHub
 
     # Utility method to perform searches against the ldap server.
     #
-    # It takes the same arguments than Net:::LDAP#search.
+    # It takes the same arguments than Net::LDAP::Connection#search.
     # Returns an Array with the entries that match the search.
     # Returns nil if there are no entries that match the search.
     def_delegator :@connection, :search
@@ -21,6 +21,12 @@ module GitHub
     # Returns an OpenStruct with `code` and `message`.
     # If `code` is 0, the operation succeeded and there is no message.
     def_delegator :@connection, :get_operation_result, :last_operation_result
+
+    # Utility method to bind entries in the ldap server.
+    #
+    # It takes the same arguments than Net::LDAP::Connection#bind.
+    # Returns a Net::LDAP::Entry if the operation succeeded.
+    def_delegator :@connection, :bind
 
     def initialize(options = {})
       @uid = options[:uid] || "sAMAccountName"
@@ -77,7 +83,7 @@ module GitHub
     #
     # Returns a new Domain object.
     def domain(base_name)
-      Domain.new(base_name, @connection, @uid)
+      Domain.new(self, base_name, @uid)
     end
 
     # Creates a new group object to perform operations
