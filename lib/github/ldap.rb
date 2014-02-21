@@ -6,6 +6,7 @@ module GitHub
     require 'github/ldap/domain'
     require 'github/ldap/group'
     require 'github/ldap/virtual_group'
+    require 'github/ldap/virtual_attributes'
 
     extend Forwardable
 
@@ -28,6 +29,8 @@ module GitHub
     # Returns a Net::LDAP::Entry if the operation succeeded.
     def_delegator :@connection, :bind
 
+    attr_reader :virtual_attributes
+
     def initialize(options = {})
       @uid = options[:uid] || "sAMAccountName"
 
@@ -41,14 +44,7 @@ module GitHub
         @connection.encryption(encryption)
       end
 
-      @virtual_attributes = options[:virtual_attributes]
-    end
-
-    # Check whether the ldap server supports virual attributes or not.
-    #
-    # Returns true of we create the ldap object with that option.
-    def virtual_attributes?
-      @virtual_attributes
+      configure_virtual_attributes(options[:virtual_attributes])
     end
 
     # Determine whether to use encryption or not.
@@ -92,10 +88,27 @@ module GitHub
     #
     # Returns a new Group object.
     def group(base_name)
-      if virtual_attributes?
+      if @virtual_attributes.enabled?
         VirtualGroup.new(self, domain(base_name).bind)
       else
         Group.new(self, domain(base_name).bind)
+      end
+    end
+
+    # Configure virtual attributes for this server.
+    # If the option is `true`, we'll use the default virual attributes.
+    # If it's a Hash we'll map the attributes in the hash.
+    #
+    # attributes: is the option set when Ldap is initialized.
+    #
+    # Returns a VirtualAttributes.
+    def configure_virtual_attributes(attributes)
+      @virtual_attributes = if attributes == true
+        VirtualAttributes.new(true)
+      elsif attributes.is_a?(Hash)
+        VirtualAttributes.new(true, attributes)
+      else
+        VirtualAttributes.new(false)
       end
     end
   end

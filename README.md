@@ -63,6 +63,24 @@ Or whether a user is member of the given groups:
   domain.is_member? 'uid=calavera,dc=github,dc=com', %w(Enterprise)
 ```
 
+### Virtual Attributes
+
+Some LDAP servers have support for virtual attributes, or overlays. These allow to perform queries more efficiently on the server.
+
+To enable virtual attributes you can set the option `virtual_attributes` initializing the ldap connection.
+We use our default set of virtual names if this option is just set to `true`.
+
+```ruby
+  ldap = GitHub::Ldap.new {virtual_attributes: true}
+```
+
+You can also override our defaults by providing your server mappings into a Hash.
+The only mapping supported for now is to check virtual membership of individuals in groups.
+
+```ruby
+  ldap = GitHub::Ldap.new {virtual_attributes: {virtual_membership: 'memberOf'}}
+```
+
 ### Testing support
 
 GitHub-Ldap uses [ladle](https://github.com/NUBIC/ladle) for testing. Ladle is not required by default, so you'll need to add it to your gemfile separatedly and require it.

@@ -31,6 +31,31 @@ module GitHubLdapTestCases
 
     assert_equal 'calavera', result.first[:uid].first
   end
+
+  def test_virtual_attributes_defaults
+    @ldap = GitHub::Ldap.new(options.merge(virtual_attributes: true))
+
+    assert @ldap.virtual_attributes.enabled?, "Expected to have virtual attributes enabled with defaults"
+    assert_equal 'memberOf', @ldap.virtual_attributes.virtual_membership
+  end
+
+  def test_virtual_attributes_defaults
+    ldap = GitHub::Ldap.new(options.merge(virtual_attributes: true))
+
+    assert ldap.virtual_attributes.enabled?, "Expected to have virtual attributes enabled with defaults"
+    assert_equal 'memberOf', ldap.virtual_attributes.virtual_membership
+  end
+
+  def test_virtual_attributes_hash
+    ldap = GitHub::Ldap.new(options.merge(virtual_attributes: {virtual_membership: "isMemberOf"}))
+
+    assert ldap.virtual_attributes.enabled?, "Expected to have virtual attributes enabled with defaults"
+    assert_equal 'isMemberOf', ldap.virtual_attributes.virtual_membership
+  end
+
+  def test_virtual_attributes_disabled
+    refute @ldap.virtual_attributes.enabled?, "Expected to have virtual attributes disabled"
+  end
 end
 
 class GitHubLdapTest < GitHub::Ldap::Test

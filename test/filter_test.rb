@@ -25,4 +25,20 @@ class FilterTest < Minitest::Test
     assert_equal "(&(|(member=#{@me})(uniqueMember=#{@me}))(|(cn=Enterprise)(cn=People)))",
       @subject.group_filter(%w(Enterprise People), @me).to_s
   end
+
+  def test_is_member_of_group
+    assert_equal "(memberOf=cn=group,dc=github,dc=com)",
+      @subject.is_member_of_group('cn=group,dc=github,dc=com').to_s
+
+    assert_equal "(isMemberOf=cn=group,dc=github,dc=com)",
+      @subject.is_member_of_group('cn=group,dc=github,dc=com', 'isMemberOf').to_s
+  end
+
+  def test_is_subgroup_of_group
+    assert_equal "(&(memberOf=cn=group,dc=github,dc=com)#{Subject::ALL_GROUPS_FILTER})",
+      @subject.is_subgroup_of_group('cn=group,dc=github,dc=com').to_s
+
+    assert_equal "(&(isMemberOf=cn=group,dc=github,dc=com)#{Subject::ALL_GROUPS_FILTER})",
+      @subject.is_subgroup_of_group('cn=group,dc=github,dc=com', 'isMemberOf').to_s
+  end
 end
