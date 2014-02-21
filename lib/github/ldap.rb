@@ -5,6 +5,7 @@ module GitHub
     require 'github/ldap/filter'
     require 'github/ldap/domain'
     require 'github/ldap/group'
+    require 'github/ldap/virtual_group'
 
     extend Forwardable
 
@@ -21,7 +22,6 @@ module GitHub
     # If `code` is 0, the operation succeeded and there is no message.
     def_delegator :@connection, :get_operation_result, :last_operation_result
 
-
     def initialize(options = {})
       @uid = options[:uid] || "sAMAccountName"
 
@@ -34,6 +34,15 @@ module GitHub
       if encryption = check_encryption(options[:encryption])
         @connection.encryption(encryption)
       end
+
+      @virtual_attributes = options[:virtual_attributes]
+    end
+
+    # Check whether the ldap server supports virual attributes or not.
+    #
+    # Returns true of we create the ldap object with that option.
+    def virtual_attributes?
+      @virtual_attributes
     end
 
     # Determine whether to use encryption or not.
@@ -77,7 +86,11 @@ module GitHub
     #
     # Returns a new Group object.
     def group(base_name)
-      Group.new(self, domain(base_name).bind)
+      if virtual_attributes?
+        VirtualGroup.new(self, domain(base_name).bind)
+      else
+        Group.new(self, domain(base_name).bind)
+      end
     end
   end
 end

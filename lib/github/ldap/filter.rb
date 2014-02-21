@@ -49,6 +49,24 @@ module GitHub
       def group_contains_filter(query)
         Net::LDAP::Filter.contains("cn", query) & ALL_GROUPS_FILTER
       end
+
+      # Filter to get all the members of a group using the virtual attribute `memberOf`.
+      #
+      # group_dn: is the group dn to look members for.
+      #
+      # Returns a Net::LDAP::Filter
+      def is_member_of_group(group_dn)
+        Net::LDAP::Filter.eq('memberOf', group_dn)
+      end
+
+      # Filter to get all the members of a group that are groups using the virtual attribute `memberOf`.
+      #
+      # group_dn: is the group dn to look members for.
+      #
+      # Returns a Net::LDAP::Filter
+      def is_subgroup_of_group(group_dn)
+        Net::LDAP::Filter.eq('memberOf', group_dn) & ALL_GROUPS_FILTER
+      end
     end
   end
 end
