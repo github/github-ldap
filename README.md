@@ -60,7 +60,8 @@ When we have the domain, we can check if a user can log in with a given password
 Or whether a user is member of the given groups:
 
 ```ruby
-  domain.is_member? 'uid=calavera,dc=github,dc=com', %w(Enterprise)
+  entry = ldap.domain('uid=calavera,dc=github,dc=com').bind
+  domain.is_member? entry, %w(Enterprise)
 ```
 
 ### Virtual Attributes
