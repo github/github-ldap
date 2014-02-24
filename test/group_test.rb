@@ -6,11 +6,12 @@ class GitHubLdapGroupTest < GitHub::Ldap::Test
   end
 
   def groups_domain
-    GitHub::Ldap.new(options).domain("ou=groups,dc=github,dc=com")
+    @ldap.domain("ou=groups,dc=github,dc=com")
   end
 
   def setup
-    @group = GitHub::Ldap.new(options).group("cn=enterprise,ou=groups,dc=github,dc=com")
+    @ldap  = GitHub::Ldap.new(options)
+    @group = @ldap.group("cn=enterprise,ou=groups,dc=github,dc=com")
   end
 
   def test_subgroups
@@ -29,6 +30,11 @@ class GitHubLdapGroupTest < GitHub::Ldap::Test
   def test_filter_domain_groups
     groups = groups_domain.filter_groups('devs')
     assert_equal 1, groups.size
+  end
+
+  def test_unknown_group
+    refute @ldap.group("cn=foobar,ou=groups,dc=github,dc=com"),
+      "Expected to not bind any group"
   end
 end
 
