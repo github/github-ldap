@@ -2,7 +2,8 @@ require 'test_helper'
 
 module GitHubLdapDomainTestCases
   def setup
-    @domain = GitHub::Ldap.new(options).domain("dc=github,dc=com")
+    @ldap   = GitHub::Ldap.new(options)
+    @domain = @ldap.domain("dc=github,dc=com")
   end
 
   def test_user_valid_login
@@ -27,22 +28,22 @@ module GitHubLdapDomainTestCases
   def test_user_in_group
     user = @domain.valid_login?('calavera', 'passworD1')
 
-    assert @domain.is_member?(user.dn, %w(Enterprise People)),
+    assert @domain.is_member?(user, %w(Enterprise People)),
       "Expected `Enterprise` or `Poeple` to include the member `#{user.dn}`"
   end
 
   def test_user_not_in_different_group
     user = @domain.valid_login?('calavera', 'passworD1')
 
-    assert !@domain.is_member?(user.dn, %w(People)),
+    assert !@domain.is_member?(user, %w(People)),
       "Expected `Poeple` not to include the member `#{user.dn}`"
   end
 
   def test_user_without_group
     user = @domain.valid_login?('ldaptest', 'secret')
 
-    assert !@domain.is_member?(user.dn, %w(People)),
-      "Expected `Poeple` not to include the member `#{user.dn}`"
+    assert !@domain.is_member?(user, %w(People)),
+      "Expected `People` not to include the member `#{user.dn}`"
   end
 
   def test_authenticate_doesnt_return_invalid_users
@@ -67,12 +68,26 @@ module GitHubLdapDomainTestCases
   end
 
   def test_membership_empty_for_non_members
-    assert @domain.membership('uid=calavera,dc=github,dc=com', %w(People)).empty?,
+    user = @ldap.domain('uid=calavera,dc=github,dc=com').bind
+
+    assert @domain.membership(user, %w(People)).empty?,
       "Expected `calavera` not to be a member of `People`."
   end
 
   def test_membership_groups_for_members
-    groups = @domain.membership('uid=calavera,dc=github,dc=com', %w(Enterprise People))
+    user = @ldap.domain('uid=calavera,dc=github,dc=com').bind
+    groups = @domain.membership(user, %w(Enterprise People))
+
+    assert_equal 1, groups.size
+    assert_equal 'cn=Enterprise,ou=Group,dc=github,dc=com', groups.first.dn
+  end
+
+  def test_membership_with_virtual_attributes
+    ldap = GitHub::Ldap.new(options.merge(virtual_attributes: true))
+    user = @ldap.domain('uid=calavera,dc=github,dc=com').bind
+    user[:memberof] = 'cn=Enterprise,ou=Group,dc=github,dc=com'
+
+    groups = @domain.membership(user, %w(Enterprise People))
 
     assert_equal 1, groups.size
     assert_equal 'cn=Enterprise,ou=Group,dc=github,dc=com', groups.first.dn
@@ -124,4 +139,22 @@ end
 
 class GitHubLdapDomainUnauthenticatedTest < GitHub::Ldap::UnauthenticatedTest
   include GitHubLdapDomainTestCases
+end
+
+class GitHubLdapDomainNestedGroupsTest < GitHub::Ldap::Test
+  def self.test_server_options
+    {user_fixtures: FIXTURES.join('github-with-subgroups.ldif').to_s}
+  end
+
+  def setup
+    @ldap = GitHub::Ldap.new(options)
+    @domain = @ldap.domain("dc=github,dc=com")
+  end
+
+  def test_membership_in_subgroups
+    user = @ldap.domain('uid=rubiojr,ou=users,dc=github,dc=com').bind
+
+    assert @domain.is_member?(user, %w(enterprise-ops)),
+      "Expected `enterprise-ops` to include the member `#{user.dn}`"
+  end
 end

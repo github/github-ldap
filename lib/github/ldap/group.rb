@@ -49,6 +49,16 @@ module GitHub
         results
       end
 
+      # Public - Check if a user dn is included in the members of this group and its subgroups.
+      #
+      # user_dn: is the dn to check.
+      #
+      # Returns true if the dn is in the list of members.
+      def is_member?(user_dn)
+        members.detect {|entry| entry.dn == user_dn}
+      end
+
+
       # Internal - Get all the member entries for a group.
       #
       # Returns an array of Net::LDAP::Entry.

@@ -43,26 +43,36 @@ module GitHub
 
       # List the groups that a user is member of.
       #
-      # user_dn: is the dn for the user ldap entry.
+      # user_entry: is the entry for the user in the server.
       # group_names: is an array of group CNs.
       #
       # Return an Array with the groups that the given user is member of that belong to the given group list.
-      def membership(user_dn, group_names)
-        search(filter: group_filter(group_names, user_dn))
+      def membership(user_entry, group_names)
+        all_groups = search(filter: group_filter(group_names))
+        groups_map = all_groups.each_with_object({}) {|entry, hash| hash[entry.dn] = entry}
+
+        if @ldap.virtual_attributes.enabled?
+          member_of = groups_map.keys & user_entry[@ldap.virtual_attributes.user_membership]
+          member_of.map {|dn| group_map[dn]}
+        else
+          groups_map.each_with_object([]) do |(dn, group), acc|
+            acc << group if Group.new(@ldap, group).is_member?(user_entry.dn)
+          end
+        end
       end
 
       # Check if the user is include in any of the configured groups.
       #
-      # user_dn: is the dn for the user ldap entry.
+      # user_entry: is the entry for the user in the server.
       # group_names: is an array of group CNs.
       #
       # Returns true if the user belongs to any of the groups.
       # Returns false otherwise.
-      def is_member?(user_dn, group_names)
+      def is_member?(user_entry, group_names)
         return true if group_names.nil?
         return true if group_names.empty?
 
-        user_membership = membership(user_dn, group_names)
+        user_membership = membership(user_entry, group_names)
 
         !user_membership.empty?
       end
@@ -112,7 +122,7 @@ module GitHub
       def authenticate!(login, password, group_names = nil)
         user = valid_login?(login, password)
 
-        return user if user && is_member?(user.dn, group_names)
+        return user if user && is_member?(user, group_names)
       end
 
       # Search entries using this domain as base.

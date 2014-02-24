@@ -56,7 +56,7 @@ module GitHub
       # attr: is the membership attribute.
       #
       # Returns a Net::LDAP::Filter
-      def is_member_of_group(group_dn, attr = 'memberOf')
+      def members_of_group(group_dn, attr = 'memberOf')
         Net::LDAP::Filter.eq(attr, group_dn)
       end
 
@@ -66,7 +66,7 @@ module GitHub
       # attr: is the membership attribute.
       #
       # Returns a Net::LDAP::Filter
-      def is_subgroup_of_group(group_dn, attr = 'memberOf')
+      def subgroups_of_group(group_dn, attr = 'memberOf')
         Net::LDAP::Filter.eq(attr, group_dn) & ALL_GROUPS_FILTER
       end
     end
