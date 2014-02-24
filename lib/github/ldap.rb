@@ -87,11 +87,15 @@ module GitHub
     # base_name: is the dn of the base root.
     #
     # Returns a new Group object.
+    # Returns nil if the dn is not in the server.
     def group(base_name)
+      entry = domain(base_name).bind
+      return unless entry
+
       if @virtual_attributes.enabled?
-        VirtualGroup.new(self, domain(base_name).bind)
+        VirtualGroup.new(self, entry)
       else
-        Group.new(self, domain(base_name).bind)
+        Group.new(self, entry)
       end
     end
 
