@@ -60,7 +60,26 @@ When we have the domain, we can check if a user can log in with a given password
 Or whether a user is member of the given groups:
 
 ```ruby
-  domain.is_member? 'uid=calavera,dc=github,dc=com', %w(Enterprise)
+  entry = ldap.domain('uid=calavera,dc=github,dc=com').bind
+  domain.is_member? entry, %w(Enterprise)
+```
+
+### Virtual Attributes
+
+Some LDAP servers have support for virtual attributes, or overlays. These allow to perform queries more efficiently on the server.
+
+To enable virtual attributes you can set the option `virtual_attributes` initializing the ldap connection.
+We use our default set of virtual names if this option is just set to `true`.
+
+```ruby
+  ldap = GitHub::Ldap.new {virtual_attributes: true}
+```
+
+You can also override our defaults by providing your server mappings into a Hash.
+The only mapping supported for now is to check virtual membership of individuals in groups.
+
+```ruby
+  ldap = GitHub::Ldap.new {virtual_attributes: {virtual_membership: 'memberOf'}}
 ```
 
 ### Testing support

@@ -5,12 +5,14 @@ module GitHub
     require 'github/ldap/filter'
     require 'github/ldap/domain'
     require 'github/ldap/group'
+    require 'github/ldap/virtual_group'
+    require 'github/ldap/virtual_attributes'
 
     extend Forwardable
 
     # Utility method to perform searches against the ldap server.
     #
-    # It takes the same arguments than Net:::LDAP#search.
+    # It takes the same arguments than Net::LDAP::Connection#search.
     # Returns an Array with the entries that match the search.
     # Returns nil if there are no entries that match the search.
     def_delegator :@connection, :search
@@ -21,6 +23,13 @@ module GitHub
     # If `code` is 0, the operation succeeded and there is no message.
     def_delegator :@connection, :get_operation_result, :last_operation_result
 
+    # Utility method to bind entries in the ldap server.
+    #
+    # It takes the same arguments than Net::LDAP::Connection#bind.
+    # Returns a Net::LDAP::Entry if the operation succeeded.
+    def_delegator :@connection, :bind
+
+    attr_reader :virtual_attributes
 
     def initialize(options = {})
       @uid = options[:uid] || "sAMAccountName"
@@ -34,6 +43,8 @@ module GitHub
       if encryption = check_encryption(options[:encryption])
         @connection.encryption(encryption)
       end
+
+      configure_virtual_attributes(options[:virtual_attributes])
     end
 
     # Determine whether to use encryption or not.
@@ -68,7 +79,7 @@ module GitHub
     #
     # Returns a new Domain object.
     def domain(base_name)
-      Domain.new(base_name, @connection, @uid)
+      Domain.new(self, base_name, @uid)
     end
 
     # Creates a new group object to perform operations
@@ -77,7 +88,28 @@ module GitHub
     #
     # Returns a new Group object.
     def group(base_name)
-      Group.new(self, domain(base_name).bind)
+      if @virtual_attributes.enabled?
+        VirtualGroup.new(self, domain(base_name).bind)
+      else
+        Group.new(self, domain(base_name).bind)
+      end
+    end
+
+    # Configure virtual attributes for this server.
+    # If the option is `true`, we'll use the default virual attributes.
+    # If it's a Hash we'll map the attributes in the hash.
+    #
+    # attributes: is the option set when Ldap is initialized.
+    #
+    # Returns a VirtualAttributes.
+    def configure_virtual_attributes(attributes)
+      @virtual_attributes = if attributes == true
+        VirtualAttributes.new(true)
+      elsif attributes.is_a?(Hash)
+        VirtualAttributes.new(true, attributes)
+      else
+        VirtualAttributes.new(false)
+      end
     end
   end
 end

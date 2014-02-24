@@ -16,7 +16,7 @@ module GitHub
         @ldap, @entry = ldap, entry
       end
 
-      # Get all members that belong to a group.
+      # Public - Get all members that belong to a group.
       # This list also includes the members of subgroups.
       #
       # Returns an array with all the member entries.
@@ -33,7 +33,7 @@ module GitHub
         results.uniq {|m| m.dn }
       end
 
-      # Get all the subgroups from a group recursively.
+      # Public - Get all the subgroups from a group recursively.
       #
       # Returns an array with all the subgroup entries.
       def subgroups
@@ -49,7 +49,17 @@ module GitHub
         results
       end
 
-      # Get all the member entries for a group.
+      # Public - Check if a user dn is included in the members of this group and its subgroups.
+      #
+      # user_dn: is the dn to check.
+      #
+      # Returns true if the dn is in the list of members.
+      def is_member?(user_dn)
+        members.detect {|entry| entry.dn == user_dn}
+      end
+
+
+      # Internal - Get all the member entries for a group.
       #
       # Returns an array of Net::LDAP::Entry.
       def member_entries
@@ -58,14 +68,14 @@ module GitHub
         end
       end
 
-      # Get all the names under `member` and `uniqueMember`.
+      # Internal - Get all the names under `member` and `uniqueMember`.
       #
       # Returns an array with all the DN members.
       def member_names
         @entry[:member] + @entry[:uniqueMember]
       end
 
-      # Check if an object class includes the member names
+      # Internal - Check if an object class includes the member names
       # Use `&` rathen than `include?` because both are arrays.
       #
       # Returns true if the object class includes one of the group class names.
