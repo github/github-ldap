@@ -46,6 +46,8 @@ objectClass: groupOfNames
 member: uid=sbryant,ou=users,dc=github,dc=com
 member: cn=spaniards,ou=groups,dc=github,dc=com
 
+# The last member of this group is missing on purpose.
+# See: https://github.com/github/github-ldap/pull/18
 dn: cn=spaniards,ou=groups,dc=github,dc=com
 cn: spaniards
 objectClass: groupOfNames
