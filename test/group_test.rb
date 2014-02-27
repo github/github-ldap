@@ -58,10 +58,14 @@ class GitHubLdapMissingEntriesTest < GitHub::Ldap::Test
   end
 
   def setup
-    @group = GitHub::Ldap.new(options).group("cn=spaniards,ou=groups,dc=github,dc=com")
+    @ldap = GitHub::Ldap.new(options)
+  end
+
+  def test_load_right_members
+    assert_equal 3, @ldap.domain("cn=spaniards,ou=groups,dc=github,dc=com").bind[:member].size
   end
 
   def test_ignore_missing_member_entries
-    assert_equal 2, @group.members.size
+    assert_equal 2, @ldap.group("cn=spaniards,ou=groups,dc=github,dc=com").members.size
   end
 end
