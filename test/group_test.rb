@@ -51,3 +51,21 @@ class GitHubLdapLoopedGroupTest < GitHub::Ldap::Test
     assert_equal 4, @group.members.size
   end
 end
+
+class GitHubLdapMissingEntriesTest < GitHub::Ldap::Test
+  def self.test_server_options
+    {user_fixtures: FIXTURES.join('github-with-missing-entries.ldif').to_s}
+  end
+
+  def setup
+    @ldap = GitHub::Ldap.new(options)
+  end
+
+  def test_load_right_members
+    assert_equal 3, @ldap.domain("cn=spaniards,ou=groups,dc=github,dc=com").bind[:member].size
+  end
+
+  def test_ignore_missing_member_entries
+    assert_equal 2, @ldap.group("cn=spaniards,ou=groups,dc=github,dc=com").members.size
+  end
+end

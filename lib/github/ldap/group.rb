@@ -63,8 +63,9 @@ module GitHub
       #
       # Returns an array of Net::LDAP::Entry.
       def member_entries
-        @member_entries ||= member_names.map do |m|
-          @ldap.domain(m).bind
+        @member_entries ||= member_names.each_with_object([]) do |m, a|
+          entry = @ldap.domain(m).bind
+          a << entry if entry
         end
       end
 
