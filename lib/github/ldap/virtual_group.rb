@@ -1,6 +1,8 @@
 module GitHub
   class Ldap
     class VirtualGroup < Group
+      include Filter
+
       def members
         @ldap.search(filter: members_of_group(@entry.dn, membership_attribute))
       end
@@ -17,7 +19,7 @@ module GitHub
       #
       # Returns a string.
       def membership_attribute
-        @ldap.virual_attributes.virtual_membership
+        @ldap.virtual_attributes.virtual_membership
       end
     end
   end
