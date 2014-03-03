@@ -52,8 +52,8 @@ module GitHub
         groups_map = all_groups.each_with_object({}) {|entry, hash| hash[entry.dn] = entry}
 
         if @ldap.virtual_attributes.enabled?
-          member_of = groups_map.keys & user_entry[@ldap.virtual_attributes.user_membership]
-          member_of.map {|dn| group_map[dn]}
+          member_of = groups_map.keys & user_entry[@ldap.virtual_attributes.virtual_membership]
+          member_of.map {|dn| groups_map[dn]}
         else
           groups_map.each_with_object([]) do |(dn, group), acc|
             acc << group if Group.new(@ldap, group).is_member?(user_entry.dn)

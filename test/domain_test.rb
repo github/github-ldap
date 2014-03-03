@@ -84,10 +84,11 @@ module GitHubLdapDomainTestCases
 
   def test_membership_with_virtual_attributes
     ldap = GitHub::Ldap.new(options.merge(virtual_attributes: true))
-    user = @ldap.domain('uid=calavera,dc=github,dc=com').bind
+    user = ldap.domain('uid=calavera,dc=github,dc=com').bind
     user[:memberof] = 'cn=Enterprise,ou=Group,dc=github,dc=com'
 
-    groups = @domain.membership(user, %w(Enterprise People))
+    domain = ldap.domain("dc=github,dc=com")
+    groups = domain.membership(user, %w(Enterprise People))
 
     assert_equal 1, groups.size
     assert_equal 'cn=Enterprise,ou=Group,dc=github,dc=com', groups.first.dn
