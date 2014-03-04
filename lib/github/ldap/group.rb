@@ -21,32 +21,18 @@ module GitHub
       #
       # Returns an array with all the member entries.
       def members
-        groups, members = groups_and_members
-        results = members
-
-        cache = load_cache(groups)
-
-        loop_cached_groups(groups, cache) do |_, users|
-          results.concat users
-        end
-
-        results.uniq {|m| m.dn }
+        return @all_members if @all_members
+        group_and_member_entries
+        @all_members
       end
 
       # Public - Get all the subgroups from a group recursively.
       #
       # Returns an array with all the subgroup entries.
       def subgroups
-        groups, _ = groups_and_members
-        results = groups
-
-        cache = load_cache(groups)
-
-        loop_cached_groups(groups, cache) do |subgroups, _|
-          results.concat subgroups
-        end
-
-        results
+        return @all_groups if @all_groups
+        group_and_member_entries
+        @all_groups
       end
 
       # Public - Check if a user dn is included in the members of this group and its subgroups.
@@ -118,6 +104,26 @@ module GitHub
       # Returns two arrays, the first one with subgroups and the second one with users.
       def groups_and_members
         member_entries.partition {|e| group?(e[:objectclass])}
+      end
+
+      # Internal - Inspect the ldap server searching for group and member entries.
+      #
+      # Returns two arrays, the first one with subgroups and the second one with users.
+      def group_and_member_entries
+        groups, members = groups_and_members
+        @all_members = members
+        @all_groups  = groups
+
+        cache = load_cache(groups)
+
+        loop_cached_groups(groups, cache) do |subgroups, users|
+          @all_groups.concat subgroups
+          @all_members.concat users
+        end
+
+        @all_members.uniq! {|m| m.dn }
+
+        [@all_groups, @all_members]
       end
     end
   end
