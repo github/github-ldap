@@ -137,7 +137,10 @@ module GitHub
         options[:ignore_server_caps] ||= true
         options[:paged_searches_supported] ||= true
 
-        Array(@ldap.search(options))
+        rs = @ldap.search(options)
+        return [] if rs == false
+
+        Array(rs)
       end
 
       # Provide a meaningful result after a protocol operation (for example,
