@@ -2,7 +2,10 @@ module GitHub
   class Ldap
     module Filter
       ALL_GROUPS_FILTER = Net::LDAP::Filter.eq("objectClass", "groupOfNames") |
-                          Net::LDAP::Filter.eq("objectClass", "groupOfUniqueNames")
+                          Net::LDAP::Filter.eq("objectClass", "groupOfUniqueNames") |
+                          Net::LDAP::Filter.eq("objectClass", "posixGroup")
+
+      MEMBERSHIP_NAMES  = %w(member uniqueMember memberUid)
 
       # Filter to get the configured groups in the ldap server.
       # Takes the list of the group names and generate a filter for the groups
@@ -24,9 +27,9 @@ module GitHub
       # Returns a Net::LDAP::Filter.
       def member_filter(user_dn = nil)
         if user_dn
-          Net::LDAP::Filter.eq("member", user_dn) | Net::LDAP::Filter.eq("uniqueMember", user_dn)
+          MEMBERSHIP_NAMES.map {|n| Net::LDAP::Filter.eq(n, user_dn)}.reduce(:|)
         else
-          Net::LDAP::Filter.pres("member") | Net::LDAP::Filter.pres("uniqueMember")
+          MEMBERSHIP_NAMES.map {|n| Net::LDAP::Filter.pres(n)}.reduce(:|)
         end
       end
 

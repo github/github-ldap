@@ -10,7 +10,7 @@ module GitHub
     # domain = GitHub::Ldap.new(options).group("cn=enterprise,dc=github,dc=com")
     #
     class Group
-      GROUP_CLASS_NAMES = %w(groupOfNames groupOfUniqueNames)
+      GROUP_CLASS_NAMES = %w(groupOfNames groupOfUniqueNames posixGroup)
 
       def initialize(ldap, entry)
         @ldap, @entry = ldap, entry
@@ -59,7 +59,9 @@ module GitHub
       #
       # Returns an array with all the DN members.
       def member_names
-        @entry[:member] + @entry[:uniqueMember]
+        MEMBERSHIP_NAMES.each_with_object([]) do |n, cache|
+          cache.concat @entry[n]
+        end
       end
 
       # Internal - Check if an object class includes the member names
