@@ -10,6 +10,8 @@ module GitHub
     # domain = GitHub::Ldap.new(options).group("cn=enterprise,dc=github,dc=com")
     #
     class Group
+      include Filter
+
       GROUP_CLASS_NAMES = %w(groupOfNames groupOfUniqueNames posixGroup)
 
       def initialize(ldap, entry)
