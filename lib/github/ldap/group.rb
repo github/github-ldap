@@ -43,7 +43,8 @@ module GitHub
       #
       # Returns true if the dn is in the list of members.
       def is_member?(user_dn)
-        members.detect {|entry| entry.dn == user_dn}
+        member_names.include?(user_dn) ||
+          members.detect {|entry| entry.dn == user_dn}
       end
 
 
