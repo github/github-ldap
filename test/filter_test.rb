@@ -9,20 +9,20 @@ class FilterTest < Minitest::Test
   end
 
   def test_member_present
-    assert_equal "(|(member=*)(uniqueMember=*)(memberUid=*))", @subject.member_filter.to_s
+    assert_equal "(|(|(member=*)(uniqueMember=*))(memberUid=*))", @subject.member_filter.to_s
   end
 
   def test_member_equal
-    assert_equal "(|(member=#{@me})(uniqueMember=#{@me})(memberUid=#{@me}))", @subject.member_filter(@me).to_s
+    assert_equal "(|(|(member=#{@me})(uniqueMember=#{@me}))(memberUid=#{@me}))", @subject.member_filter(@me).to_s
   end
 
   def test_groups_reduced
-    assert_equal "(&(|(member=*)(uniqueMember=*)(memberUid=*))(|(cn=Enterprise)(cn=People)))",
+    assert_equal "(&(|(|(member=*)(uniqueMember=*))(memberUid=*))(|(cn=Enterprise)(cn=People)))",
       @subject.group_filter(%w(Enterprise People)).to_s
   end
 
   def test_groups_for_member
-    assert_equal "(&(|(member=#{@me})(uniqueMember=#{@me})(memberUid=#{@me}))(|(cn=Enterprise)(cn=People)))",
+    assert_equal "(&(|(|(member=#{@me})(uniqueMember=#{@me}))(memberUid=#{@me}))(|(cn=Enterprise)(cn=People)))",
       @subject.group_filter(%w(Enterprise People), @me).to_s
   end
 
