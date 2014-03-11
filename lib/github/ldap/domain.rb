@@ -134,8 +134,7 @@ module GitHub
       def search(options)
         options[:base] = @base_name
         options[:attributes] ||= []
-        options[:ignore_server_caps] ||= true
-        options[:paged_searches_supported] ||= true
+        options[:paged_searches_supported] = true
 
         rs = @ldap.search(options)
         return [] if rs == false
