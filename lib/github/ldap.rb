@@ -10,13 +10,6 @@ module GitHub
 
     extend Forwardable
 
-    # Utility method to perform searches against the ldap server.
-    #
-    # It takes the same arguments than Net::LDAP::Connection#search.
-    # Returns an Array with the entries that match the search.
-    # Returns nil if there are no entries that match the search.
-    def_delegator :@connection, :search
-
     # Utility method to get the last operation result with a human friendly message.
     #
     # Returns an OpenStruct with `code` and `message`.
@@ -29,7 +22,7 @@ module GitHub
     # Returns a Net::LDAP::Entry if the operation succeeded.
     def_delegator :@connection, :bind
 
-    attr_reader :virtual_attributes
+    attr_reader :virtual_attributes, :search_domains
 
     def initialize(options = {})
       @uid = options[:uid] || "sAMAccountName"
@@ -45,6 +38,10 @@ module GitHub
       end
 
       configure_virtual_attributes(options[:virtual_attributes])
+
+      # search_domains is a connection of bases to perform searches
+      # when a base is not explicitly provided.
+      @search_domains = Array(options[:search_domains])
     end
 
     # Determine whether to use encryption or not.
@@ -113,6 +110,17 @@ module GitHub
         VirtualAttributes.new(true, attributes)
       else
         VirtualAttributes.new(false)
+      end
+    end
+
+    def search(options)
+      if options.key?(:base)
+        @connection.search(options)
+      else
+        search_domains.each_with_object([]) do |base, result|
+          rs = @connection.search(options.merge(:base => base))
+          result.concat Array(rs) unless rs == false
+        end
       end
     end
   end

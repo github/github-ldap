@@ -29,6 +29,7 @@ module GitHubLdapTestCases
         :attributes => %w(uid),
         :filter     => Net::LDAP::Filter.eq('uid', 'calavera')})
 
+    refute result.empty?
     assert_equal 'calavera', result.first[:uid].first
   end
 
@@ -55,6 +56,14 @@ module GitHubLdapTestCases
 
   def test_virtual_attributes_disabled
     refute @ldap.virtual_attributes.enabled?, "Expected to have virtual attributes disabled"
+  end
+
+  def test_search_domains
+    ldap = GitHub::Ldap.new(options.merge(search_domains: ['dc=github,dc=com']))
+    result = ldap.search(filter: Net::LDAP::Filter.eq('uid', 'calavera'))
+
+    refute result.empty?
+    assert_equal 'calavera', result.first[:uid].first
   end
 end
 
