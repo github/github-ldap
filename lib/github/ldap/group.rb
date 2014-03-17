@@ -10,7 +10,11 @@ module GitHub
     # domain = GitHub::Ldap.new(options).group("cn=enterprise,dc=github,dc=com")
     #
     class Group
-      GROUP_CLASS_NAMES = %w(groupOfNames groupOfUniqueNames)
+      include Filter
+
+      GROUP_CLASS_NAMES = %w(groupOfNames groupOfUniqueNames posixGroup)
+
+      attr_reader :ldap, :entry
 
       def initialize(ldap, entry)
         @ldap, @entry = ldap, entry
@@ -37,12 +41,12 @@ module GitHub
 
       # Public - Check if a user dn is included in the members of this group and its subgroups.
       #
-      # user_dn: is the dn to check.
+      # user_entry: is the user entry to check the membership.
       #
       # Returns true if the dn is in the list of members.
-      def is_member?(user_dn)
-        member_names.include?(user_dn) ||
-          members.detect {|entry| entry.dn == user_dn}
+      def is_member?(user_entry)
+        member_names.include?(user_entry.dn) ||
+          members.detect {|entry| entry.dn == user_entry.dn}
       end
 
 
@@ -60,7 +64,9 @@ module GitHub
       #
       # Returns an array with all the DN members.
       def member_names
-        @entry[:member] + @entry[:uniqueMember]
+        MEMBERSHIP_NAMES.each_with_object([]) do |n, cache|
+          cache.concat @entry[n]
+        end
       end
 
       # Internal - Check if an object class includes the member names

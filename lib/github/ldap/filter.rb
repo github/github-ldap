@@ -2,19 +2,20 @@ module GitHub
   class Ldap
     module Filter
       ALL_GROUPS_FILTER = Net::LDAP::Filter.eq("objectClass", "groupOfNames") |
-                          Net::LDAP::Filter.eq("objectClass", "groupOfUniqueNames")
+                          Net::LDAP::Filter.eq("objectClass", "groupOfUniqueNames") |
+                          Net::LDAP::Filter.eq("objectClass", "posixGroup")
+
+      MEMBERSHIP_NAMES  = %w(member uniqueMember)
 
       # Filter to get the configured groups in the ldap server.
       # Takes the list of the group names and generate a filter for the groups
-      # with cn that match and also include members:
+      # with cn that match.
       #
       # group_names: is an array of group CNs.
-      # user_dn: is an optional member to scope the search to.
       #
       # Returns a Net::LDAP::Filter.
-      def group_filter(group_names, user_dn = nil)
-        or_filters = group_names.map {|g| Net::LDAP::Filter.eq("cn", g)}.reduce(:|)
-        member_filter(user_dn) & or_filters
+      def group_filter(group_names)
+        group_names.map {|g| Net::LDAP::Filter.eq("cn", g)}.reduce(:|)
       end
 
       # Filter to check a group membership.
@@ -24,9 +25,9 @@ module GitHub
       # Returns a Net::LDAP::Filter.
       def member_filter(user_dn = nil)
         if user_dn
-          Net::LDAP::Filter.eq("member", user_dn) | Net::LDAP::Filter.eq("uniqueMember", user_dn)
+          MEMBERSHIP_NAMES.map {|n| Net::LDAP::Filter.eq(n, user_dn)}.reduce(:|)
         else
-          Net::LDAP::Filter.pres("member") | Net::LDAP::Filter.pres("uniqueMember")
+          MEMBERSHIP_NAMES.map {|n| Net::LDAP::Filter.pres(n)}.reduce(:|)
         end
       end
 
@@ -68,6 +69,16 @@ module GitHub
       # Returns a Net::LDAP::Filter
       def subgroups_of_group(group_dn, attr = 'memberOf')
         Net::LDAP::Filter.eq(attr, group_dn) & ALL_GROUPS_FILTER
+      end
+
+      # Filter to get all the members of a group which uid is included in `memberUid`.
+      #
+      # uids: is an array with all the uids to search.
+      # uid_attr: is the names of the uid attribute in the directory.
+      #
+      # Returns a Net::LDAP::Filter
+      def all_members_by_uid(uids, uid_attr)
+        uids.map {|uid| Net::LDAP::Filter.eq(uid_attr, uid)}.reduce(:|)
       end
     end
   end

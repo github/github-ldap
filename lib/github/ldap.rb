@@ -5,17 +5,11 @@ module GitHub
     require 'github/ldap/filter'
     require 'github/ldap/domain'
     require 'github/ldap/group'
+    require 'github/ldap/posix_group'
     require 'github/ldap/virtual_group'
     require 'github/ldap/virtual_attributes'
 
     extend Forwardable
-
-    # Utility method to perform searches against the ldap server.
-    #
-    # It takes the same arguments than Net::LDAP::Connection#search.
-    # Returns an Array with the entries that match the search.
-    # Returns nil if there are no entries that match the search.
-    def_delegator :@connection, :search
 
     # Utility method to get the last operation result with a human friendly message.
     #
@@ -29,7 +23,7 @@ module GitHub
     # Returns a Net::LDAP::Entry if the operation succeeded.
     def_delegator :@connection, :bind
 
-    attr_reader :virtual_attributes
+    attr_reader :uid, :virtual_attributes, :search_domains
 
     def initialize(options = {})
       @uid = options[:uid] || "sAMAccountName"
@@ -45,9 +39,79 @@ module GitHub
       end
 
       configure_virtual_attributes(options[:virtual_attributes])
+
+      # search_domains is a connection of bases to perform searches
+      # when a base is not explicitly provided.
+      @search_domains = Array(options[:search_domains])
     end
 
-    # Determine whether to use encryption or not.
+    # Public - Utility method to check if the connection with the server can be stablished.
+    # It tries to bind with the ldap auth default configuration.
+    #
+    # Returns an OpenStruct with `code` and `message`.
+    # If `code` is 0, the operation succeeded and there is no message.
+    def test_connection
+      @connection.bind
+      last_operation_result
+    end
+
+    # Public - Creates a new domain object to perform operations
+    #
+    # base_name: is the dn of the base root.
+    #
+    # Returns a new Domain object.
+    def domain(base_name)
+      Domain.new(self, base_name, @uid)
+    end
+
+    # Public - Creates a new group object to perform operations
+    #
+    # base_name: is the dn of the base root.
+    #
+    # Returns a new Group object.
+    # Returns nil if the dn is not in the server.
+    def group(base_name)
+      entry = domain(base_name).bind
+      return unless entry
+
+      load_group(entry)
+    end
+
+    # Public - Create a new group object based on a Net::LDAP::Entry.
+    #
+    # group_entry: is a Net::LDAP::Entry.
+    #
+    # Returns a Group, PosixGroup or VirtualGroup object.
+    def load_group(group_entry)
+      if @virtual_attributes.enabled?
+        VirtualGroup.new(self, group_entry)
+      elsif PosixGroup.valid?(group_entry)
+        PosixGroup.new(self, group_entry)
+      else
+        Group.new(self, group_entry)
+      end
+    end
+
+    # Public - Search entries in the ldap server.
+    #
+    # options: is a hash with the same options that Net::LDAP::Connection#search supports.
+    #
+    # Returns an Array of Net::LDAP::Entry.
+    def search(options)
+      result = if options[:base]
+        @connection.search(options)
+      else
+        search_domains.each_with_object([]) do |base, result|
+          rs = @connection.search(options.merge(:base => base))
+          result.concat Array(rs) unless rs == false
+        end
+      end
+
+      return [] if result == false
+      Array(result)
+    end
+
+    # Internal - Determine whether to use encryption or not.
     #
     # encryption: is the encryption method, either 'ssl', 'tls', 'simple_tls' or 'start_tls'.
     #
@@ -63,43 +127,7 @@ module GitHub
       end
     end
 
-    # Utility method to check if the connection with the server can be stablished.
-    # It tries to bind with the ldap auth default configuration.
-    #
-    # Returns an OpenStruct with `code` and `message`.
-    # If `code` is 0, the operation succeeded and there is no message.
-    def test_connection
-      @connection.bind
-      last_operation_result
-    end
-
-    # Creates a new domain object to perform operations
-    #
-    # base_name: is the dn of the base root.
-    #
-    # Returns a new Domain object.
-    def domain(base_name)
-      Domain.new(self, base_name, @uid)
-    end
-
-    # Creates a new group object to perform operations
-    #
-    # base_name: is the dn of the base root.
-    #
-    # Returns a new Group object.
-    # Returns nil if the dn is not in the server.
-    def group(base_name)
-      entry = domain(base_name).bind
-      return unless entry
-
-      if @virtual_attributes.enabled?
-        VirtualGroup.new(self, entry)
-      else
-        Group.new(self, entry)
-      end
-    end
-
-    # Configure virtual attributes for this server.
+    # Internal - Configure virtual attributes for this server.
     # If the option is `true`, we'll use the default virual attributes.
     # If it's a Hash we'll map the attributes in the hash.
     #
