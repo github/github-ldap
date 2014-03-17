@@ -70,8 +70,10 @@ module GitHub
       #
       # Return an array of user entries.
       def search_members_by_uids
-        filter = all_members_by_uid(entry[:memberUid], ldap.uid)
+        member_uids = entry[:memberUid]
+        return [] if member_uids.empty?
 
+        filter = all_members_by_uid(member_uids, ldap.uid)
         ldap.search(filter: filter)
       end
     end

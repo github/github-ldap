@@ -29,6 +29,11 @@ memberUid: calavera
 member: cn=enterprise-devs,ou=groups,dc=github,dc=com
 member: cn=enterprise-ops,ou=groups,dc=github,dc=com""")
 
+    @empty_group = Net::LDAP::Entry._load("""
+dn: cn=enterprise-posix-empty,ou=groups,dc=github,dc=com
+cn: enterprise-posix-empty
+objectClass: posixGroup""")
+
     @ldap = GitHub::Ldap.new(options.merge(search_domains: %w(dc=github,dc=com)))
   end
 
@@ -103,5 +108,12 @@ member: cn=enterprise-ops,ou=groups,dc=github,dc=com""")
 
     refute group.is_member?(user),
       "Expected user to not be member when she's not member of any subgroup"
+  end
+
+  def test_empty_posix_group
+    group = GitHub::Ldap::PosixGroup.new(@ldap, @empty_group)
+
+    assert group.members.empty?,
+      "Expected members to be an empty array"
   end
 end
