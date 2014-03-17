@@ -9,11 +9,11 @@ class FilterTest < Minitest::Test
   end
 
   def test_member_present
-    assert_equal "(|(|(member=*)(uniqueMember=*))(memberUid=*))", @subject.member_filter.to_s
+    assert_equal "(|(member=*)(uniqueMember=*))", @subject.member_filter.to_s
   end
 
   def test_member_equal
-    assert_equal "(|(|(member=#{@me})(uniqueMember=#{@me}))(memberUid=#{@me}))", @subject.member_filter(@me).to_s
+    assert_equal "(|(member=#{@me})(uniqueMember=#{@me}))", @subject.member_filter(@me).to_s
   end
 
   def test_groups_reduced
@@ -35,5 +35,10 @@ class FilterTest < Minitest::Test
 
     assert_equal "(&(isMemberOf=cn=group,dc=github,dc=com)#{Subject::ALL_GROUPS_FILTER})",
       @subject.subgroups_of_group('cn=group,dc=github,dc=com', 'isMemberOf').to_s
+  end
+
+  def test_all_members_by_uid
+    assert_equal "(|(uid=calavera)(uid=mtodd))",
+      @subject.all_members_by_uid(%w(calavera mtodd), :uid).to_s
   end
 end

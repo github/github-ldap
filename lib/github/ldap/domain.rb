@@ -56,7 +56,7 @@ module GitHub
           member_of.map {|dn| groups_map[dn]}
         else
           groups_map.each_with_object([]) do |(dn, group), acc|
-            acc << group if Group.new(@ldap, group).is_member?(user_entry.dn)
+            acc << group if @ldap.group(group).is_member?(user_entry)
           end
         end
       end

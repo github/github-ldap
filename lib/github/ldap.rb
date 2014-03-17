@@ -5,6 +5,7 @@ module GitHub
     require 'github/ldap/filter'
     require 'github/ldap/domain'
     require 'github/ldap/group'
+    require 'github/ldap/posix_group'
     require 'github/ldap/virtual_group'
     require 'github/ldap/virtual_attributes'
 
@@ -91,6 +92,8 @@ module GitHub
 
       if @virtual_attributes.enabled?
         VirtualGroup.new(self, entry)
+      elsif PosixGroup.valid?(entry)
+        PosixGroup.new(self, entry)
       else
         Group.new(self, entry)
       end
