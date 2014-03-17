@@ -55,8 +55,8 @@ module GitHub
           member_of = groups_map.keys & user_entry[@ldap.virtual_attributes.virtual_membership]
           member_of.map {|dn| groups_map[dn]}
         else
-          groups_map.each_with_object([]) do |(dn, group), acc|
-            acc << group if @ldap.group(group).is_member?(user_entry)
+          groups_map.each_with_object([]) do |(dn, group_entry), acc|
+            acc << group_entry if @ldap.load_group(group_entry).is_member?(user_entry)
           end
         end
       end
@@ -136,10 +136,7 @@ module GitHub
         options[:attributes] ||= []
         options[:paged_searches_supported] = true
 
-        rs = @ldap.search(options)
-        return [] if rs == false
-
-        Array(rs)
+        @ldap.search(options)
       end
 
       # Provide a meaningful result after a protocol operation (for example,

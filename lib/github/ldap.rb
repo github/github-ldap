@@ -45,7 +45,73 @@ module GitHub
       @search_domains = Array(options[:search_domains])
     end
 
-    # Determine whether to use encryption or not.
+    # Public - Utility method to check if the connection with the server can be stablished.
+    # It tries to bind with the ldap auth default configuration.
+    #
+    # Returns an OpenStruct with `code` and `message`.
+    # If `code` is 0, the operation succeeded and there is no message.
+    def test_connection
+      @connection.bind
+      last_operation_result
+    end
+
+    # Public - Creates a new domain object to perform operations
+    #
+    # base_name: is the dn of the base root.
+    #
+    # Returns a new Domain object.
+    def domain(base_name)
+      Domain.new(self, base_name, @uid)
+    end
+
+    # Public - Creates a new group object to perform operations
+    #
+    # base_name: is the dn of the base root.
+    #
+    # Returns a new Group object.
+    # Returns nil if the dn is not in the server.
+    def group(base_name)
+      entry = domain(base_name).bind
+      return unless entry
+
+      load_group(entry)
+    end
+
+    # Public - Create a new group object based on a Net::LDAP::Entry.
+    #
+    # group_entry: is a Net::LDAP::Entry.
+    #
+    # Returns a Group, PosixGroup or VirtualGroup object.
+    def load_group(group_entry)
+      if @virtual_attributes.enabled?
+        VirtualGroup.new(self, group_entry)
+      elsif PosixGroup.valid?(group_entry)
+        PosixGroup.new(self, group_entry)
+      else
+        Group.new(self, group_entry)
+      end
+    end
+
+    # Public - Search entries in the ldap server.
+    #
+    # options: is a hash with the same options that Net::LDAP::Connection#search supports.
+    #
+    # Returns an Array of Net::LDAP::Entry.
+    def search(options)
+      result = if options[:base]
+        @connection.search(options)
+      else
+        search_domains.each_with_object([]) do |base, result|
+          rs = @connection.search(options.merge(:base => base))
+          result.concat Array(rs) unless rs == false
+        end
+      end
+
+      return [] if result == false
+      Array(result)
+    end
+
+    # Internal - Determine whether to use encryption or not.
     #
     # encryption: is the encryption method, either 'ssl', 'tls', 'simple_tls' or 'start_tls'.
     #
@@ -61,45 +127,7 @@ module GitHub
       end
     end
 
-    # Utility method to check if the connection with the server can be stablished.
-    # It tries to bind with the ldap auth default configuration.
-    #
-    # Returns an OpenStruct with `code` and `message`.
-    # If `code` is 0, the operation succeeded and there is no message.
-    def test_connection
-      @connection.bind
-      last_operation_result
-    end
-
-    # Creates a new domain object to perform operations
-    #
-    # base_name: is the dn of the base root.
-    #
-    # Returns a new Domain object.
-    def domain(base_name)
-      Domain.new(self, base_name, @uid)
-    end
-
-    # Creates a new group object to perform operations
-    #
-    # base_name: is the dn of the base root.
-    #
-    # Returns a new Group object.
-    # Returns nil if the dn is not in the server.
-    def group(base_name)
-      entry = domain(base_name).bind
-      return unless entry
-
-      if @virtual_attributes.enabled?
-        VirtualGroup.new(self, entry)
-      elsif PosixGroup.valid?(entry)
-        PosixGroup.new(self, entry)
-      else
-        Group.new(self, entry)
-      end
-    end
-
-    # Configure virtual attributes for this server.
+    # Internal - Configure virtual attributes for this server.
     # If the option is `true`, we'll use the default virual attributes.
     # If it's a Hash we'll map the attributes in the hash.
     #
@@ -113,17 +141,6 @@ module GitHub
         VirtualAttributes.new(true, attributes)
       else
         VirtualAttributes.new(false)
-      end
-    end
-
-    def search(options)
-      if options.key?(:base)
-        @connection.search(options)
-      else
-        search_domains.each_with_object([]) do |base, result|
-          rs = @connection.search(options.merge(:base => base))
-          result.concat Array(rs) unless rs == false
-        end
       end
     end
   end
