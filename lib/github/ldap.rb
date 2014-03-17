@@ -22,7 +22,7 @@ module GitHub
     # Returns a Net::LDAP::Entry if the operation succeeded.
     def_delegator :@connection, :bind
 
-    attr_reader :virtual_attributes, :search_domains
+    attr_reader :uid, :virtual_attributes, :search_domains
 
     def initialize(options = {})
       @uid = options[:uid] || "sAMAccountName"
