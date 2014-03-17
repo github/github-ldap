@@ -10,7 +10,8 @@ class GitHubLdapPosixGroupTest < GitHub::Ldap::Test
 dn: cn=enterprise-posix-devs,ou=groups,dc=github,dc=com
 cn: enterprise-posix-devs
 objectClass: posixGroup
-memberUid: benburkert""")
+memberUid: benburkert
+memberUid: mtodd""")
 
     @one_level_deep_group = Net::LDAP::Entry._load("""
 dn: cn=enterprise-posix-ops,ou=groups,dc=github,dc=com
@@ -46,7 +47,7 @@ objectClass: posixGroup""")
     group = GitHub::Ldap::PosixGroup.new(@ldap, @simple_group)
     members = group.members
 
-    assert_equal 1, members.size
+    assert_equal 2, members.size
     assert_equal 'benburkert', members.first[:uid].first
   end
 

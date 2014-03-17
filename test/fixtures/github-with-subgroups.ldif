@@ -3,7 +3,6 @@ version: 1
 # Organizations
 
 dn: dc=github,dc=com
-cn: github
 objectClass: dcObject
 objectClass: organization
 dc: github
@@ -89,4 +88,12 @@ sn: rubiojr
 uid: rubiojr
 userPassword: passworD1
 mail: rubiojr@github.com
+objectClass: inetOrgPerson
+
+dn: uid=mtodd,ou=users,dc=github,dc=com
+cn: mtodd
+sn: mtodd
+uid: mtodd
+userPassword: passworD1
+mail: mtodd@github.com
 objectClass: inetOrgPerson
