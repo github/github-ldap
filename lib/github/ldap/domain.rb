@@ -27,9 +27,13 @@ module GitHub
 
       # List all groups under this tree that match the query.
       #
+      # query: is the partial name to filter for.
+      # opts: additional options to filter with. It's specially recommended to restrict this search by size.
+      # block: is an optional block to pass to the search.
+      #
       # Returns a list of ldap entries.
-      def filter_groups(query)
-        search(filter: group_contains_filter(query))
+      def filter_groups(query, opts = {}, &block)
+        search(opts.merge(filter: group_contains_filter(query)), &block)
       end
 
       # List the groups in the ldap server that match the configured ones.
@@ -127,16 +131,16 @@ module GitHub
 
       # Search entries using this domain as base.
       #
-      # options: is a Hash with the options for the search.
-      # The base option is always overriden.
+      # options: is a Hash with the options for the search. The base option is always overriden.
+      # block: is an optional block to pass to the search.
       #
       # Returns an array with the entries found.
-      def search(options)
+      def search(options, &block)
         options[:base] = @base_name
         options[:attributes] ||= []
         options[:paged_searches_supported] = true
 
-        @ldap.search(options)
+        @ldap.search(options, &block)
       end
 
       # Provide a meaningful result after a protocol operation (for example,

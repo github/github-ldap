@@ -95,14 +95,15 @@ module GitHub
     # Public - Search entries in the ldap server.
     #
     # options: is a hash with the same options that Net::LDAP::Connection#search supports.
+    # block: is an optional block to pass to the search.
     #
     # Returns an Array of Net::LDAP::Entry.
-    def search(options)
+    def search(options, &block)
       result = if options[:base]
-        @connection.search(options)
+        @connection.search(options, &block)
       else
         search_domains.each_with_object([]) do |base, result|
-          rs = @connection.search(options.merge(:base => base))
+          rs = @connection.search(options.merge(:base => base), &block)
           result.concat Array(rs) unless rs == false
         end
       end
