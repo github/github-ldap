@@ -32,6 +32,19 @@ class GitHubLdapGroupTest < GitHub::Ldap::Test
     assert_equal 1, groups.size
   end
 
+  def test_filter_domain_groups_limited
+    groups = []
+    groups_domain.filter_groups('enter', size: 1) do |entry|
+      groups << entry
+    end
+    assert_equal 1, groups.size
+  end
+
+  def test_filter_domain_groups_unlimited
+    groups = groups_domain.filter_groups('ent')
+    assert_equal 3, groups.size
+  end
+
   def test_unknown_group
     refute @ldap.group("cn=foobar,ou=groups,dc=github,dc=com"),
       "Expected to not bind any group"
