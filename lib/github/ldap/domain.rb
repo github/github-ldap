@@ -143,16 +143,6 @@ module GitHub
         @ldap.search(options, &block)
       end
 
-      # Provide a meaningful result after a protocol operation (for example,
-      # bind or search) has completed.
-      #
-      # Returns an OpenStruct containing an LDAP result code and a
-      # human-readable string.
-      # See http://tools.ietf.org/html/rfc4511#appendix-A
-      def get_operation_result
-        @ldap.get_operation_result
-      end
-
       # Get the entry for this domain.
       #
       # Returns a Net::LDAP::Entry
