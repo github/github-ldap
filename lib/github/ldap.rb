@@ -129,10 +129,9 @@ module GitHub
     end
 
     # Internal - Configure virtual attributes for this server.
-    # If the option is `true`, we'll use the default virual attributes.
-    # If it's a Hash we'll map the attributes in the hash.
-    #
-    # attributes: is the option set when Ldap is initialized.
+    # options: configuration options during initialization
+    #   - :virtual_attributes - boolean - to toggle support
+    #   - :virtual_membership - string - attribute name on the user's object to check group membership
     #
     # Returns a VirtualAttributes.
     def configure_virtual_attributes(options)
