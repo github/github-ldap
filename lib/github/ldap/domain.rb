@@ -66,7 +66,8 @@ module GitHub
           end
         else
           # fallback to non-recursive group membership search
-          search(filter: group_filter(group_names, user_entry.dn))
+          filter = member_filter(user_entry.dn) & group_filter(group_names)
+          search(filter: filter)
         end
       end
 
