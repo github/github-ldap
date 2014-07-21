@@ -38,7 +38,7 @@ module GitHub
         @connection.encryption(encryption)
       end
 
-      configure_virtual_attributes(options[:virtual_attributes])
+      configure_virtual_attributes(options)
 
       # search_domains is a connection of bases to perform searches
       # when a base is not explicitly provided.
@@ -134,7 +134,7 @@ module GitHub
     #   - :virtual_membership - string - attribute name on the user's object to check group membership
     #
     # Returns a VirtualAttributes.
-    def configure_virtual_attributes(options)
+    def configure_virtual_attributes(options={})
       @virtual_attributes = if options[:virtual_attributes] == true
         VirtualAttributes.new(true, { :virtual_membership => options[:virtual_membership]})
       else
