@@ -135,11 +135,9 @@ module GitHub
     # attributes: is the option set when Ldap is initialized.
     #
     # Returns a VirtualAttributes.
-    def configure_virtual_attributes(attributes)
-      @virtual_attributes = if attributes == true
-        VirtualAttributes.new(true)
-      elsif attributes.is_a?(Hash)
-        VirtualAttributes.new(true, attributes)
+    def configure_virtual_attributes(options)
+      @virtual_attributes = if options[:virtual_attributes] == true
+        VirtualAttributes.new(true, { :virtual_membership => options[:virtual_membership]})
       else
         VirtualAttributes.new(false)
       end
