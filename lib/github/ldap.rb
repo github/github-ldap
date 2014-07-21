@@ -23,7 +23,8 @@ module GitHub
     # Returns a Net::LDAP::Entry if the operation succeeded.
     def_delegator :@connection, :bind
 
-    attr_reader :uid, :virtual_attributes, :search_domains
+    attr_reader :uid, :virtual_attributes, :search_domains,
+                :instrumentation_service
 
     def initialize(options = {})
       @uid = options[:uid] || "sAMAccountName"
@@ -43,6 +44,9 @@ module GitHub
       # search_domains is a connection of bases to perform searches
       # when a base is not explicitly provided.
       @search_domains = Array(options[:search_domains])
+
+      # enables instrumenting queries
+      @instrumentation_service = options[:instrumentation_service]
     end
 
     # Public - Utility method to check if the connection with the server can be stablished.
@@ -142,6 +146,19 @@ module GitHub
         VirtualAttributes.new(true, attributes)
       else
         VirtualAttributes.new(false)
+      end
+    end
+
+    # Internal: Instrument the block if an instrumentation servie is set.
+    #
+    # Returns the result of the block.
+    def instrument(event, payload = {})
+      if instrumentation_service
+        instrumentation_service.instrument(event, payload) do
+          yield payload
+        end
+      else
+        yield payload
       end
     end
   end
