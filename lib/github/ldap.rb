@@ -75,7 +75,11 @@ module GitHub
     # Returns a new Group object.
     # Returns nil if the dn is not in the server.
     def group(base_name)
-      entry = domain(base_name).bind
+      entry =
+        instrument "github_ldap.group", :base_name => base_name do
+          domain(base_name).bind
+        end
+
       return unless entry
 
       load_group(entry)
@@ -104,11 +108,17 @@ module GitHub
     # Returns an Array of Net::LDAP::Entry.
     def search(options, &block)
       result = if options[:base]
-        @connection.search(options, &block)
+        instrument "github_ldap.search_base", options do
+          @connection.search(options, &block)
+        end
       else
-        search_domains.each_with_object([]) do |base, result|
-          rs = @connection.search(options.merge(:base => base), &block)
-          result.concat Array(rs) unless rs == false
+        instrument "github_ldap.search_bases", options.dup do |payload|
+          search_domains.each_with_object([]) do |base, result|
+            instrument "github_ldap.search_base", payload.merge(:base => base) do
+              rs = @connection.search(options.merge(:base => base), &block)
+              result.concat Array(rs) unless rs == false
+            end
+          end
         end
       end
 
