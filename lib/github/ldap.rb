@@ -40,9 +40,22 @@ module GitHub
 
       configure_virtual_attributes(options)
 
+      # enable fallback recursive group search unless option is false
+      @recursive_group_search_fallback = (options[:recursive_group_search_fallback] != false)
+
       # search_domains is a connection of bases to perform searches
       # when a base is not explicitly provided.
       @search_domains = Array(options[:search_domains])
+    end
+
+    # Public - Whether membership checks should recurse into nested groups when
+    # virtual attributes aren't enabled. The fallback search has poor
+    # performance characteristics in some cases, in which case this should be
+    # disabled by passing :recursive_group_search_fallback => false.
+    #
+    # Returns true or false.
+    def recursive_group_search_fallback?
+      @recursive_group_search_fallback
     end
 
     # Public - Utility method to check if the connection with the server can be stablished.
