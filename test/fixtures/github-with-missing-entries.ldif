@@ -1,13 +1,12 @@
 version: 1
 
-# Organizations
-
-dn: dc=github,dc=com
-cn: github
-objectClass: dcObject
-objectClass: organization
-dc: github
-o: GitHub Inc.
+# Organizations (already defined)
+# dn: dc=github,dc=com
+# cn: github
+# objectClass: dcObject
+# objectClass: organization
+# dc: github
+# o: GitHub Inc.
 
 # Admin user
 
