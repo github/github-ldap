@@ -32,7 +32,9 @@ module GitHub
       def member_filter(entry = nil)
         if entry
           MEMBERSHIP_NAMES.map do |n|
-            Net::LDAP::Filter.eq(n, entry[MEMBERSHIP_ATTRS[n]])
+            entry[MEMBERSHIP_ATTRS[n]].map do |a|
+              Net::LDAP::Filter.eq(n, a)
+            end.reduce(:|)
           end.reduce(:|)
         else
           MEMBERSHIP_NAMES.map {|n| Net::LDAP::Filter.pres(n)}.reduce(:|)
