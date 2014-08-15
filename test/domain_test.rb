@@ -160,9 +160,13 @@ class GitHubLdapDomainNestedGroupsTest < GitHub::Ldap::Test
   end
 end
 
-class GitHubLdapPosixGroupsTest < GitHub::Ldap::Test
+class GitHubLdapPosixGroupsWithRecursionFallbackTest < GitHub::Ldap::Test
   def self.test_server_options
-    {user_fixtures: FIXTURES.join('github-with-subgroups.ldif').to_s}
+    {
+      user_fixtures: FIXTURES.join('github-with-subgroups.ldif').to_s,
+      # so we exercise the recursive group search fallback
+      recursive_group_search_fallback: true
+    }
   end
 
   def setup
@@ -181,6 +185,35 @@ memberUid: mtodd""")
     assert user = @ldap.domain('uid=mtodd,ou=users,dc=github,dc=com').bind
 
     assert @domain.is_member?(user, @group.cn),
-      "Expected `#{@group.cn}` to include the member `#{user.dn}`"
+      "Expected `#{@group.cn.first}` to include the member `#{user.dn}`"
+  end
+end
+
+class GitHubLdapPosixGroupsTest < GitHub::Ldap::Test
+  def self.test_server_options
+    {
+      user_fixtures: FIXTURES.join('github-with-subgroups.ldif').to_s,
+      # so we test the test the non-recursive group membership search
+      recursive_group_search_fallback: false
+    }
+  end
+
+  def setup
+    @ldap = GitHub::Ldap.new(options)
+    @domain = @ldap.domain("dc=github,dc=com")
+
+    @group = Net::LDAP::Entry._load("""
+dn: cn=enterprise-posix-devs,ou=groups,dc=github,dc=com
+cn: enterprise-posix-devs
+objectClass: posixGroup
+memberUid: benburkert
+memberUid: mtodd""")
+  end
+
+  def test_membership_for_posixGroups
+    assert user = @ldap.domain('uid=mtodd,ou=users,dc=github,dc=com').bind
+
+    assert @domain.is_member?(user, @group.cn),
+      "Expected `#{@group.cn.first}` to include the member `#{user.dn}`"
   end
 end
