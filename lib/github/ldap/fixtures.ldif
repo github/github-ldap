@@ -1,12 +1,5 @@
 version: 1
 
-# Organizations (already defined)
-# dn: dc=github,dc=com
-# objectClass: dcObject
-# objectClass: organization
-# dc: github
-# o: GitHub Inc.
-
 dn: ou=Group,dc=github,dc=com
 objectclass: organizationalUnit
 ou: Group
