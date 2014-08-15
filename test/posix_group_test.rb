@@ -48,7 +48,7 @@ objectClass: posixGroup""")
     members = group.members
 
     assert_equal 2, members.size
-    assert_equal 'benburkert', members.first[:uid].first
+    assert_equal %w(benburkert mtodd), members.map(&:uid).flatten.sort
   end
 
   def test_posix_combined_group
