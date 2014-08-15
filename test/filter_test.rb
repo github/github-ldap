@@ -18,11 +18,11 @@ class FilterTest < Minitest::Test
   end
 
   def test_member_present
-    assert_equal "(|(member=*)(uniqueMember=*))", @subject.member_filter.to_s
+    assert_equal "(|(member=*)(uniqueMember=*)(memberUid=*))", @subject.member_filter.to_s
   end
 
   def test_member_equal
-    assert_equal "(|(member=#{@me})(uniqueMember=#{@me}))",
+    assert_equal "(|(member=#{@me})(uniqueMember=#{@me})(memberUid=#{@cn}))",
                  @subject.member_filter(@entry).to_s
   end
 
