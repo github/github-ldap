@@ -163,7 +163,8 @@ end
 class GitHubLdapPosixGroupsWithRecursionFallbackTest < GitHub::Ldap::Test
   def self.test_server_options
     {
-      user_fixtures: FIXTURES.join('github-with-subgroups.ldif').to_s,
+      custom_schemas: FIXTURES.join('posixGroup.schema.ldif'),
+      user_fixtures: FIXTURES.join('github-with-posixGroups.ldif').to_s,
       # so we exercise the recursive group search fallback
       recursive_group_search_fallback: true
     }
@@ -192,7 +193,8 @@ end
 class GitHubLdapPosixGroupsTest < GitHub::Ldap::Test
   def self.test_server_options
     {
-      user_fixtures: FIXTURES.join('github-with-subgroups.ldif').to_s,
+      custom_schemas: FIXTURES.join('posixGroup.schema.ldif'),
+      user_fixtures: FIXTURES.join('github-with-posixGroups.ldif').to_s,
       # so we test the test the non-recursive group membership search
       recursive_group_search_fallback: false
     }
