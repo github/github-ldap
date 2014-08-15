@@ -3,9 +3,18 @@ require 'test_helper'
 class FilterTest < Minitest::Test
   class Subject; include GitHub::Ldap::Filter; end
 
+  # Fake a Net::LDAP::Entry
+  class Entry < Struct.new(:dn, :cn)
+    def [](field)
+      send(field)
+    end
+  end
+
   def setup
     @subject = Subject.new
-    @me = 'uid=calavera,dc=github,dc=com'
+    @me      = 'uid=calavera,dc=github,dc=com'
+    @cn      = "calavera"
+    @entry   = Entry.new(@me, @cn)
   end
 
   def test_member_present
@@ -13,7 +22,8 @@ class FilterTest < Minitest::Test
   end
 
   def test_member_equal
-    assert_equal "(|(member=#{@me})(uniqueMember=#{@me}))", @subject.member_filter(@me).to_s
+    assert_equal "(|(member=#{@me})(uniqueMember=#{@me}))",
+                 @subject.member_filter(@entry).to_s
   end
 
   def test_groups_reduced

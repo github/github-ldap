@@ -20,12 +20,12 @@ module GitHub
 
       # Filter to check a group membership.
       #
-      # user_dn: is an optional user_dn to scope the search to.
+      # entry: is an optional Net::LDAP::Entry to scope the search to.
       #
       # Returns a Net::LDAP::Filter.
-      def member_filter(user_dn = nil)
-        if user_dn
-          MEMBERSHIP_NAMES.map {|n| Net::LDAP::Filter.eq(n, user_dn)}.reduce(:|)
+      def member_filter(entry = nil)
+        if entry
+          MEMBERSHIP_NAMES.map {|n| Net::LDAP::Filter.eq(n, entry.dn)}.reduce(:|)
         else
           MEMBERSHIP_NAMES.map {|n| Net::LDAP::Filter.pres(n)}.reduce(:|)
         end
