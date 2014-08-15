@@ -1,4 +1,4 @@
-require 'test_helper'
+require_relative 'test_helper'
 
 class FilterTest < Minitest::Test
   class Subject; include GitHub::Ldap::Filter; end
