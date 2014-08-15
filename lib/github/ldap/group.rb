@@ -64,7 +64,7 @@ module GitHub
       #
       # Returns an array with all the DN members.
       def member_names
-        MEMBERSHIP_NAMES.each_with_object([]) do |n, cache|
+        (MEMBERSHIP_NAMES - MEMBERSHIP_NAMES_EXCLUDE).each_with_object([]) do |n, cache|
           cache.concat @entry[n]
         end
       end

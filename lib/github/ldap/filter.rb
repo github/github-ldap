@@ -6,6 +6,7 @@ module GitHub
                           Net::LDAP::Filter.eq("objectClass", "posixGroup")
 
       MEMBERSHIP_NAMES  = %w(member uniqueMember memberUid)
+      MEMBERSHIP_NAMES_EXCLUDE = %w(memberUid) # handled separately
 
       MEMBERSHIP_ATTRS  = {
         "member"       => "dn",
