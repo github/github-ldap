@@ -28,7 +28,7 @@ module GitHub
           MEMBERSHIP_NAMES.map {|n| Net::LDAP::Filter.eq(n, entry.dn) }.
                            reduce(:|) |
           entry[@ldap.uid].map { |uid| Net::LDAP::Filter.eq("memberUid", uid) }.
-                           reduce(&:|)
+                           reduce(:|)
         else
           (MEMBERSHIP_NAMES + %w(memberUid)).
             map {|n| Net::LDAP::Filter.pres(n)}.reduce(:|)
