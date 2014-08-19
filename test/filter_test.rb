@@ -1,19 +1,35 @@
 require_relative 'test_helper'
 
 class FilterTest < Minitest::Test
-  class Subject; include GitHub::Ldap::Filter; end
+  class Subject
+    include GitHub::Ldap::Filter
+    def initialize(ldap)
+      @ldap = ldap
+    end
+  end
+
+  # Fake a Net::LDAP::Entry
+  class Entry < Struct.new(:dn, :uid)
+    def [](field)
+      Array(send(field))
+    end
+  end
 
   def setup
-    @subject = Subject.new
-    @me = 'uid=calavera,dc=github,dc=com'
+    @ldap    = GitHub::Ldap.new(:uid => 'uid')
+    @subject = Subject.new(@ldap)
+    @me      = 'uid=calavera,dc=github,dc=com'
+    @uid     = "calavera"
+    @entry   = Entry.new(@me, @uid)
   end
 
   def test_member_present
-    assert_equal "(|(member=*)(uniqueMember=*))", @subject.member_filter.to_s
+    assert_equal "(|(|(member=*)(uniqueMember=*))(memberUid=*))", @subject.member_filter.to_s
   end
 
   def test_member_equal
-    assert_equal "(|(member=#{@me})(uniqueMember=#{@me}))", @subject.member_filter(@me).to_s
+    assert_equal "(|(|(member=#{@me})(uniqueMember=#{@me}))(memberUid=#{@uid}))",
+                 @subject.member_filter(@entry).to_s
   end
 
   def test_groups_reduced

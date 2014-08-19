@@ -18,16 +18,21 @@ module GitHub
         group_names.map {|g| Net::LDAP::Filter.eq("cn", g)}.reduce(:|)
       end
 
-      # Filter to check a group membership.
+      # Filter to check group membership.
       #
-      # user_dn: is an optional user_dn to scope the search to.
+      # entry:    finds groups this Net::LDAP::Entry is a member of (optional)
+      # uid_attr: specifies the memberUid attribute to match with   (optional)
       #
       # Returns a Net::LDAP::Filter.
-      def member_filter(user_dn = nil)
-        if user_dn
-          MEMBERSHIP_NAMES.map {|n| Net::LDAP::Filter.eq(n, user_dn)}.reduce(:|)
+      def member_filter(entry = nil, uid_attr = @ldap.uid)
+        if entry
+          MEMBERSHIP_NAMES.map {|n| Net::LDAP::Filter.eq(n, entry.dn) }.
+                           reduce(:|) |
+          entry[uid_attr]. map { |uid| Net::LDAP::Filter.eq("memberUid", uid) }.
+                           reduce(:|)
         else
-          MEMBERSHIP_NAMES.map {|n| Net::LDAP::Filter.pres(n)}.reduce(:|)
+          (MEMBERSHIP_NAMES + %w(memberUid)).
+            map {|n| Net::LDAP::Filter.pres(n)}.reduce(:|)
         end
       end
 
