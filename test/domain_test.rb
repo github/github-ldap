@@ -213,21 +213,25 @@ end
 class GitHubLdapWithoutPosixGroupsTest < GitHub::Ldap::Test
   def self.test_server_options
     {
+      custom_schemas: FIXTURES.join('posixGroup.schema.ldif'),
+      user_fixtures: FIXTURES.join('github-with-posixGroups.ldif').to_s,
       # so we test the test the non-recursive group membership search
-      recursive_group_search_fallback: false
+      recursive_group_search_fallback: false,
+      # explicitly disable posixGroup support (even if the schema supports it)
+      posix_support:                   false
     }
   end
 
   def setup
     @ldap = GitHub::Ldap.new(options)
     @domain = @ldap.domain("dc=github,dc=com")
-    @cn = "Enterprise"
+    @cn = "enterprise-posix-devs"
   end
 
   def test_membership_for_posixGroups
-    assert user = @ldap.domain('uid=calavera,dc=github,dc=com').bind
+    assert user = @ldap.domain('uid=mtodd,ou=users,dc=github,dc=com').bind
 
-    assert @domain.is_member?(user, [@cn]),
-      "Expected `#{@cn}` to include the member `#{user.dn}`"
+    refute @domain.is_member?(user, [@cn]),
+      "Expected `#{@cn}` to not include the member `#{user.dn}`"
   end
 end
