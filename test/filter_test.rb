@@ -32,6 +32,12 @@ class FilterTest < Minitest::Test
                  @subject.member_filter(@entry).to_s
   end
 
+  def test_member_without_uid
+    @entry.uid = nil
+    assert_equal "(|(member=#{@me})(uniqueMember=#{@me}))",
+                 @subject.member_filter(@entry).to_s
+  end
+
   def test_groups_reduced
     assert_equal "(|(cn=Enterprise)(cn=People))",
       @subject.group_filter(%w(Enterprise People)).to_s
