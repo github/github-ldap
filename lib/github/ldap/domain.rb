@@ -69,7 +69,7 @@ module GitHub
           filter = member_filter(user_entry)
 
           # include memberUid filter if enabled and entry has a UID set
-          if @ldap.posix_support_enabled? && !entry[@ldap.uid].empty?
+          if @ldap.posix_support_enabled? && !user_entry[@ldap.uid].empty?
             filter |= posix_member_filter(user_entry, @ldap.uid)
           end
 
