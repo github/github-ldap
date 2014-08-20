@@ -69,7 +69,7 @@ module GitHub
     #
     # Returns true, false, or nil (assumed false).
     def posix_support_enabled?
-      @posix_support_enabled
+      @posix_support
     end
 
     # Public - Utility method to check if the connection with the server can be stablished.
