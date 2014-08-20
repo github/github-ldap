@@ -173,24 +173,18 @@ class GitHubLdapPosixGroupsWithRecursionFallbackTest < GitHub::Ldap::Test
   def setup
     @ldap = GitHub::Ldap.new(options)
     @domain = @ldap.domain("dc=github,dc=com")
-
-    @group = Net::LDAP::Entry._load("""
-dn: cn=enterprise-posix-devs,ou=groups,dc=github,dc=com
-cn: enterprise-posix-devs
-objectClass: posixGroup
-memberUid: benburkert
-memberUid: mtodd""")
+    @cn = "enterprise-posix-devs"
   end
 
   def test_membership_for_posixGroups
     assert user = @ldap.domain('uid=mtodd,ou=users,dc=github,dc=com').bind
 
-    assert @domain.is_member?(user, @group.cn),
-      "Expected `#{@group.cn.first}` to include the member `#{user.dn}`"
+    assert @domain.is_member?(user, [@cn]),
+      "Expected `#{@cn}` to include the member `#{user.dn}`"
   end
 end
 
-class GitHubLdapPosixGroupsTest < GitHub::Ldap::Test
+class GitHubLdapPosixGroupsWithoutRecursionTest < GitHub::Ldap::Test
   def self.test_server_options
     {
       custom_schemas: FIXTURES.join('posixGroup.schema.ldif'),
@@ -203,19 +197,37 @@ class GitHubLdapPosixGroupsTest < GitHub::Ldap::Test
   def setup
     @ldap = GitHub::Ldap.new(options)
     @domain = @ldap.domain("dc=github,dc=com")
-
-    @group = Net::LDAP::Entry._load("""
-dn: cn=enterprise-posix-devs,ou=groups,dc=github,dc=com
-cn: enterprise-posix-devs
-objectClass: posixGroup
-memberUid: benburkert
-memberUid: mtodd""")
+    @cn = "enterprise-posix-devs"
   end
 
   def test_membership_for_posixGroups
     assert user = @ldap.domain('uid=mtodd,ou=users,dc=github,dc=com').bind
 
-    assert @domain.is_member?(user, @group.cn),
-      "Expected `#{@group.cn.first}` to include the member `#{user.dn}`"
+    assert @domain.is_member?(user, [@cn]),
+      "Expected `#{@cn}` to include the member `#{user.dn}`"
+  end
+end
+
+# Specifically testing that this doesn't break when posixGroups are not
+# supported.
+class GitHubLdapWithoutPosixGroupsTest < GitHub::Ldap::Test
+  def self.test_server_options
+    {
+      # so we test the test the non-recursive group membership search
+      recursive_group_search_fallback: false
+    }
+  end
+
+  def setup
+    @ldap = GitHub::Ldap.new(options)
+    @domain = @ldap.domain("dc=github,dc=com")
+    @cn = "Enterprise"
+  end
+
+  def test_membership_for_posixGroups
+    assert user = @ldap.domain('uid=calavera,dc=github,dc=com').bind
+
+    assert @domain.is_member?(user, [@cn]),
+      "Expected `#{@cn}` to include the member `#{user.dn}`"
   end
 end
