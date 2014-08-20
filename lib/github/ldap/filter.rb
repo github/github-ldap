@@ -26,10 +26,17 @@ module GitHub
       # Returns a Net::LDAP::Filter.
       def member_filter(entry = nil, uid_attr = @ldap.uid)
         if entry
-          MEMBERSHIP_NAMES.map {|n| Net::LDAP::Filter.eq(n, entry.dn) }.
-                           reduce(:|) |
-          entry[uid_attr]. map { |uid| Net::LDAP::Filter.eq("memberUid", uid) }.
-                           reduce(:|)
+          filter =
+            MEMBERSHIP_NAMES. map {|n| Net::LDAP::Filter.eq(n, entry.dn) }.
+                              reduce(:|)
+
+          if !entry[uid_attr].empty?
+            filter |=
+              entry[uid_attr].map { |uid| Net::LDAP::Filter.eq("memberUid", uid) }.
+                              reduce(:|)
+          end
+
+          filter
         else
           (MEMBERSHIP_NAMES + %w(memberUid)).
             map {|n| Net::LDAP::Filter.pres(n)}.reduce(:|)
