@@ -23,7 +23,7 @@ module GitHub
     # Returns a Net::LDAP::Entry if the operation succeeded.
     def_delegator :@connection, :bind
 
-    attr_reader :uid, :virtual_attributes, :search_domains
+    attr_reader :uid, :search_domains, :virtual_attributes
 
     def initialize(options = {})
       @uid = options[:uid] || "sAMAccountName"
@@ -43,6 +43,9 @@ module GitHub
       # enable fallback recursive group search unless option is false
       @recursive_group_search_fallback = (options[:recursive_group_search_fallback] != false)
 
+      # enable posixGroup support unless option is false
+      @posix_support = (options[:posix_support] != false)
+
       # search_domains is a connection of bases to perform searches
       # when a base is not explicitly provided.
       @search_domains = Array(options[:search_domains])
@@ -56,6 +59,17 @@ module GitHub
     # Returns true or false.
     def recursive_group_search_fallback?
       @recursive_group_search_fallback
+    end
+
+    # Public - Whether membership checks should include posixGroup filter
+    # conditions on `memberUid`. Configurable since some LDAP servers don't
+    # handle unsupported attribute queries gracefully.
+    #
+    # Enable by passing :posix_support => true.
+    #
+    # Returns true, false, or nil (assumed false).
+    def posix_support_enabled?
+      @posix_support
     end
 
     # Public - Utility method to check if the connection with the server can be stablished.

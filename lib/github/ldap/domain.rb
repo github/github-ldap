@@ -66,7 +66,14 @@ module GitHub
           end
         else
           # fallback to non-recursive group membership search
-          filter = member_filter(user_entry) & group_filter(group_names)
+          filter = member_filter(user_entry)
+
+          # include memberUid filter if enabled and entry has a UID set
+          if @ldap.posix_support_enabled? && !user_entry[@ldap.uid].empty?
+            filter |= posix_member_filter(user_entry, @ldap.uid)
+          end
+
+          filter &= group_filter(group_names)
           search(filter: filter)
         end
       end

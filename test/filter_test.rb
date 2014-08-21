@@ -24,18 +24,22 @@ class FilterTest < Minitest::Test
   end
 
   def test_member_present
-    assert_equal "(|(|(member=*)(uniqueMember=*))(memberUid=*))", @subject.member_filter.to_s
+    assert_equal "(|(member=*)(uniqueMember=*))", @subject.member_filter.to_s
   end
 
   def test_member_equal
-    assert_equal "(|(|(member=#{@me})(uniqueMember=#{@me}))(memberUid=#{@uid}))",
+    assert_equal "(|(member=#{@me})(uniqueMember=#{@me}))",
                  @subject.member_filter(@entry).to_s
   end
 
-  def test_member_without_uid
+  def test_posix_member_without_uid
     @entry.uid = nil
-    assert_equal "(|(member=#{@me})(uniqueMember=#{@me}))",
-                 @subject.member_filter(@entry).to_s
+    assert_nil @subject.posix_member_filter(@entry, @ldap.uid)
+  end
+
+  def test_posix_member_equal
+    assert_equal "(memberUid=#{@uid})",
+                 @subject.posix_member_filter(@entry, @ldap.uid).to_s
   end
 
   def test_groups_reduced
