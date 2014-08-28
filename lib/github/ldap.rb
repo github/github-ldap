@@ -51,6 +51,16 @@ module GitHub
       @search_domains = Array(options[:search_domains])
     end
 
+    # Public - Opens a connection to the server and keeps it open for the
+    # duration of the block.
+    #
+    # Returns the return value of the block.
+    def open
+      @connection.open do
+        yield self
+      end
+    end
+
     # Public - Whether membership checks should recurse into nested groups when
     # virtual attributes aren't enabled. The fallback search has poor
     # performance characteristics in some cases, in which case this should be
