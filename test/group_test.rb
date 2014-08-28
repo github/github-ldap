@@ -24,7 +24,7 @@ class GitHubLdapGroupTest < GitHub::Ldap::Test
 
   def test_all_domain_groups
     groups = groups_domain.all_groups
-    assert_equal 4, groups.size
+    assert_equal 8, groups.size
   end
 
   def test_filter_domain_groups
