@@ -52,16 +52,29 @@ module GitHub
       #
       # Return an Array with the groups that the given user is member of that belong to the given group list.
       def membership(user_entry, group_names)
-        all_groups = search(filter: group_filter(group_names))
-        groups_map = all_groups.each_with_object({}) {|entry, hash| hash[entry.dn] = entry}
+        if @ldap.virtual_attributes.enabled? || @ldap.recursive_group_search_fallback?
+          all_groups = search(filter: group_filter(group_names))
+          groups_map = all_groups.each_with_object({}) {|entry, hash| hash[entry.dn] = entry}
 
-        if @ldap.virtual_attributes.enabled?
-          member_of = groups_map.keys & user_entry[@ldap.virtual_attributes.virtual_membership]
-          member_of.map {|dn| groups_map[dn]}
-        else
-          groups_map.each_with_object([]) do |(dn, group_entry), acc|
-            acc << group_entry if @ldap.load_group(group_entry).is_member?(user_entry)
+          if @ldap.virtual_attributes.enabled?
+            member_of = groups_map.keys & user_entry[@ldap.virtual_attributes.virtual_membership]
+            member_of.map {|dn| groups_map[dn]}
+          else # recursive group search fallback
+            groups_map.each_with_object([]) do |(dn, group_entry), acc|
+              acc << group_entry if @ldap.load_group(group_entry).is_member?(user_entry)
+            end
           end
+        else
+          # fallback to non-recursive group membership search
+          filter = member_filter(user_entry)
+
+          # include memberUid filter if enabled and entry has a UID set
+          if @ldap.posix_support_enabled? && !user_entry[@ldap.uid].empty?
+            filter |= posix_member_filter(user_entry, @ldap.uid)
+          end
+
+          filter &= group_filter(group_names)
+          search(filter: filter)
         end
       end
 

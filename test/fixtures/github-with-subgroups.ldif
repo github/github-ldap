@@ -1,13 +1,5 @@
 version: 1
 
-# Organizations
-
-dn: dc=github,dc=com
-objectClass: dcObject
-objectClass: organization
-dc: github
-o: GitHub Inc.
-
 # Admin user
 
 dn: uid=admin,dc=github,dc=com

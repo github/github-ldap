@@ -18,16 +18,33 @@ module GitHub
         group_names.map {|g| Net::LDAP::Filter.eq("cn", g)}.reduce(:|)
       end
 
-      # Filter to check a group membership.
+      # Filter to check group membership.
       #
-      # user_dn: is an optional user_dn to scope the search to.
+      # entry: finds groups this Net::LDAP::Entry is a member of (optional)
       #
       # Returns a Net::LDAP::Filter.
-      def member_filter(user_dn = nil)
-        if user_dn
-          MEMBERSHIP_NAMES.map {|n| Net::LDAP::Filter.eq(n, user_dn)}.reduce(:|)
+      def member_filter(entry = nil)
+        if entry
+          MEMBERSHIP_NAMES.
+            map {|n| Net::LDAP::Filter.eq(n, entry.dn) }.reduce(:|)
         else
-          MEMBERSHIP_NAMES.map {|n| Net::LDAP::Filter.pres(n)}.reduce(:|)
+          MEMBERSHIP_NAMES.
+            map {|n| Net::LDAP::Filter.pres(n) }.        reduce(:|)
+        end
+      end
+
+      # Filter to check group membership for posixGroups.
+      #
+      # Used by Domain#membership when posix_support_enabled? is true.
+      #
+      # entry:    finds groups this Net::LDAP::Entry is a member of
+      # uid_attr: specifies the memberUid attribute to match with
+      #
+      # Returns a Net::LDAP::Filter or nil if no entry has no UID set.
+      def posix_member_filter(entry, uid_attr)
+        if !entry[uid_attr].empty?
+          entry[uid_attr].map { |uid| Net::LDAP::Filter.eq("memberUid", uid) }.
+                          reduce(:|)
         end
       end
 

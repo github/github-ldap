@@ -1,11 +1,26 @@
-require 'test_helper'
+require_relative 'test_helper'
 
 class FilterTest < Minitest::Test
-  class Subject; include GitHub::Ldap::Filter; end
+  class Subject
+    include GitHub::Ldap::Filter
+    def initialize(ldap)
+      @ldap = ldap
+    end
+  end
+
+  # Fake a Net::LDAP::Entry
+  class Entry < Struct.new(:dn, :uid)
+    def [](field)
+      Array(send(field))
+    end
+  end
 
   def setup
-    @subject = Subject.new
-    @me = 'uid=calavera,dc=github,dc=com'
+    @ldap    = GitHub::Ldap.new(:uid => 'uid')
+    @subject = Subject.new(@ldap)
+    @me      = 'uid=calavera,dc=github,dc=com'
+    @uid     = "calavera"
+    @entry   = Entry.new(@me, @uid)
   end
 
   def test_member_present
@@ -13,7 +28,18 @@ class FilterTest < Minitest::Test
   end
 
   def test_member_equal
-    assert_equal "(|(member=#{@me})(uniqueMember=#{@me}))", @subject.member_filter(@me).to_s
+    assert_equal "(|(member=#{@me})(uniqueMember=#{@me}))",
+                 @subject.member_filter(@entry).to_s
+  end
+
+  def test_posix_member_without_uid
+    @entry.uid = nil
+    assert_nil @subject.posix_member_filter(@entry, @ldap.uid)
+  end
+
+  def test_posix_member_equal
+    assert_equal "(memberUid=#{@uid})",
+                 @subject.posix_member_filter(@entry, @ldap.uid).to_s
   end
 
   def test_groups_reduced
