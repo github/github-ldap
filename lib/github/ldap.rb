@@ -112,7 +112,7 @@ module GitHub
     def load_group(group_entry)
       if @virtual_attributes.enabled?
         VirtualGroup.new(self, group_entry)
-      elsif PosixGroup.valid?(group_entry)
+      elsif posix_support_enabled? && PosixGroup.valid?(group_entry)
         PosixGroup.new(self, group_entry)
       else
         Group.new(self, group_entry)
