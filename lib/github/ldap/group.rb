@@ -72,9 +72,12 @@ module GitHub
       # Internal - Check if an object class includes the member names
       # Use `&` rathen than `include?` because both are arrays.
       #
+      # NOTE: object classes are downcased by default in Net::LDAP, so this
+      # will fail to match correctly unless we also downcase our group classes.
+      #
       # Returns true if the object class includes one of the group class names.
       def group?(object_class)
-        !(GROUP_CLASS_NAMES & object_class).empty?
+        !(GROUP_CLASS_NAMES.map(&:downcase) & object_class.map(&:downcase)).empty?
       end
 
       # Internal - Generate a hash with all the group DNs for caching purposes.
