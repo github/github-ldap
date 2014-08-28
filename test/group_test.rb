@@ -14,6 +14,12 @@ class GitHubLdapGroupTest < GitHub::Ldap::Test
     @group = @ldap.group("cn=enterprise,ou=groups,dc=github,dc=com")
   end
 
+  def test_group?
+    object_classes = %w(groupOfNames)
+    assert @group.group?(object_classes)
+    assert @group.group?(object_classes.map(&:downcase))
+  end
+
   def test_subgroups
     assert_equal 3, @group.subgroups.size
   end
