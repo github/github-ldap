@@ -1,7 +1,7 @@
 module GitHub
   class Ldap
     # Encapsulates common instrumentation behavior.
-    class Instrumentation
+    module Instrumentation
       attr_reader :instrumentation_service
       private     :instrumentation_service
 
