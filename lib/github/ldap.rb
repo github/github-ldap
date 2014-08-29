@@ -23,6 +23,12 @@ module GitHub
     # Returns a Net::LDAP::Entry if the operation succeeded.
     def_delegator :@connection, :bind
 
+    # Public - Opens a connection to the server and keeps it open for the
+    # duration of the block.
+    #
+    # Returns the return value of the block.
+    def_delegator :@connection, :open
+
     attr_reader :uid, :search_domains, :virtual_attributes
 
     def initialize(options = {})
