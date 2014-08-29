@@ -8,6 +8,9 @@ module GitHub
     require 'github/ldap/posix_group'
     require 'github/ldap/virtual_group'
     require 'github/ldap/virtual_attributes'
+    require 'github/ldap/instrumentation'
+
+    include Instrumentation
 
     extend Forwardable
 
@@ -187,19 +190,6 @@ module GitHub
         VirtualAttributes.new(true, attributes)
       else
         VirtualAttributes.new(false)
-      end
-    end
-
-    # Internal: Instrument the block if an instrumentation servie is set.
-    #
-    # Returns the result of the block.
-    def instrument(event, payload = {})
-      if instrumentation_service
-        instrumentation_service.instrument(event, payload) do
-          yield payload
-        end
-      else
-        yield payload
       end
     end
   end
