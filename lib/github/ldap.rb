@@ -23,6 +23,12 @@ module GitHub
     # Returns a Net::LDAP::Entry if the operation succeeded.
     def_delegator :@connection, :bind
 
+    # Public - Opens a connection to the server and keeps it open for the
+    # duration of the block.
+    #
+    # Returns the return value of the block.
+    def_delegator :@connection, :open
+
     attr_reader :uid, :search_domains, :virtual_attributes
 
     def initialize(options = {})
@@ -49,16 +55,6 @@ module GitHub
       # search_domains is a connection of bases to perform searches
       # when a base is not explicitly provided.
       @search_domains = Array(options[:search_domains])
-    end
-
-    # Public - Opens a connection to the server and keeps it open for the
-    # duration of the block.
-    #
-    # Returns the return value of the block.
-    def open
-      @connection.open do
-        yield self
-      end
     end
 
     # Public - Whether membership checks should recurse into nested groups when
