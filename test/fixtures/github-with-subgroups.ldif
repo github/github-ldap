@@ -43,6 +43,29 @@ objectClass: groupOfNames
 member: uid=calavera,ou=users,dc=github,dc=com
 member: uid=rubiojr,ou=users,dc=github,dc=com
 
+dn: cn=group1,ou=groups,dc=github,dc=com
+cn: group1
+objectClass: groupOfNames
+member: uid=user1,ou=users,dc=github,dc=com
+member: cn=group1.1,ou=groups,dc=github,dc=com
+
+dn: cn=group1.1,ou=groups,dc=github,dc=com
+cn: group1
+objectClass: groupOfNames
+member: uid=user1.1,ou=users,dc=github,dc=com
+member: cn=group1.1.1,ou=groups,dc=github,dc=com
+
+dn: cn=group1.1.1,ou=groups,dc=github,dc=com
+cn: group1
+objectClass: groupOfNames
+member: uid=user1.1.1,ou=users,dc=github,dc=com
+member: cn=group1.1.1.1,ou=groups,dc=github,dc=com
+
+dn: cn=group1.1.1.1,ou=groups,dc=github,dc=com
+cn: group1
+objectClass: groupOfNames
+member: uid=user1.1.1.1,ou=users,dc=github,dc=com
+
 # Users
 
 dn: ou=users,dc=github,dc=com
@@ -88,4 +111,36 @@ sn: mtodd
 uid: mtodd
 userPassword: passworD1
 mail: mtodd@github.com
+objectClass: inetOrgPerson
+
+dn: uid=user1,ou=users,dc=github,dc=com
+uid: user1
+sn: user1
+cn: user1
+userPassword: passworD1
+mail: user1@github.com
+objectClass: inetOrgPerson
+
+dn: uid=user1.1,ou=users,dc=github,dc=com
+uid: user1.1
+sn: user1.1
+cn: user1.1
+userPassword: passworD1
+mail: user1.1@github.com
+objectClass: inetOrgPerson
+
+dn: uid=user1.1.1,ou=users,dc=github,dc=com
+uid: user1.1.1
+sn: user1.1.1
+cn: user1.1.1
+userPassword: passworD1
+mail: user1.1.1@github.com
+objectClass: inetOrgPerson
+
+dn: uid=user1.1.1.1,ou=users,dc=github,dc=com
+uid: user1.1.1.1
+sn: user1.1.1.1
+cn: user1.1.1.1
+userPassword: passworD1
+mail: user1.1.1.1@github.com
 objectClass: inetOrgPerson

@@ -158,6 +158,13 @@ class GitHubLdapDomainNestedGroupsTest < GitHub::Ldap::Test
     assert @domain.is_member?(user, %w(enterprise-ops)),
       "Expected `enterprise-ops` to include the member `#{user.dn}`"
   end
+
+  def test_membership_in_deeply_nested_subgroups
+    assert user = @ldap.domain('uid=user1.1.1.1,ou=users,dc=github,dc=com').bind
+
+    assert @domain.is_member?(user, %w(group1)),
+      "Expected `group1` to include the member `#{user.dn}` via deep recursion"
+  end
 end
 
 class GitHubLdapPosixGroupsWithRecursionFallbackTest < GitHub::Ldap::Test

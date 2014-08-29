@@ -26,6 +26,12 @@ module GitHub
     # Returns a Net::LDAP::Entry if the operation succeeded.
     def_delegator :@connection, :bind
 
+    # Public - Opens a connection to the server and keeps it open for the
+    # duration of the block.
+    #
+    # Returns the return value of the block.
+    def_delegator :@connection, :open
+
     attr_reader :uid, :search_domains, :virtual_attributes,
                 :instrumentation_service
 
@@ -127,7 +133,7 @@ module GitHub
     def load_group(group_entry)
       if @virtual_attributes.enabled?
         VirtualGroup.new(self, group_entry)
-      elsif PosixGroup.valid?(group_entry)
+      elsif posix_support_enabled? && PosixGroup.valid?(group_entry)
         PosixGroup.new(self, group_entry)
       else
         Group.new(self, group_entry)
