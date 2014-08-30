@@ -147,23 +147,20 @@ module GitHub
     #
     # Returns an Array of Net::LDAP::Entry.
     def search(options, &block)
-      result = if options[:base]
-        instrument "github_ldap.search_base", options do
-          @connection.search(options, &block)
-        end
-      else
-        instrument "github_ldap.search_bases", options.dup do |payload|
-          search_domains.each_with_object([]) do |base, result|
-            instrument "github_ldap.search_base", payload.merge(:base => base) do
+      instrument "github_ldap.search", options.dup do |payload|
+        result =
+          if options[:base]
+            @connection.search(options, &block)
+          else
+            search_domains.each_with_object([]) do |base, result|
               rs = @connection.search(options.merge(:base => base), &block)
               result.concat Array(rs) unless rs == false
             end
           end
-        end
-      end
 
-      return [] if result == false
-      Array(result)
+        return [] if result == false
+        Array(result)
+      end
     end
 
     # Internal - Determine whether to use encryption or not.
