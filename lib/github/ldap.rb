@@ -115,11 +115,7 @@ module GitHub
     # Returns a new Group object.
     # Returns nil if the dn is not in the server.
     def group(base_name)
-      entry =
-        instrument "github_ldap.group", :base_name => base_name do
-          domain(base_name).bind
-        end
-
+      entry = domain(base_name).bind
       return unless entry
 
       load_group(entry)
