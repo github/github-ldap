@@ -147,7 +147,7 @@ module GitHub
     #
     # Returns an Array of Net::LDAP::Entry.
     def search(options, &block)
-      instrument "github_ldap.search", options.dup do |payload|
+      instrument "search.github_ldap", options.dup do |payload|
         result =
           if options[:base]
             @connection.search(options, &block)

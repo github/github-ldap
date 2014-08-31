@@ -29,9 +29,11 @@ class GitHub::Ldap::Test < Minitest::Test
   end
 
   def options
+    @service   = MockInstrumentationService.new
     @options ||= GitHub::Ldap.server_options.merge \
       host: 'localhost',
-      uid:  'uid'
+      uid:  'uid',
+      :instrumentation_service => @service
   end
 end
 

@@ -65,6 +65,18 @@ module GitHubLdapTestCases
     refute result.empty?
     assert_equal 'calavera', result.first[:uid].first
   end
+
+  def test_instruments_search
+    events = @service.subscribe "search.github_ldap"
+    result = @ldap.search(filter: "(uid=calavera)", :base => "dc=github,dc=com")
+    refute_predicate result, :empty?
+    payload, event_result = events.pop
+    assert payload
+    assert event_result
+    assert_equal result, event_result
+    assert_equal "(uid=calavera)",   payload[:filter].to_s
+    assert_equal "dc=github,dc=com", payload[:base]
+  end
 end
 
 class GitHubLdapTest < GitHub::Ldap::Test
