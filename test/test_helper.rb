@@ -29,9 +29,11 @@ class GitHub::Ldap::Test < Minitest::Test
   end
 
   def options
+    @service   = MockInstrumentationService.new
     @options ||= GitHub::Ldap.server_options.merge \
       host: 'localhost',
-      uid:  'uid'
+      uid:  'uid',
+      :instrumentation_service => @service
   end
 end
 
@@ -44,5 +46,23 @@ class GitHub::Ldap::UnauthenticatedTest < GitHub::Ldap::Test
     @options ||= begin
       super.delete_if {|k, _| [:admin_user, :admin_password].include?(k)}
     end
+  end
+end
+
+class MockInstrumentationService
+  def initialize
+    @events = {}
+  end
+
+  def instrument(event, payload)
+    result = yield(payload)
+    @events[event] ||= []
+    @events[event] << [payload, result]
+    result
+  end
+
+  def subscribe(event)
+    @events[event] ||= []
+    @events[event]
   end
 end

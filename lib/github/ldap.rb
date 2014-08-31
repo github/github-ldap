@@ -8,6 +8,9 @@ module GitHub
     require 'github/ldap/posix_group'
     require 'github/ldap/virtual_group'
     require 'github/ldap/virtual_attributes'
+    require 'github/ldap/instrumentation'
+
+    include Instrumentation
 
     extend Forwardable
 
@@ -29,12 +32,17 @@ module GitHub
     # Returns the return value of the block.
     def_delegator :@connection, :open
 
-    attr_reader :uid, :search_domains, :virtual_attributes
+    attr_reader :uid, :search_domains, :virtual_attributes,
+                :instrumentation_service
 
     def initialize(options = {})
       @uid = options[:uid] || "sAMAccountName"
 
-      @connection = Net::LDAP.new({host: options[:host], port: options[:port]})
+      @connection = Net::LDAP.new({
+        host: options[:host],
+        port: options[:port],
+        instrumentation_service: options[:instrumentation_service]
+      })
 
       if options[:admin_user] && options[:admin_password]
         @connection.authenticate(options[:admin_user], options[:admin_password])
@@ -55,6 +63,9 @@ module GitHub
       # search_domains is a connection of bases to perform searches
       # when a base is not explicitly provided.
       @search_domains = Array(options[:search_domains])
+
+      # enables instrumenting queries
+      @instrumentation_service = options[:instrumentation_service]
     end
 
     # Public - Whether membership checks should recurse into nested groups when
@@ -132,17 +143,20 @@ module GitHub
     #
     # Returns an Array of Net::LDAP::Entry.
     def search(options, &block)
-      result = if options[:base]
-        @connection.search(options, &block)
-      else
-        search_domains.each_with_object([]) do |base, result|
-          rs = @connection.search(options.merge(:base => base), &block)
-          result.concat Array(rs) unless rs == false
-        end
-      end
+      instrument "search.github_ldap", options.dup do |payload|
+        result =
+          if options[:base]
+            @connection.search(options, &block)
+          else
+            search_domains.each_with_object([]) do |base, result|
+              rs = @connection.search(options.merge(:base => base), &block)
+              result.concat Array(rs) unless rs == false
+            end
+          end
 
-      return [] if result == false
-      Array(result)
+        return [] if result == false
+        Array(result)
+      end
     end
 
     # Internal - Determine whether to use encryption or not.
