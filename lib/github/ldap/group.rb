@@ -12,7 +12,7 @@ module GitHub
     class Group
       include Filter
 
-      GROUP_CLASS_NAMES = %w(groupOfNames groupOfUniqueNames posixGroup)
+      GROUP_CLASS_NAMES = %w(groupOfNames groupOfUniqueNames posixGroup group)
 
       attr_reader :ldap, :entry
 
