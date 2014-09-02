@@ -15,6 +15,10 @@ class GitHubLdapGroupTest < GitHub::Ldap::Test
   end
 
   def test_group?
+    assert @group.group?(%w(group))
+    assert @group.group?(%w(groupOfUniqueNames))
+    assert @group.group?(%w(posixGroup))
+
     object_classes = %w(groupOfNames)
     assert @group.group?(object_classes)
     assert @group.group?(object_classes.map(&:downcase))
