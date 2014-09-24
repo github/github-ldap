@@ -1,5 +1,5 @@
 module GitHub
-  module Ldap
+  class Ldap
     module MembershipValidators
       class Base
         attr_reader :ldap, :groups
