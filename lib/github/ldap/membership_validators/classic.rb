@@ -1,5 +1,5 @@
 module GitHub
-  module Ldap
+  class Ldap
     module MembershipValidators
       # Validates membership using the `Domain#membership` lookup method.
       #
