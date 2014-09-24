@@ -1,6 +1,6 @@
 module GitHub
   class Ldap
-    # x
+    # Provides various strategies for validating membership.
     #
     # For example:
     #
