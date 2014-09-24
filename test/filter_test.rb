@@ -32,6 +32,11 @@ class FilterTest < Minitest::Test
                  @subject.member_filter(@entry).to_s
   end
 
+  def test_member_equal_with_string
+    assert_equal "(|(member=#{@me})(uniqueMember=#{@me}))",
+                 @subject.member_filter(@entry.dn).to_s
+  end
+
   def test_posix_member_without_uid
     @entry.uid = nil
     assert_nil @subject.posix_member_filter(@entry, @ldap.uid)

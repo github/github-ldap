@@ -20,16 +20,18 @@ module GitHub
 
       # Filter to check group membership.
       #
-      # entry: finds groups this Net::LDAP::Entry is a member of (optional)
+      # entry: finds groups this entry is a member of (optional)
+      #        Expects a Net::LDAP::Entry or String DN.
       #
       # Returns a Net::LDAP::Filter.
       def member_filter(entry = nil)
         if entry
+          entry = entry.dn if entry.respond_to?(:dn)
           MEMBERSHIP_NAMES.
-            map {|n| Net::LDAP::Filter.eq(n, entry.dn) }.reduce(:|)
+            map {|n| Net::LDAP::Filter.eq(n, entry) }.reduce(:|)
         else
           MEMBERSHIP_NAMES.
-            map {|n| Net::LDAP::Filter.pres(n) }.        reduce(:|)
+            map {|n| Net::LDAP::Filter.pres(n) }.     reduce(:|)
         end
       end
 
