@@ -19,11 +19,13 @@ module GitHub
         include Filter
 
         DEFAULT_MAX_DEPTH = 9
+        ATTRS             = %w(dn)
 
         def perform(entry, depth = DEFAULT_MAX_DEPTH)
           domains.each do |domain|
             # find groups entry is an immediate member of
-            membership = domain.search(filter: member_filter(entry), attributes: %w(dn)).map(&:dn)
+            membership = domain.search(filter: member_filter(entry), attributes: ATTRS).map(&:dn)
+
             # success if any of these groups match the restricted auth groups
             return true if membership.any?{ |dn| group_dns.include?(dn) }
 
@@ -33,7 +35,8 @@ module GitHub
             # recurse to at most `depth`
             depth.times do |n|
               # find groups whose members include membership groups
-              membership = domain.search(filter: membership_filter(membership), attributes: %w(dn)).map(&:dn)
+              membership = domain.search(filter: membership_filter(membership), attributes: ATTRS).map(&:dn)
+
               # success if any of these groups match the restricted auth groups
               return true if membership.any?{ |dn| group_dns.include?(dn) }
 
