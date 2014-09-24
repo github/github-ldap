@@ -16,7 +16,7 @@ module GitHub
         # end
 
         def domains
-          ldap.search_domains
+          @domains ||= ldap.search_domains.map { |base| ldap.domain(base) }
         end
       end
     end

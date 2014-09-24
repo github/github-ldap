@@ -9,8 +9,8 @@ module GitHub
         def perform(entry)
           return true if groups.empty?
 
-          domains.each do |base_name, domain|
-            membership = domain.membership(entry, groups)
+          domains.each do |domain|
+            membership = domain.membership(entry, group_names)
 
             if !membership.empty?
               entry[:groups] = membership
@@ -19,6 +19,15 @@ module GitHub
           end
 
           false
+        end
+
+        # Internal: the group names to look up membership for.
+        #
+        # FIXME: Hardcoded to CN.
+        #
+        # Returns an Array of String group names (CNs).
+        def group_names
+          @group_names ||= groups.map { |g| g[:cn].first }
         end
       end
     end
