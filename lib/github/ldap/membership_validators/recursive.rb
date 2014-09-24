@@ -51,8 +51,6 @@ module GitHub
         # Internal: Construct a filter to find groups whose members are the
         # Array of String group DNs passed in.
         #
-        # FIXME: Not portable (hardcoded to `member` attribute).
-        #
         # Returns a String filter.
         def membership_filter(groups)
           groups.map{ |dn| member_filter(dn) }.reduce(:|)
