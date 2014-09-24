@@ -23,8 +23,6 @@ module GitHub
 
         # Internal: the group names to look up membership for.
         #
-        # FIXME: Hardcoded to CN.
-        #
         # Returns an Array of String group names (CNs).
         def group_names
           @group_names ||= groups.map { |g| g[:cn].first }
