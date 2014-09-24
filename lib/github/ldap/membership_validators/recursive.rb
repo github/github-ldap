@@ -55,7 +55,7 @@ module GitHub
         #
         # Returns a String filter.
         def membership_filter(groups)
-          "(|%s)" % groups.map{ |dn| "(member=#{dn})" }.join
+          groups.map{ |dn| member_filter(dn) }.reduce(:|)
         end
 
         # Internal: the group DNs to check against.
