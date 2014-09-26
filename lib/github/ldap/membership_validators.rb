@@ -8,8 +8,7 @@ module GitHub
     #   validator.perform(entry) #=> true
     #
     module MembershipValidators
-      require 'github/ldap/membership_validators/base'
-
+      autoload :Base,      'github/ldap/membership_validators/base'
       autoload :Classic,   'github/ldap/membership_validators/classic'
       autoload :Recursive, 'github/ldap/membership_validators/recursive'
     end
