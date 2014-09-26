@@ -27,7 +27,7 @@ module GitHub
             membership = domain.search(filter: member_filter(entry), attributes: ATTRS).map(&:dn)
 
             # success if any of these groups match the restricted auth groups
-            return true if membership.any?{ |dn| group_dns.include?(dn) }
+            return true if membership.any? { |dn| group_dns.include?(dn) }
 
             # give up if the entry has no memberships to recurse
             next if membership.empty?
@@ -38,7 +38,7 @@ module GitHub
               membership = domain.search(filter: membership_filter(membership), attributes: ATTRS).map(&:dn)
 
               # success if any of these groups match the restricted auth groups
-              return true if membership.any?{ |dn| group_dns.include?(dn) }
+              return true if membership.any? { |dn| group_dns.include?(dn) }
 
               # give up if there are no more membersips to recurse
               break if membership.empty?
@@ -56,7 +56,7 @@ module GitHub
         #
         # Returns a String filter.
         def membership_filter(groups)
-          groups.map{ |dn| member_filter(dn) }.reduce(:|)
+          groups.map { |dn| member_filter(dn) }.reduce(:|)
         end
 
         # Internal: the group DNs to check against.
