@@ -43,10 +43,16 @@ module GitHub
       # uid_attr: specifies the memberUid attribute to match with
       #
       # Returns a Net::LDAP::Filter or nil if no entry has no UID set.
-      def posix_member_filter(entry, uid_attr)
-        if !entry[uid_attr].empty?
-          entry[uid_attr].map { |uid| Net::LDAP::Filter.eq("memberUid", uid) }.
-                          reduce(:|)
+      def posix_member_filter(entry_or_uid, uid_attr = nil)
+        case entry_or_uid
+        when Net::LDAP::Entry
+          entry = entry_or_uid
+          if !entry[uid_attr].empty?
+            entry[uid_attr].map { |uid| Net::LDAP::Filter.eq("memberUid", uid) }.
+                            reduce(:|)
+          end
+        when String
+          Net::LDAP::Filter.eq("memberUid", entry_or_uid)
         end
       end
 

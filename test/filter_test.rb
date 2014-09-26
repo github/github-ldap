@@ -20,7 +20,8 @@ class FilterTest < Minitest::Test
     @subject = Subject.new(@ldap)
     @me      = 'uid=calavera,dc=github,dc=com'
     @uid     = "calavera"
-    @entry   = Entry.new(@me, @uid)
+    @entry   = Net::LDAP::Entry.new(@me)
+    @entry[:uid] = @uid
   end
 
   def test_member_present
@@ -45,6 +46,11 @@ class FilterTest < Minitest::Test
   def test_posix_member_equal
     assert_equal "(memberUid=#{@uid})",
                  @subject.posix_member_filter(@entry, @ldap.uid).to_s
+  end
+
+  def test_posix_member_equal_string
+    assert_equal "(memberUid=#{@uid})",
+                 @subject.posix_member_filter(@uid).to_s
   end
 
   def test_groups_reduced
