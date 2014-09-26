@@ -4,7 +4,8 @@ module GitHub
     #
     # For example:
     #
-    #   validator = GitHub::Ldap::MembershipValidators::Classic.new(ldap, %w(Engineering))
+    #   groups = domain.groups(%w(Engineering))
+    #   validator = GitHub::Ldap::MembershipValidators::Classic.new(ldap, groups)
     #   validator.perform(entry) #=> true
     #
     module MembershipValidators
