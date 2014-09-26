@@ -27,7 +27,9 @@ class GitHubLdapMembershipValidatorsClassicTest < GitHub::Ldap::Test
   include GitHubLdapMembershipValidatorsTestCases
 
   def self.test_server_options
-    {search_domains: "dc=github,dc=com"}
+    { search_domains: "dc=github,dc=com",
+      uid: "uid"
+    }
   end
 
   def setup
@@ -42,7 +44,9 @@ class GitHubLdapMembershipValidatorsRecursiveTest < GitHub::Ldap::Test
   include GitHubLdapMembershipValidatorsTestCases
 
   def self.test_server_options
-    {search_domains: "dc=github,dc=com"}
+    { search_domains: "dc=github,dc=com",
+      uid: "uid"
+    }
   end
 
   def setup
