@@ -19,15 +19,15 @@ module GitHub
         include Filter
 
         DEFAULT_MAX_DEPTH = 9
-        ATTRS             = %w(dn)
+        ATTRS             = %w(dn cn)
 
         def perform(entry, depth = DEFAULT_MAX_DEPTH)
           domains.each do |domain|
             # find groups entry is an immediate member of
-            membership = domain.search(filter: member_filter(entry), attributes: ATTRS).map(&:dn)
+            membership = domain.search(filter: member_filter(entry), attributes: ATTRS)
 
             # success if any of these groups match the restricted auth groups
-            return true if membership.any? { |dn| group_dns.include?(dn) }
+            return true if membership.any? { |entry| group_dns.include?(entry.dn) }
 
             # give up if the entry has no memberships to recurse
             next if membership.empty?
@@ -35,10 +35,10 @@ module GitHub
             # recurse to at most `depth`
             depth.times do |n|
               # find groups whose members include membership groups
-              membership = domain.search(filter: membership_filter(membership), attributes: ATTRS).map(&:dn)
+              membership = domain.search(filter: membership_filter(membership), attributes: ATTRS)
 
               # success if any of these groups match the restricted auth groups
-              return true if membership.any? { |dn| group_dns.include?(dn) }
+              return true if membership.any? { |entry| group_dns.include?(entry.dn) }
 
               # give up if there are no more membersips to recurse
               break if membership.empty?
@@ -51,12 +51,31 @@ module GitHub
           false
         end
 
+        # Internal: Construct a filter to find groups this entry is a direct
+        # member of.
+        #
+        # Overloads the included `GitHub::Ldap::Filters#member_filter` method
+        # to inject `posixGroup` handling.
+        #
+        # Returns a Net::LDAP::Filter object.
+        def member_filter(entry_or_uid, uid = ldap.uid)
+          filter = super(entry_or_uid)
+
+          if ldap.posix_support_enabled?
+            if posix_filter = posix_member_filter(entry_or_uid, uid)
+              filter |= posix_filter
+            end
+          end
+
+          filter
+        end
+
         # Internal: Construct a filter to find groups whose members are the
         # Array of String group DNs passed in.
         #
         # Returns a String filter.
         def membership_filter(groups)
-          groups.map { |dn| member_filter(dn) }.reduce(:|)
+          groups.map { |entry| member_filter(entry, :cn) }.reduce(:|)
         end
 
         # Internal: the group DNs to check against.
