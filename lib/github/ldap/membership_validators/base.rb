@@ -2,7 +2,12 @@ module GitHub
   class Ldap
     module MembershipValidators
       class Base
-        attr_reader :ldap, :groups
+
+        # Internal: The GitHub::Ldap object to search domains with.
+        attr_reader :ldap
+
+        # Internal: an Array of Net::LDAP::Entry group objects to validate with.
+        attr_reader :groups
 
         # Public: Instantiate new validator.
         #
@@ -25,6 +30,7 @@ module GitHub
         def domains
           @domains ||= ldap.search_domains.map { |base| ldap.domain(base) }
         end
+        private :domains
       end
     end
   end
