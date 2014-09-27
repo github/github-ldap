@@ -50,19 +50,19 @@ member: uid=user1,ou=users,dc=github,dc=com
 member: cn=group1.1,ou=groups,dc=github,dc=com
 
 dn: cn=group1.1,ou=groups,dc=github,dc=com
-cn: group1
+cn: group1.1
 objectClass: groupOfNames
 member: uid=user1.1,ou=users,dc=github,dc=com
 member: cn=group1.1.1,ou=groups,dc=github,dc=com
 
 dn: cn=group1.1.1,ou=groups,dc=github,dc=com
-cn: group1
+cn: group1.1.1
 objectClass: groupOfNames
 member: uid=user1.1.1,ou=users,dc=github,dc=com
 member: cn=group1.1.1.1,ou=groups,dc=github,dc=com
 
 dn: cn=group1.1.1.1,ou=groups,dc=github,dc=com
-cn: group1
+cn: group1.1.1.1
 objectClass: groupOfNames
 member: uid=user1.1.1.1,ou=users,dc=github,dc=com
 
