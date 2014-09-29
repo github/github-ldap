@@ -1,4 +1,9 @@
 #!/usr/bin/env sh
+set -e
+set -x
 
-cd ..
+echo pwd
+cd `dirname $0`/..
+echo pwd
+
 rake
