@@ -9,6 +9,7 @@ env:
 
 install:
   - if [ "$TESTENV" = "openldap" ]; then ./script/install-openldap; fi
+  - bundle install
 
 script:
   - ./script/cibuild-$TESTENV
