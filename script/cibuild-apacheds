@@ -2,8 +2,8 @@
 set -e
 set -x
 
-echo pwd
+echo `pwd`
 cd `dirname $0`/..
-echo pwd
+echo `pwd`
 
-rake
+bundle exec rake
