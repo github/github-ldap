@@ -1,10 +1,14 @@
 #!/usr/bin/env sh
+set -e
+set -x
 
 echo "OpenLDAP installer stub"
 
 DEBIAN_FRONTEND=noninteractive sudo -E apt-get install -y --force-yes slapd time ldap-utils
 
-BASE_PATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && cd ../test/fixtures/openldap && pwd )"
+BASE_PATH="$( cd `dirname $0`/../test/fixtures/openldap && pwd )"
+
+sudo /etc/init.d/slapd stop
 
 # setup base configuration, schemas
 sudo slapadd -F /etc/ldap/slapd.d -b "cn=config" -l $BASE_PATH/slapd.conf.ldif
