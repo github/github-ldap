@@ -2,16 +2,14 @@
 set -e
 set -x
 
-TMPDIR=$(mktemp -d)
-cd $TMPDIR
-
 BASE_PATH="$( cd `dirname $0`/../test/fixtures/openldap && pwd )"
 
 DEBIAN_FRONTEND=noninteractive sudo -E apt-get install -y --force-yes slapd time ldap-utils
 
 sudo /etc/init.d/slapd stop
 
-ls -lah /etc/ldap/slapd.d
+TMPDIR=$(mktemp -d)
+cd $TMPDIR
 
 # Delete data and reconfigure.
 sudo cp -v /var/lib/ldap/DB_CONFIG ./DB_CONFIG
