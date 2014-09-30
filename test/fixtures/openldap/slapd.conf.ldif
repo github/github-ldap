@@ -49,19 +49,19 @@ olcDbConfig: set_lk_max_objects 1500
 olcDbConfig: set_lk_max_locks 1500
 olcDbConfig: set_lk_max_lockers 1500
 olcLastMod: TRUE
-olcSuffix: dc=github,dc=org
+olcSuffix: dc=github,dc=com
 olcDbDirectory: /var/lib/ldap
-olcRootDN: cn=admin,dc=github,dc=org
+olcRootDN: cn=admin,dc=github,dc=com
 # admin's password: "passworD1"
 olcRootPW: {SHA}LFSkM9eegU6j3PeGG7UuHrT/KZM=
 olcDbIndex: objectClass eq
 olcAccess: to attrs=userPassword,shadowLastChange
   by self write
   by anonymous auth
-  by dn="cn=admin,dc=github,dc=org" write
+  by dn="cn=admin,dc=github,dc=com" write
   by * none
 olcAccess: to dn.base="" by * read
 olcAccess: to *
   by self write
-  by dn="cn=admin,dc=github,dc=org" write
+  by dn="cn=admin,dc=github,dc=com" write
   by * read

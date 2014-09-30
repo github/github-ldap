@@ -22,7 +22,7 @@ sudo slapadd -F /etc/ldap/slapd.d -b "cn=config" -l $BASE_PATH/memberof.ldif
 
 # Add base domain.
 sudo slapadd -F /etc/ldap/slapd.d <<EOM
-dn: dc=github,dc=org
+dn: dc=github,dc=com
 objectClass: top
 objectClass: domain
 dc: github
@@ -37,7 +37,7 @@ sudo /etc/init.d/slapd start
 # NOTE: use ldapadd in order for memberOf and refint to apply, instead of:
 # /vagrant/services/ldap/openldap/seed.rb | sudo slapadd -F /etc/ldap/slapd.d
 cat $BASE_PATH/seed.ldif |
-  /usr/bin/time sudo ldapadd -x -D "cn=admin,dc=github,dc=org" -w passworD1 \
+  /usr/bin/time sudo ldapadd -x -D "cn=admin,dc=github,dc=com" -w passworD1 \
                -h localhost -p 389
 
 sudo rm -rf $TMPDIR

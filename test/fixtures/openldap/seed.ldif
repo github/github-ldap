@@ -1,14 +1,14 @@
-dn: ou=People,dc=github,dc=org
+dn: ou=People,dc=github,dc=com
 objectClass: top
 objectClass: organizationalUnit
 ou: People
 
-dn: ou=Groups,dc=github,dc=org
+dn: ou=Groups,dc=github,dc=com
 objectClass: top
 objectClass: organizationalUnit
 ou: Groups
 
-dn: uid=user1,ou=People,dc=github,dc=org
+dn: uid=user1,ou=People,dc=github,dc=com
 uid: user1
 cn: user1
 sn: user1
@@ -19,7 +19,7 @@ objectClass: inetOrgPerson
 userPassword: passworD1
 mail: user1@openldap.ghe.local
 
-dn: uid=user2,ou=People,dc=github,dc=org
+dn: uid=user2,ou=People,dc=github,dc=com
 uid: user2
 cn: user2
 sn: user2
@@ -30,7 +30,7 @@ objectClass: inetOrgPerson
 userPassword: passworD1
 mail: user2@openldap.ghe.local
 
-dn: uid=user3,ou=People,dc=github,dc=org
+dn: uid=user3,ou=People,dc=github,dc=com
 uid: user3
 cn: user3
 sn: user3
@@ -41,7 +41,7 @@ objectClass: inetOrgPerson
 userPassword: passworD1
 mail: user3@openldap.ghe.local
 
-dn: uid=user4,ou=People,dc=github,dc=org
+dn: uid=user4,ou=People,dc=github,dc=com
 uid: user4
 cn: user4
 sn: user4
@@ -52,7 +52,7 @@ objectClass: inetOrgPerson
 userPassword: passworD1
 mail: user4@openldap.ghe.local
 
-dn: uid=user5,ou=People,dc=github,dc=org
+dn: uid=user5,ou=People,dc=github,dc=com
 uid: user5
 cn: user5
 sn: user5
@@ -63,7 +63,7 @@ objectClass: inetOrgPerson
 userPassword: passworD1
 mail: user5@openldap.ghe.local
 
-dn: uid=user6,ou=People,dc=github,dc=org
+dn: uid=user6,ou=People,dc=github,dc=com
 uid: user6
 cn: user6
 sn: user6
@@ -74,7 +74,7 @@ objectClass: inetOrgPerson
 userPassword: passworD1
 mail: user6@openldap.ghe.local
 
-dn: uid=user7,ou=People,dc=github,dc=org
+dn: uid=user7,ou=People,dc=github,dc=com
 uid: user7
 cn: user7
 sn: user7
@@ -85,7 +85,7 @@ objectClass: inetOrgPerson
 userPassword: passworD1
 mail: user7@openldap.ghe.local
 
-dn: uid=user8,ou=People,dc=github,dc=org
+dn: uid=user8,ou=People,dc=github,dc=com
 uid: user8
 cn: user8
 sn: user8
@@ -96,7 +96,7 @@ objectClass: inetOrgPerson
 userPassword: passworD1
 mail: user8@openldap.ghe.local
 
-dn: uid=user9,ou=People,dc=github,dc=org
+dn: uid=user9,ou=People,dc=github,dc=com
 uid: user9
 cn: user9
 sn: user9
@@ -107,7 +107,7 @@ objectClass: inetOrgPerson
 userPassword: passworD1
 mail: user9@openldap.ghe.local
 
-dn: uid=user10,ou=People,dc=github,dc=org
+dn: uid=user10,ou=People,dc=github,dc=com
 uid: user10
 cn: user10
 sn: user10
@@ -118,7 +118,7 @@ objectClass: inetOrgPerson
 userPassword: passworD1
 mail: user10@openldap.ghe.local
 
-dn: uid=emailless-user1,ou=People,dc=github,dc=org
+dn: uid=emailless-user1,ou=People,dc=github,dc=com
 uid: emailless-user1
 cn: emailless-user1
 sn: emailless-user1
@@ -128,7 +128,7 @@ objectClass: organizationalPerson
 objectClass: inetOrgPerson
 userPassword: passworD1
 
-dn: uid=admin1,ou=People,dc=github,dc=org
+dn: uid=admin1,ou=People,dc=github,dc=com
 uid: admin1
 cn: admin1
 sn: admin1
@@ -139,178 +139,178 @@ objectClass: inetOrgPerson
 userPassword: passworD1
 mail: admin1@openldap.ghe.local
 
-dn: cn=ghe-users,ou=Groups,dc=github,dc=org
+dn: cn=ghe-users,ou=Groups,dc=github,dc=com
 cn: ghe-users
 objectClass: groupOfNames
-member: uid=user1,ou=People,dc=github,dc=org
-member: uid=emailless-user1,ou=People,dc=github,dc=org
+member: uid=user1,ou=People,dc=github,dc=com
+member: uid=emailless-user1,ou=People,dc=github,dc=com
 
-dn: cn=all-users,ou=Groups,dc=github,dc=org
+dn: cn=all-users,ou=Groups,dc=github,dc=com
 cn: all-users
 objectClass: groupOfNames
-member: cn=ghe-users,ou=Groups,dc=github,dc=org
-member: uid=user1,ou=People,dc=github,dc=org
-member: uid=user2,ou=People,dc=github,dc=org
-member: uid=user3,ou=People,dc=github,dc=org
-member: uid=user4,ou=People,dc=github,dc=org
-member: uid=user5,ou=People,dc=github,dc=org
-member: uid=user6,ou=People,dc=github,dc=org
-member: uid=user7,ou=People,dc=github,dc=org
-member: uid=user8,ou=People,dc=github,dc=org
-member: uid=user9,ou=People,dc=github,dc=org
-member: uid=user10,ou=People,dc=github,dc=org
-member: uid=emailless-user1,ou=People,dc=github,dc=org
+member: cn=ghe-users,ou=Groups,dc=github,dc=com
+member: uid=user1,ou=People,dc=github,dc=com
+member: uid=user2,ou=People,dc=github,dc=com
+member: uid=user3,ou=People,dc=github,dc=com
+member: uid=user4,ou=People,dc=github,dc=com
+member: uid=user5,ou=People,dc=github,dc=com
+member: uid=user6,ou=People,dc=github,dc=com
+member: uid=user7,ou=People,dc=github,dc=com
+member: uid=user8,ou=People,dc=github,dc=com
+member: uid=user9,ou=People,dc=github,dc=com
+member: uid=user10,ou=People,dc=github,dc=com
+member: uid=emailless-user1,ou=People,dc=github,dc=com
 
-dn: cn=ghe-admins,ou=Groups,dc=github,dc=org
+dn: cn=ghe-admins,ou=Groups,dc=github,dc=com
 cn: ghe-admins
 objectClass: groupOfNames
-member: uid=admin1,ou=People,dc=github,dc=org
+member: uid=admin1,ou=People,dc=github,dc=com
 
-dn: cn=all-admins,ou=Groups,dc=github,dc=org
+dn: cn=all-admins,ou=Groups,dc=github,dc=com
 cn: all-admins
 objectClass: groupOfNames
-member: cn=ghe-admins,ou=Groups,dc=github,dc=org
-member: uid=admin1,ou=People,dc=github,dc=org
+member: cn=ghe-admins,ou=Groups,dc=github,dc=com
+member: uid=admin1,ou=People,dc=github,dc=com
 
-dn: cn=n-member-group10,ou=Groups,dc=github,dc=org
+dn: cn=n-member-group10,ou=Groups,dc=github,dc=com
 cn: n-member-group10
 objectClass: groupOfNames
-member: uid=user1,ou=People,dc=github,dc=org
-member: uid=user2,ou=People,dc=github,dc=org
-member: uid=user3,ou=People,dc=github,dc=org
-member: uid=user4,ou=People,dc=github,dc=org
-member: uid=user5,ou=People,dc=github,dc=org
-member: uid=user6,ou=People,dc=github,dc=org
-member: uid=user7,ou=People,dc=github,dc=org
-member: uid=user8,ou=People,dc=github,dc=org
-member: uid=user9,ou=People,dc=github,dc=org
-member: uid=user10,ou=People,dc=github,dc=org
+member: uid=user1,ou=People,dc=github,dc=com
+member: uid=user2,ou=People,dc=github,dc=com
+member: uid=user3,ou=People,dc=github,dc=com
+member: uid=user4,ou=People,dc=github,dc=com
+member: uid=user5,ou=People,dc=github,dc=com
+member: uid=user6,ou=People,dc=github,dc=com
+member: uid=user7,ou=People,dc=github,dc=com
+member: uid=user8,ou=People,dc=github,dc=com
+member: uid=user9,ou=People,dc=github,dc=com
+member: uid=user10,ou=People,dc=github,dc=com
 
-dn: cn=nested-group1,ou=Groups,dc=github,dc=org
+dn: cn=nested-group1,ou=Groups,dc=github,dc=com
 cn: nested-group1
 objectClass: groupOfNames
-member: uid=user1,ou=People,dc=github,dc=org
-member: uid=user2,ou=People,dc=github,dc=org
-member: uid=user3,ou=People,dc=github,dc=org
-member: uid=user4,ou=People,dc=github,dc=org
-member: uid=user5,ou=People,dc=github,dc=org
-member: uid=user6,ou=People,dc=github,dc=org
-member: uid=user7,ou=People,dc=github,dc=org
-member: uid=user8,ou=People,dc=github,dc=org
-member: uid=user9,ou=People,dc=github,dc=org
-member: uid=user10,ou=People,dc=github,dc=org
+member: uid=user1,ou=People,dc=github,dc=com
+member: uid=user2,ou=People,dc=github,dc=com
+member: uid=user3,ou=People,dc=github,dc=com
+member: uid=user4,ou=People,dc=github,dc=com
+member: uid=user5,ou=People,dc=github,dc=com
+member: uid=user6,ou=People,dc=github,dc=com
+member: uid=user7,ou=People,dc=github,dc=com
+member: uid=user8,ou=People,dc=github,dc=com
+member: uid=user9,ou=People,dc=github,dc=com
+member: uid=user10,ou=People,dc=github,dc=com
 
-dn: cn=nested-groups,ou=Groups,dc=github,dc=org
+dn: cn=nested-groups,ou=Groups,dc=github,dc=com
 cn: nested-groups
 objectClass: groupOfNames
-member: cn=nested-group1,ou=Groups,dc=github,dc=org
+member: cn=nested-group1,ou=Groups,dc=github,dc=com
 
-dn: cn=n-member-nested-group1,ou=Groups,dc=github,dc=org
+dn: cn=n-member-nested-group1,ou=Groups,dc=github,dc=com
 cn: n-member-nested-group1
 objectClass: groupOfNames
-member: cn=nested-group1,ou=Groups,dc=github,dc=org
+member: cn=nested-group1,ou=Groups,dc=github,dc=com
 
-dn: cn=deeply-nested-group0.0.0,ou=Groups,dc=github,dc=org
+dn: cn=deeply-nested-group0.0.0,ou=Groups,dc=github,dc=com
 cn: deeply-nested-group0.0.0
 objectClass: groupOfNames
-member: uid=user1,ou=People,dc=github,dc=org
-member: uid=user2,ou=People,dc=github,dc=org
-member: uid=user3,ou=People,dc=github,dc=org
-member: uid=user4,ou=People,dc=github,dc=org
-member: uid=user5,ou=People,dc=github,dc=org
+member: uid=user1,ou=People,dc=github,dc=com
+member: uid=user2,ou=People,dc=github,dc=com
+member: uid=user3,ou=People,dc=github,dc=com
+member: uid=user4,ou=People,dc=github,dc=com
+member: uid=user5,ou=People,dc=github,dc=com
 
-dn: cn=deeply-nested-group0.0.1,ou=Groups,dc=github,dc=org
+dn: cn=deeply-nested-group0.0.1,ou=Groups,dc=github,dc=com
 cn: deeply-nested-group0.0.1
 objectClass: groupOfNames
-member: uid=user6,ou=People,dc=github,dc=org
-member: uid=user7,ou=People,dc=github,dc=org
-member: uid=user8,ou=People,dc=github,dc=org
-member: uid=user9,ou=People,dc=github,dc=org
-member: uid=user10,ou=People,dc=github,dc=org
+member: uid=user6,ou=People,dc=github,dc=com
+member: uid=user7,ou=People,dc=github,dc=com
+member: uid=user8,ou=People,dc=github,dc=com
+member: uid=user9,ou=People,dc=github,dc=com
+member: uid=user10,ou=People,dc=github,dc=com
 
-dn: cn=deeply-nested-group0.0,ou=Groups,dc=github,dc=org
+dn: cn=deeply-nested-group0.0,ou=Groups,dc=github,dc=com
 cn: deeply-nested-group0.0
 objectClass: groupOfNames
-member: cn=deeply-nested-group0.0.0,ou=Groups,dc=github,dc=org
-member: cn=deeply-nested-group0.0.1,ou=Groups,dc=github,dc=org
+member: cn=deeply-nested-group0.0.0,ou=Groups,dc=github,dc=com
+member: cn=deeply-nested-group0.0.1,ou=Groups,dc=github,dc=com
 
-dn: cn=deeply-nested-group0,ou=Groups,dc=github,dc=org
+dn: cn=deeply-nested-group0,ou=Groups,dc=github,dc=com
 cn: deeply-nested-group0
 objectClass: groupOfNames
-member: cn=deeply-nested-group0.0,ou=Groups,dc=github,dc=org
+member: cn=deeply-nested-group0.0,ou=Groups,dc=github,dc=com
 
-dn: cn=deeply-nested-groups,ou=Groups,dc=github,dc=org
+dn: cn=deeply-nested-groups,ou=Groups,dc=github,dc=com
 cn: deeply-nested-groups
 objectClass: groupOfNames
-member: cn=deeply-nested-group0,ou=Groups,dc=github,dc=org
+member: cn=deeply-nested-group0,ou=Groups,dc=github,dc=com
 
-dn: cn=n-depth-nested-group1,ou=Groups,dc=github,dc=org
+dn: cn=n-depth-nested-group1,ou=Groups,dc=github,dc=com
 cn: n-depth-nested-group1
 objectClass: groupOfNames
-member: cn=nested-group1,ou=Groups,dc=github,dc=org
+member: cn=nested-group1,ou=Groups,dc=github,dc=com
 
-dn: cn=n-depth-nested-group2,ou=Groups,dc=github,dc=org
+dn: cn=n-depth-nested-group2,ou=Groups,dc=github,dc=com
 cn: n-depth-nested-group2
 objectClass: groupOfNames
-member: cn=n-depth-nested-group1,ou=Groups,dc=github,dc=org
+member: cn=n-depth-nested-group1,ou=Groups,dc=github,dc=com
 
-dn: cn=n-depth-nested-group3,ou=Groups,dc=github,dc=org
+dn: cn=n-depth-nested-group3,ou=Groups,dc=github,dc=com
 cn: n-depth-nested-group3
 objectClass: groupOfNames
-member: cn=n-depth-nested-group2,ou=Groups,dc=github,dc=org
+member: cn=n-depth-nested-group2,ou=Groups,dc=github,dc=com
 
-dn: cn=n-depth-nested-group4,ou=Groups,dc=github,dc=org
+dn: cn=n-depth-nested-group4,ou=Groups,dc=github,dc=com
 cn: n-depth-nested-group4
 objectClass: groupOfNames
-member: cn=n-depth-nested-group3,ou=Groups,dc=github,dc=org
+member: cn=n-depth-nested-group3,ou=Groups,dc=github,dc=com
 
-dn: cn=n-depth-nested-group5,ou=Groups,dc=github,dc=org
+dn: cn=n-depth-nested-group5,ou=Groups,dc=github,dc=com
 cn: n-depth-nested-group5
 objectClass: groupOfNames
-member: cn=n-depth-nested-group4,ou=Groups,dc=github,dc=org
+member: cn=n-depth-nested-group4,ou=Groups,dc=github,dc=com
 
-dn: cn=n-depth-nested-group6,ou=Groups,dc=github,dc=org
+dn: cn=n-depth-nested-group6,ou=Groups,dc=github,dc=com
 cn: n-depth-nested-group6
 objectClass: groupOfNames
-member: cn=n-depth-nested-group5,ou=Groups,dc=github,dc=org
+member: cn=n-depth-nested-group5,ou=Groups,dc=github,dc=com
 
-dn: cn=n-depth-nested-group7,ou=Groups,dc=github,dc=org
+dn: cn=n-depth-nested-group7,ou=Groups,dc=github,dc=com
 cn: n-depth-nested-group7
 objectClass: groupOfNames
-member: cn=n-depth-nested-group6,ou=Groups,dc=github,dc=org
+member: cn=n-depth-nested-group6,ou=Groups,dc=github,dc=com
 
-dn: cn=n-depth-nested-group8,ou=Groups,dc=github,dc=org
+dn: cn=n-depth-nested-group8,ou=Groups,dc=github,dc=com
 cn: n-depth-nested-group8
 objectClass: groupOfNames
-member: cn=n-depth-nested-group7,ou=Groups,dc=github,dc=org
+member: cn=n-depth-nested-group7,ou=Groups,dc=github,dc=com
 
-dn: cn=n-depth-nested-group9,ou=Groups,dc=github,dc=org
+dn: cn=n-depth-nested-group9,ou=Groups,dc=github,dc=com
 cn: n-depth-nested-group9
 objectClass: groupOfNames
-member: cn=n-depth-nested-group8,ou=Groups,dc=github,dc=org
+member: cn=n-depth-nested-group8,ou=Groups,dc=github,dc=com
 
-dn: cn=head-group,ou=Groups,dc=github,dc=org
+dn: cn=head-group,ou=Groups,dc=github,dc=com
 cn: head-group
 objectClass: groupOfNames
-member: cn=tail-group,ou=Groups,dc=github,dc=org
-member: uid=user1,ou=People,dc=github,dc=org
-member: uid=user2,ou=People,dc=github,dc=org
-member: uid=user3,ou=People,dc=github,dc=org
-member: uid=user4,ou=People,dc=github,dc=org
-member: uid=user5,ou=People,dc=github,dc=org
+member: cn=tail-group,ou=Groups,dc=github,dc=com
+member: uid=user1,ou=People,dc=github,dc=com
+member: uid=user2,ou=People,dc=github,dc=com
+member: uid=user3,ou=People,dc=github,dc=com
+member: uid=user4,ou=People,dc=github,dc=com
+member: uid=user5,ou=People,dc=github,dc=com
 
-dn: cn=tail-group,ou=Groups,dc=github,dc=org
+dn: cn=tail-group,ou=Groups,dc=github,dc=com
 cn: tail-group
 objectClass: groupOfNames
-member: cn=head-group,ou=Groups,dc=github,dc=org
-member: uid=user6,ou=People,dc=github,dc=org
-member: uid=user7,ou=People,dc=github,dc=org
-member: uid=user8,ou=People,dc=github,dc=org
-member: uid=user9,ou=People,dc=github,dc=org
-member: uid=user10,ou=People,dc=github,dc=org
+member: cn=head-group,ou=Groups,dc=github,dc=com
+member: uid=user6,ou=People,dc=github,dc=com
+member: uid=user7,ou=People,dc=github,dc=com
+member: uid=user8,ou=People,dc=github,dc=com
+member: uid=user9,ou=People,dc=github,dc=com
+member: uid=user10,ou=People,dc=github,dc=com
 
-dn: cn=recursively-nested-groups,ou=Groups,dc=github,dc=org
+dn: cn=recursively-nested-groups,ou=Groups,dc=github,dc=com
 cn: recursively-nested-groups
 objectClass: groupOfNames
-member: cn=head-group,ou=Groups,dc=github,dc=org
-member: cn=tail-group,ou=Groups,dc=github,dc=org
+member: cn=head-group,ou=Groups,dc=github,dc=com
+member: cn=tail-group,ou=Groups,dc=github,dc=com
