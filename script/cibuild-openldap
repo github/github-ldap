@@ -1,3 +1,7 @@
 #!/usr/bin/env sh
+set -e
+set -x
 
-echo "OpenLDAP test runner stub"
+cd `dirname $0`/..
+
+bundle exec rake
