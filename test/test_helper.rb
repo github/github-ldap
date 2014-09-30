@@ -13,6 +13,10 @@ require 'github/ldap/server'
 require 'minitest/autorun'
 
 class GitHub::Ldap::Test < Minitest::Test
+  def self.test_env
+    ENV['TESTENV'] || "apacheds"
+  end
+
   def self.run(reporter, options = {})
     start_server
     super
@@ -20,26 +24,46 @@ class GitHub::Ldap::Test < Minitest::Test
   end
 
   def self.stop_server
-    GitHub::Ldap.stop_server
+    if test_env == "apacheds"
+      GitHub::Ldap.stop_server
+    end
   end
 
   def self.start_server
-    server_opts = respond_to?(:test_server_options) ? test_server_options : {}
-    GitHub::Ldap.start_server(server_opts)
+    if test_env == "apacheds"
+      server_opts = respond_to?(:test_server_options) ? test_server_options : {}
+      GitHub::Ldap.start_server(server_opts)
+    end
   end
 
   def options
     @service   = MockInstrumentationService.new
-    @options ||= GitHub::Ldap.server_options.merge \
-      host: 'localhost',
-      uid:  'uid',
-      :instrumentation_service => @service
+    @options ||=
+      case self.class.test_env
+      when "apacheds"
+        GitHub::Ldap.server_options.merge \
+          host: 'localhost',
+          uid:  'uid',
+          instrumentation_service: @service
+      when "openldap"
+        {
+          host: 'localhost',
+          port: 389
+          admin_user:     'uid=admin,dc=github,dc=com',
+          admin_password: 'passworD1',
+          search_domains: %w(dc=github,dc=com),
+          uid: 'uid',
+          instrumentation_service: @service
+        }
+      end
   end
 end
 
 class GitHub::Ldap::UnauthenticatedTest < GitHub::Ldap::Test
   def self.start_server
-    GitHub::Ldap.start_server(:allow_anonymous => true)
+    if test_env == "apacheds"
+      GitHub::Ldap.start_server(:allow_anonymous => true)
+    end
   end
 
   def options
