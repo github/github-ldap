@@ -48,7 +48,7 @@ class GitHub::Ldap::Test < Minitest::Test
       when "openldap"
         {
           host: 'localhost',
-          port: 389
+          port: 389,
           admin_user:     'uid=admin,dc=github,dc=com',
           admin_password: 'passworD1',
           search_domains: %w(dc=github,dc=com),
