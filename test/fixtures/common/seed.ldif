@@ -352,6 +352,7 @@ member: cn=tail-group,ou=Groups,dc=github,dc=com
 dn: cn=posix-group1,ou=Groups,dc=github,dc=com
 cn: posix-group1
 objectClass: posixGroup
+gidNumber: 1001
 memberUid: user1
 memberUid: user2
 memberUid: user3
