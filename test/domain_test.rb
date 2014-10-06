@@ -143,10 +143,6 @@ class GitHubLdapDomainUnauthenticatedTest < GitHub::Ldap::UnauthenticatedTest
 end
 
 class GitHubLdapDomainNestedGroupsTest < GitHub::Ldap::Test
-  def self.test_server_options
-    {user_fixtures: FIXTURES.join('github-with-subgroups.ldif').to_s}
-  end
-
   def setup
     @ldap = GitHub::Ldap.new(options)
     @domain = @ldap.domain("dc=github,dc=com")
@@ -168,17 +164,10 @@ class GitHubLdapDomainNestedGroupsTest < GitHub::Ldap::Test
 end
 
 class GitHubLdapPosixGroupsWithRecursionFallbackTest < GitHub::Ldap::Test
-  def self.test_server_options
-    {
-      custom_schemas: FIXTURES.join('posixGroup.schema.ldif'),
-      user_fixtures: FIXTURES.join('github-with-posixGroups.ldif').to_s,
-      # so we exercise the recursive group search fallback
-      recursive_group_search_fallback: true
-    }
-  end
-
   def setup
-    @ldap = GitHub::Ldap.new(options)
+    opts = options.merge \
+      recursive_group_search_fallback: true
+    @ldap = GitHub::Ldap.new(opts)
     @domain = @ldap.domain("dc=github,dc=com")
     @cn = "enterprise-posix-devs"
   end
@@ -192,17 +181,10 @@ class GitHubLdapPosixGroupsWithRecursionFallbackTest < GitHub::Ldap::Test
 end
 
 class GitHubLdapPosixGroupsWithoutRecursionTest < GitHub::Ldap::Test
-  def self.test_server_options
-    {
-      custom_schemas: FIXTURES.join('posixGroup.schema.ldif'),
-      user_fixtures: FIXTURES.join('github-with-posixGroups.ldif').to_s,
-      # so we test the test the non-recursive group membership search
-      recursive_group_search_fallback: false
-    }
-  end
-
   def setup
-    @ldap = GitHub::Ldap.new(options)
+    opts = options.merge \
+      recursive_group_search_fallback: false
+    @ldap = GitHub::Ldap.new(opts)
     @domain = @ldap.domain("dc=github,dc=com")
     @cn = "enterprise-posix-devs"
   end
@@ -218,19 +200,11 @@ end
 # Specifically testing that this doesn't break when posixGroups are not
 # supported.
 class GitHubLdapWithoutPosixGroupsTest < GitHub::Ldap::Test
-  def self.test_server_options
-    {
-      custom_schemas: FIXTURES.join('posixGroup.schema.ldif'),
-      user_fixtures: FIXTURES.join('github-with-posixGroups.ldif').to_s,
-      # so we test the test the non-recursive group membership search
-      recursive_group_search_fallback: false,
-      # explicitly disable posixGroup support (even if the schema supports it)
-      posix_support:                   false
-    }
-  end
-
   def setup
-    @ldap = GitHub::Ldap.new(options)
+    opts = options.merge \
+      recursive_group_search_fallback: false, # test non-recursive group membership search
+      posix_support:                   false  # disable posixGroup support
+    @ldap = GitHub::Ldap.new(opts)
     @domain = @ldap.domain("dc=github,dc=com")
     @cn = "enterprise-posix-devs"
   end

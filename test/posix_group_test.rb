@@ -1,10 +1,6 @@
 require_relative 'test_helper'
 
 class GitHubLdapPosixGroupTest < GitHub::Ldap::Test
-  def self.test_server_options
-    {user_fixtures: FIXTURES.join('github-with-subgroups.ldif').to_s}
-  end
-
   def setup
     @simple_group = Net::LDAP::Entry._load("""
 dn: cn=enterprise-posix-devs,ou=groups,dc=github,dc=com

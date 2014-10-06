@@ -1,10 +1,6 @@
 require_relative 'test_helper'
 
 class GitHubLdapGroupTest < GitHub::Ldap::Test
-  def self.test_server_options
-    {user_fixtures: FIXTURES.join('github-with-subgroups.ldif').to_s}
-  end
-
   def groups_domain
     @ldap.domain("ou=groups,dc=github,dc=com")
   end
@@ -62,10 +58,6 @@ class GitHubLdapGroupTest < GitHub::Ldap::Test
 end
 
 class GitHubLdapLoopedGroupTest < GitHub::Ldap::Test
-  def self.test_server_options
-    {user_fixtures: FIXTURES.join('github-with-looped-subgroups.ldif').to_s}
-  end
-
   def setup
     @group = GitHub::Ldap.new(options).group("cn=enterprise,ou=groups,dc=github,dc=com")
   end
@@ -76,10 +68,6 @@ class GitHubLdapLoopedGroupTest < GitHub::Ldap::Test
 end
 
 class GitHubLdapMissingEntriesTest < GitHub::Ldap::Test
-  def self.test_server_options
-    {user_fixtures: FIXTURES.join('github-with-missing-entries.ldif').to_s}
-  end
-
   def setup
     @ldap = GitHub::Ldap.new(options)
   end
