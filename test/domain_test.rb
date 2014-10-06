@@ -7,8 +7,8 @@ module GitHubLdapDomainTestCases
   end
 
   def test_user_valid_login
-    user = @domain.valid_login?('calavera', 'passworD1')
-    assert_equal 'uid=calavera,dc=github,dc=com', user.dn
+    assert user = @domain.valid_login?('user1', 'passworD1')
+    assert_equal 'uid=user1,ou=People,dc=github,dc=com', user.dn
   end
 
   def test_user_with_invalid_password
