@@ -29,10 +29,18 @@ class GitHub::Ldap::Test < Minitest::Test
     end
   end
 
+  def self.test_server_options
+    {
+      custom_schemas:   FIXTURES.join('posixGroup.schema.ldif').to_s,
+      user_fixtures:    FIXTURES.join('common/seed.ldif').to_s,
+      allow_anonymous:  true,
+      verbose:          ENV.fetch("VERBOSE", "0") == "1"
+    }
+  end
+
   def self.start_server
     if test_env == "apacheds"
-      server_opts = respond_to?(:test_server_options) ? test_server_options : {}
-      GitHub::Ldap.start_server(server_opts)
+      GitHub::Ldap.start_server(test_server_options)
     end
   end
 
@@ -42,6 +50,8 @@ class GitHub::Ldap::Test < Minitest::Test
       case self.class.test_env
       when "apacheds"
         GitHub::Ldap.server_options.merge \
+          admin_user: 'uid=admin,dc=github,dc=com',
+          admin_password: 'passworD1',
           host: 'localhost',
           uid:  'uid',
           instrumentation_service: @service
@@ -60,12 +70,6 @@ class GitHub::Ldap::Test < Minitest::Test
 end
 
 class GitHub::Ldap::UnauthenticatedTest < GitHub::Ldap::Test
-  def self.start_server
-    if test_env == "apacheds"
-      GitHub::Ldap.start_server(:allow_anonymous => true)
-    end
-  end
-
   def options
     @options ||= begin
       super.delete_if {|k, _| [:admin_user, :admin_password].include?(k)}
