@@ -14,7 +14,7 @@ require 'minitest/autorun'
 
 class GitHub::Ldap::Test < Minitest::Test
   def self.test_env
-    ENV['TESTENV'] || "apacheds"
+    ENV.fetch("TESTENV", "apacheds")
   end
 
   def self.run(reporter, options = {})
