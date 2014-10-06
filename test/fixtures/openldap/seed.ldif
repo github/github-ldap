@@ -17,7 +17,7 @@ objectClass: person
 objectClass: organizationalPerson
 objectClass: inetOrgPerson
 userPassword: passworD1
-mail: user1@openldap.ghe.local
+mail: user1@github.com
 
 dn: uid=user2,ou=People,dc=github,dc=com
 uid: user2
@@ -28,7 +28,7 @@ objectClass: person
 objectClass: organizationalPerson
 objectClass: inetOrgPerson
 userPassword: passworD1
-mail: user2@openldap.ghe.local
+mail: user2@github.com
 
 dn: uid=user3,ou=People,dc=github,dc=com
 uid: user3
@@ -39,7 +39,7 @@ objectClass: person
 objectClass: organizationalPerson
 objectClass: inetOrgPerson
 userPassword: passworD1
-mail: user3@openldap.ghe.local
+mail: user3@github.com
 
 dn: uid=user4,ou=People,dc=github,dc=com
 uid: user4
@@ -50,7 +50,7 @@ objectClass: person
 objectClass: organizationalPerson
 objectClass: inetOrgPerson
 userPassword: passworD1
-mail: user4@openldap.ghe.local
+mail: user4@github.com
 
 dn: uid=user5,ou=People,dc=github,dc=com
 uid: user5
@@ -61,7 +61,7 @@ objectClass: person
 objectClass: organizationalPerson
 objectClass: inetOrgPerson
 userPassword: passworD1
-mail: user5@openldap.ghe.local
+mail: user5@github.com
 
 dn: uid=user6,ou=People,dc=github,dc=com
 uid: user6
@@ -72,7 +72,7 @@ objectClass: person
 objectClass: organizationalPerson
 objectClass: inetOrgPerson
 userPassword: passworD1
-mail: user6@openldap.ghe.local
+mail: user6@github.com
 
 dn: uid=user7,ou=People,dc=github,dc=com
 uid: user7
@@ -83,7 +83,7 @@ objectClass: person
 objectClass: organizationalPerson
 objectClass: inetOrgPerson
 userPassword: passworD1
-mail: user7@openldap.ghe.local
+mail: user7@github.com
 
 dn: uid=user8,ou=People,dc=github,dc=com
 uid: user8
@@ -94,7 +94,7 @@ objectClass: person
 objectClass: organizationalPerson
 objectClass: inetOrgPerson
 userPassword: passworD1
-mail: user8@openldap.ghe.local
+mail: user8@github.com
 
 dn: uid=user9,ou=People,dc=github,dc=com
 uid: user9
@@ -105,7 +105,7 @@ objectClass: person
 objectClass: organizationalPerson
 objectClass: inetOrgPerson
 userPassword: passworD1
-mail: user9@openldap.ghe.local
+mail: user9@github.com
 
 dn: uid=user10,ou=People,dc=github,dc=com
 uid: user10
@@ -116,7 +116,7 @@ objectClass: person
 objectClass: organizationalPerson
 objectClass: inetOrgPerson
 userPassword: passworD1
-mail: user10@openldap.ghe.local
+mail: user10@github.com
 
 dn: uid=emailless-user1,ou=People,dc=github,dc=com
 uid: emailless-user1
@@ -137,7 +137,7 @@ objectClass: person
 objectClass: organizationalPerson
 objectClass: inetOrgPerson
 userPassword: passworD1
-mail: admin1@openldap.ghe.local
+mail: admin1@github.com
 
 dn: cn=ghe-users,ou=Groups,dc=github,dc=com
 cn: ghe-users
