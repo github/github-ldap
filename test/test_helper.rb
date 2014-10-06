@@ -12,6 +12,15 @@ require 'github/ldap/server'
 
 require 'minitest/autorun'
 
+if ENV.fetch('TESTENV', "apacheds") == "apacheds"
+  # Make sure we clean up running test server
+  # NOTE: We need to do this manually since its internal `at_exit` hook
+  # collides with Minitest's autorun at_exit handling, hence this hook.
+  Minitest.after_run do
+    GitHub::Ldap.stop_server
+  end
+end
+
 class GitHub::Ldap::Test < Minitest::Test
   def self.test_env
     ENV.fetch("TESTENV", "apacheds")
@@ -25,7 +34,8 @@ class GitHub::Ldap::Test < Minitest::Test
 
   def self.stop_server
     if test_env == "apacheds"
-      GitHub::Ldap.stop_server
+      # see Minitest.after_run hook above.
+      # GitHub::Ldap.stop_server
     end
   end
 
@@ -40,6 +50,9 @@ class GitHub::Ldap::Test < Minitest::Test
 
   def self.start_server
     if test_env == "apacheds"
+      # skip this if a server has already been started
+      return if GitHub::Ldap.ldap_server
+
       GitHub::Ldap.start_server(test_server_options)
     end
   end
