@@ -186,11 +186,11 @@ class GitHubLdapPosixGroupsWithoutRecursionTest < GitHub::Ldap::Test
       recursive_group_search_fallback: false
     @ldap = GitHub::Ldap.new(opts)
     @domain = @ldap.domain("dc=github,dc=com")
-    @cn = "enterprise-posix-devs"
+    @cn = "posix-group1"
   end
 
   def test_membership_for_posixGroups
-    assert user = @ldap.domain('uid=mtodd,ou=users,dc=github,dc=com').bind
+    assert user = @ldap.domain('uid=user1,ou=People,dc=github,dc=com').bind
 
     assert @domain.is_member?(user, [@cn]),
       "Expected `#{@cn}` to include the member `#{user.dn}`"
@@ -206,11 +206,11 @@ class GitHubLdapWithoutPosixGroupsTest < GitHub::Ldap::Test
       posix_support:                   false  # disable posixGroup support
     @ldap = GitHub::Ldap.new(opts)
     @domain = @ldap.domain("dc=github,dc=com")
-    @cn = "enterprise-posix-devs"
+    @cn = "posix-group1"
   end
 
   def test_membership_for_posixGroups
-    assert user = @ldap.domain('uid=mtodd,ou=users,dc=github,dc=com').bind
+    assert user = @ldap.domain('uid=user1,ou=People,dc=github,dc=com').bind
 
     refute @domain.is_member?(user, [@cn]),
       "Expected `#{@cn}` to not include the member `#{user.dn}`"

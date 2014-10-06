@@ -334,3 +334,14 @@ cn: recursively-nested-groups
 objectClass: groupOfNames
 member: cn=head-group,ou=Groups,dc=github,dc=com
 member: cn=tail-group,ou=Groups,dc=github,dc=com
+
+# posixGroup
+
+dn: cn=posix-group1,ou=Groups,dc=github,dc=com
+cn: posix-group1
+objectClass: posixGroup
+memberUid: user1
+memberUid: user2
+memberUid: user3
+memberUid: user4
+memberUid: user5
