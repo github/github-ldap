@@ -358,3 +358,12 @@ memberUid: user2
 memberUid: user3
 memberUid: user4
 memberUid: user5
+
+# missing members
+
+dn: cn=missing-users,ou=Groups,dc=github,dc=com
+cn: missing-users
+objectClass: groupOfNames
+member: uid=user1,ou=People,dc=github,dc=com
+member: uid=user2,ou=People,dc=github,dc=com
+member: uid=nonexistent-user,ou=People,dc=github,dc=com
