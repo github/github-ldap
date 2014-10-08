@@ -1,7 +1,20 @@
 language: ruby
 rvm:
-    - 1.9.3
-    - 2.1.0
+  - 1.9.3
+  - 2.1.0
 
+env:
+  - TESTENV=openldap
+  - TESTENV=apacheds
+
+install:
+  - if [ "$TESTENV" = "openldap" ]; then ./script/install-openldap; fi
+  - bundle install
+
+script:
+  - ./script/cibuild-$TESTENV
+
+matrix:
+  fast_finish: true
 notifications:
   email: false

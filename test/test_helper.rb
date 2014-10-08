@@ -12,7 +12,20 @@ require 'github/ldap/server'
 
 require 'minitest/autorun'
 
+if ENV.fetch('TESTENV', "apacheds") == "apacheds"
+  # Make sure we clean up running test server
+  # NOTE: We need to do this manually since its internal `at_exit` hook
+  # collides with Minitest's autorun at_exit handling, hence this hook.
+  Minitest.after_run do
+    GitHub::Ldap.stop_server
+  end
+end
+
 class GitHub::Ldap::Test < Minitest::Test
+  def self.test_env
+    ENV.fetch("TESTENV", "apacheds")
+  end
+
   def self.run(reporter, options = {})
     start_server
     super
@@ -20,28 +33,56 @@ class GitHub::Ldap::Test < Minitest::Test
   end
 
   def self.stop_server
-    GitHub::Ldap.stop_server
+    if test_env == "apacheds"
+      # see Minitest.after_run hook above.
+      # GitHub::Ldap.stop_server
+    end
+  end
+
+  def self.test_server_options
+    {
+      custom_schemas:   FIXTURES.join('posixGroup.schema.ldif').to_s,
+      user_fixtures:    FIXTURES.join('common/seed.ldif').to_s,
+      allow_anonymous:  true,
+      verbose:          ENV.fetch("VERBOSE", "0") == "1"
+    }
   end
 
   def self.start_server
-    server_opts = respond_to?(:test_server_options) ? test_server_options : {}
-    GitHub::Ldap.start_server(server_opts)
+    if test_env == "apacheds"
+      # skip this if a server has already been started
+      return if GitHub::Ldap.ldap_server
+
+      GitHub::Ldap.start_server(test_server_options)
+    end
   end
 
   def options
     @service   = MockInstrumentationService.new
-    @options ||= GitHub::Ldap.server_options.merge \
-      host: 'localhost',
-      uid:  'uid',
-      :instrumentation_service => @service
+    @options ||=
+      case self.class.test_env
+      when "apacheds"
+        GitHub::Ldap.server_options.merge \
+          admin_user: 'uid=admin,dc=github,dc=com',
+          admin_password: 'passworD1',
+          host: 'localhost',
+          uid:  'uid',
+          instrumentation_service: @service
+      when "openldap"
+        {
+          host: 'localhost',
+          port: 389,
+          admin_user:     'uid=admin,dc=github,dc=com',
+          admin_password: 'passworD1',
+          search_domains: %w(dc=github,dc=com),
+          uid: 'uid',
+          instrumentation_service: @service
+        }
+      end
   end
 end
 
 class GitHub::Ldap::UnauthenticatedTest < GitHub::Ldap::Test
-  def self.start_server
-    GitHub::Ldap.start_server(:allow_anonymous => true)
-  end
-
   def options
     @options ||= begin
       super.delete_if {|k, _| [:admin_user, :admin_password].include?(k)}
