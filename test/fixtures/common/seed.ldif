@@ -226,6 +226,10 @@ member: uid=user2,ou=People,dc=github,dc=com
 member: uid=user3,ou=People,dc=github,dc=com
 member: uid=user4,ou=People,dc=github,dc=com
 member: uid=user5,ou=People,dc=github,dc=com
+
+dn: cn=nested-group2,ou=Groups,dc=github,dc=com
+cn: nested-group2
+objectClass: groupOfNames
 member: uid=user6,ou=People,dc=github,dc=com
 member: uid=user7,ou=People,dc=github,dc=com
 member: uid=user8,ou=People,dc=github,dc=com
@@ -236,6 +240,7 @@ dn: cn=nested-groups,ou=Groups,dc=github,dc=com
 cn: nested-groups
 objectClass: groupOfNames
 member: cn=nested-group1,ou=Groups,dc=github,dc=com
+member: cn=nested-group2,ou=Groups,dc=github,dc=com
 
 dn: cn=n-member-nested-group1,ou=Groups,dc=github,dc=com
 cn: n-member-nested-group1

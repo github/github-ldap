@@ -219,3 +219,80 @@ class GitHubLdapWithoutPosixGroupsTest < GitHub::Ldap::Test
       "Expected `#{@cn}` to not include the member `#{user.dn}`"
   end
 end
+
+class GitHubLdapOpenTest < GitHub::Ldap::Test
+  def setup
+    @ldap = GitHub::Ldap.new(options)
+    @domain = @ldap.domain("dc=github,dc=com")
+    @dn = "cn=nested-groups,ou=Groups,dc=github,dc=com"
+    @groups = ["nested-group1", "nested-group2"]
+  end
+
+  def test_membership_for_first_nested_group
+    assert user = @ldap.domain('uid=user1,ou=People,dc=github,dc=com').bind
+
+    assert @domain.is_member?(user, @groups)
+
+    @ldap.open do
+      assert @domain.is_member?(user, @groups)
+    end
+  end
+
+  def test_membership_for_last_nested_group
+    assert user = @ldap.domain('uid=user10,ou=People,dc=github,dc=com').bind
+
+    assert @domain.is_member?(user, @groups)
+
+    @ldap.open do
+      assert @domain.is_member?(user, @groups)
+    end
+  end
+
+  def test_members_match_when_open_and_close
+    members_close = @ldap.group(@dn).members.map(&:uid).flatten
+
+    members_open =
+      @ldap.open do
+        @ldap.group(@dn).members.map(&:uid).flatten
+      end
+
+    assert_equal members_close, members_open
+  end
+
+  def test_open_with_subsearches
+    base   = "dc=github,dc=com"
+    filter = "(|(cn=nested-group1)(cn=nested-group2))"
+
+    close_results = {}
+    @ldap.search(filter: filter, base: base) do |entry|
+      close_results[entry.dn] = []
+      entry['member'].each do |child_dn|
+        @ldap.search(base: child_dn, scope: Net::LDAP::SearchScope_BaseObject) do |child|
+          close_results[entry.dn] << child.dn
+        end
+      end
+    end
+
+    open_results = {}
+    @ldap.open do
+      @ldap.search(filter: filter, base: base) do |entry|
+        open_results[entry.dn] = []
+        entry['member'].each do |child_dn|
+          @ldap.search(base: child_dn, scope: Net::LDAP::SearchScope_BaseObject) do |child|
+            open_results[entry.dn] << child.dn
+          end
+        end
+      end
+    end
+
+    if ENV.fetch('VERBOSE', '0') == '1'
+      require 'pp'
+      puts
+      pp close_results
+      puts "******"
+      pp open_results
+    end
+
+    assert_equal close_results, open_results
+  end
+end
