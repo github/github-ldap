@@ -1,3 +1,7 @@
+require 'github/ldap/membership_validators/base'
+require 'github/ldap/membership_validators/classic'
+require 'github/ldap/membership_validators/recursive'
+
 module GitHub
   class Ldap
     # Provides various strategies for validating membership.
@@ -8,10 +12,6 @@ module GitHub
     #   validator = GitHub::Ldap::MembershipValidators::Classic.new(ldap, groups)
     #   validator.perform(entry) #=> true
     #
-    module MembershipValidators
-      autoload :Base,      'github/ldap/membership_validators/base'
-      autoload :Classic,   'github/ldap/membership_validators/classic'
-      autoload :Recursive, 'github/ldap/membership_validators/recursive'
-    end
+    module MembershipValidators; end
   end
 end
