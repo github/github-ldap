@@ -126,6 +126,11 @@ module GitHubLdapDomainTestCases
     assert_equal ['user1@github.com'], user[:mail]
   end
 
+  def test_user_returns_subset_of_attributes
+    assert entry = @domain.user?('user1', :attributes => [:cn])
+    assert_equal [:dn, :cn], entry.attribute_names
+  end
+
   def test_auth_binds
     assert user = @domain.user?('user1')
     assert @domain.auth(user, 'passworD1'), 'Expected user to bind'
