@@ -110,11 +110,15 @@ module GitHub
       # Check if a user exists based in the `uid`.
       #
       # login: is the user's login
+      # search_options: Net::LDAP#search compatible options to pass through
       #
       # Returns the user if the login matches any `uid`.
       # Returns nil if there are no matches.
-      def user?(login)
-        search(filter: login_filter(@uid, login), size: 1).first
+      def user?(login, search_options = {})
+        options = search_options.merge \
+          filter: login_filter(@uid, login),
+          size: 1
+        search(options).first
       end
 
       # Check if a user can be bound with a password.
