@@ -15,23 +15,20 @@ module GitHub
       # nested groups, performed on the server side.
       class ActiveDirectory < Base
         def perform(entry)
-          domains.each do |domain|
-            # search for the entry on the condition that the entry is a member
-            # of one of the groups or their subgroups.
-            #
-            # Sets the entry to the base and scopes the search to the base,
-            # according to the source documentation, found here:
-            # http://msdn.microsoft.com/en-us/library/aa746475(v=vs.85).aspx
-            matched = domain.search \
-              filter: membership_in_chain_filter(entry),
-              base:   entry.dn,
-              scope:  Net::LDAP::SearchScope_BaseObject,
-              attributes: ATTRS
+          # search for the entry on the condition that the entry is a member
+          # of one of the groups or their subgroups.
+          #
+          # Sets the entry to the base and scopes the search to the base,
+          # according to the source documentation, found here:
+          # http://msdn.microsoft.com/en-us/library/aa746475(v=vs.85).aspx
+          matched = ldap.search \
+            filter: membership_in_chain_filter(entry),
+            base:   entry.dn,
+            scope:  Net::LDAP::SearchScope_BaseObject,
+            attributes: ATTRS
 
-            return true unless matched.empty?
-          end
-
-          false
+          # membership validated if entry was matched and returned as a result
+          matched.map(&:dn).include?(entry.dn)
         end
 
         # Internal: Constructs a membership filter using the "in chain"
