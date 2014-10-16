@@ -20,16 +20,18 @@ module GitHub
 
       # Filter to check group membership.
       #
-      # entry: finds groups this Net::LDAP::Entry is a member of (optional)
+      # entry: finds groups this entry is a member of (optional)
+      #        Expects a Net::LDAP::Entry or String DN.
       #
       # Returns a Net::LDAP::Filter.
       def member_filter(entry = nil)
         if entry
+          entry = entry.dn if entry.respond_to?(:dn)
           MEMBERSHIP_NAMES.
-            map {|n| Net::LDAP::Filter.eq(n, entry.dn) }.reduce(:|)
+            map {|n| Net::LDAP::Filter.eq(n, entry) }.reduce(:|)
         else
           MEMBERSHIP_NAMES.
-            map {|n| Net::LDAP::Filter.pres(n) }.        reduce(:|)
+            map {|n| Net::LDAP::Filter.pres(n) }.     reduce(:|)
         end
       end
 
@@ -41,10 +43,16 @@ module GitHub
       # uid_attr: specifies the memberUid attribute to match with
       #
       # Returns a Net::LDAP::Filter or nil if no entry has no UID set.
-      def posix_member_filter(entry, uid_attr)
-        if !entry[uid_attr].empty?
-          entry[uid_attr].map { |uid| Net::LDAP::Filter.eq("memberUid", uid) }.
-                          reduce(:|)
+      def posix_member_filter(entry_or_uid, uid_attr = nil)
+        case entry_or_uid
+        when Net::LDAP::Entry
+          entry = entry_or_uid
+          if !entry[uid_attr].empty?
+            entry[uid_attr].map { |uid| Net::LDAP::Filter.eq("memberUid", uid) }.
+                            reduce(:|)
+          end
+        when String
+          Net::LDAP::Filter.eq("memberUid", entry_or_uid)
         end
       end
 

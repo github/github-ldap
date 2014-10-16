@@ -22,59 +22,54 @@ module GitHubLdapTestCases
   end
 
   def test_search_delegator
-    @ldap.domain('dc=github,dc=com').valid_login? 'calavera', 'secret'
+    assert user = @ldap.domain('dc=github,dc=com').valid_login?('user1', 'passworD1')
 
-    result = @ldap.search(
-        {:base      => 'dc=github,dc=com',
-        :attributes => %w(uid),
-        :filter     => Net::LDAP::Filter.eq('uid', 'calavera')})
+    result = @ldap.search \
+      :base      => 'dc=github,dc=com',
+      :attributes => %w(uid),
+      :filter     => Net::LDAP::Filter.eq('uid', 'user1')
 
     refute result.empty?
-    assert_equal 'calavera', result.first[:uid].first
-  end
-
-  def test_virtual_attributes_defaults
-    @ldap = GitHub::Ldap.new(options.merge(virtual_attributes: true))
-
-    assert @ldap.virtual_attributes.enabled?, "Expected to have virtual attributes enabled with defaults"
-    assert_equal 'memberOf', @ldap.virtual_attributes.virtual_membership
-  end
-
-  def test_virtual_attributes_defaults
-    ldap = GitHub::Ldap.new(options.merge(virtual_attributes: true))
-
-    assert ldap.virtual_attributes.enabled?, "Expected to have virtual attributes enabled with defaults"
-    assert_equal 'memberOf', ldap.virtual_attributes.virtual_membership
-  end
-
-  def test_virtual_attributes_hash
-    ldap = GitHub::Ldap.new(options.merge(virtual_attributes: {virtual_membership: "isMemberOf"}))
-
-    assert ldap.virtual_attributes.enabled?, "Expected to have virtual attributes enabled with defaults"
-    assert_equal 'isMemberOf', ldap.virtual_attributes.virtual_membership
+    assert_equal 'user1', result.first[:uid].first
   end
 
   def test_virtual_attributes_disabled
     refute @ldap.virtual_attributes.enabled?, "Expected to have virtual attributes disabled"
   end
 
+  def test_virtual_attributes_configured
+    ldap = GitHub::Ldap.new(options.merge(virtual_attributes: true))
+
+    assert ldap.virtual_attributes.enabled?,
+      "Expected virtual attributes to be enabled"
+    assert_equal 'memberOf', ldap.virtual_attributes.virtual_membership
+  end
+
+  def test_virtual_attributes_configured_with_membership_attribute
+    ldap = GitHub::Ldap.new(options.merge(virtual_attributes: {virtual_membership: "isMemberOf"}))
+
+    assert ldap.virtual_attributes.enabled?,
+      "Expected virtual attributes to be enabled"
+    assert_equal 'isMemberOf', ldap.virtual_attributes.virtual_membership
+  end
+
   def test_search_domains
     ldap = GitHub::Ldap.new(options.merge(search_domains: ['dc=github,dc=com']))
-    result = ldap.search(filter: Net::LDAP::Filter.eq('uid', 'calavera'))
+    result = ldap.search(filter: Net::LDAP::Filter.eq('uid', 'user1'))
 
     refute result.empty?
-    assert_equal 'calavera', result.first[:uid].first
+    assert_equal 'user1', result.first[:uid].first
   end
 
   def test_instruments_search
     events = @service.subscribe "search.github_ldap"
-    result = @ldap.search(filter: "(uid=calavera)", :base => "dc=github,dc=com")
+    result = @ldap.search(filter: "(uid=user1)", :base => "dc=github,dc=com")
     refute_predicate result, :empty?
     payload, event_result = events.pop
     assert payload
     assert event_result
     assert_equal result, event_result
-    assert_equal "(uid=calavera)",   payload[:filter].to_s
+    assert_equal "(uid=user1)",      payload[:filter].to_s
     assert_equal "dc=github,dc=com", payload[:base]
   end
 end

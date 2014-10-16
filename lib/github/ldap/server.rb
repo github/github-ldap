@@ -38,6 +38,8 @@ module GitHub
       @server_options[:domain]            = @server_options[:user_domain]
       @server_options[:tmpdir]          ||= server_tmp
 
+      @server_options[:quiet] = false if @server_options[:verbose]
+
       @ldap_server = Ladle::Server.new(@server_options)
       @ldap_server.start
     end

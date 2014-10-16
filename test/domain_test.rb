@@ -7,13 +7,13 @@ module GitHubLdapDomainTestCases
   end
 
   def test_user_valid_login
-    user = @domain.valid_login?('calavera', 'passworD1')
-    assert_equal 'uid=calavera,dc=github,dc=com', user.dn
+    assert user = @domain.valid_login?('user1', 'passworD1')
+    assert_equal 'uid=user1,ou=People,dc=github,dc=com', user.dn
   end
 
   def test_user_with_invalid_password
-    assert !@domain.valid_login?('calavera', 'foo'),
-      "Login `calavera` expected to be invalid with password `foo`"
+    assert !@domain.valid_login?('user1', 'foo'),
+      "Login `user1` expected to be invalid with password `foo`"
   end
 
   def test_user_with_invalid_login
@@ -22,115 +22,123 @@ module GitHubLdapDomainTestCases
   end
 
   def test_groups_in_server
-    assert_equal 2, @domain.groups(%w(Enterprise People)).size
+    assert_equal 2, @domain.groups(%w(ghe-users ghe-admins)).size
   end
 
   def test_user_in_group
-    user = @domain.valid_login?('calavera', 'passworD1')
+    assert user = @domain.valid_login?('user1', 'passworD1')
 
-    assert @domain.is_member?(user, %w(Enterprise People)),
-      "Expected `Enterprise` or `Poeple` to include the member `#{user.dn}`"
+    assert @domain.is_member?(user, %w(ghe-users ghe-admins)),
+      "Expected `ghe-users` or `ghe-admins` to include the member `#{user.dn}`"
   end
 
   def test_user_not_in_different_group
-    user = @domain.valid_login?('calavera', 'passworD1')
+    user = @domain.valid_login?('user1', 'passworD1')
 
-    assert !@domain.is_member?(user, %w(People)),
-      "Expected `Poeple` not to include the member `#{user.dn}`"
+    refute @domain.is_member?(user, %w(ghe-admins)),
+      "Expected `ghe-admins` not to include the member `#{user.dn}`"
   end
 
   def test_user_without_group
-    user = @domain.valid_login?('ldaptest', 'secret')
+    user = @domain.valid_login?('groupless-user1', 'passworD1')
 
-    assert !@domain.is_member?(user, %w(People)),
-      "Expected `People` not to include the member `#{user.dn}`"
+    assert !@domain.is_member?(user, %w(all-users)),
+      "Expected `all-users` not to include the member `#{user.dn}`"
+  end
+
+  def test_authenticate_returns_valid_users
+    user = @domain.authenticate!('user1', 'passworD1')
+    assert_equal 'uid=user1,ou=People,dc=github,dc=com', user.dn
   end
 
   def test_authenticate_doesnt_return_invalid_users
-    user = @domain.authenticate!('calavera', 'passworD1')
-    assert_equal 'uid=calavera,dc=github,dc=com', user.dn
-  end
-
-  def test_authenticate_doesnt_return_invalid_users
-    assert !@domain.authenticate!('calavera', 'foo'),
+    refute @domain.authenticate!('user1', 'foo'),
       "Expected `authenticate!` to not return an invalid user"
   end
 
   def test_authenticate_check_valid_user_and_groups
-    user = @domain.authenticate!('calavera', 'passworD1', %w(Enterprise People))
+    user = @domain.authenticate!('user1', 'passworD1', %w(ghe-users ghe-admins))
 
-    assert_equal 'uid=calavera,dc=github,dc=com', user.dn
+    assert_equal 'uid=user1,ou=People,dc=github,dc=com', user.dn
   end
 
   def test_authenticate_doesnt_return_valid_users_in_different_groups
-    assert !@domain.authenticate!('calavera', 'passworD1', %w(People)),
+    refute @domain.authenticate!('user1', 'passworD1', %w(ghe-admins)),
       "Expected `authenticate!` to not return an user"
   end
 
   def test_membership_empty_for_non_members
-    user = @ldap.domain('uid=calavera,dc=github,dc=com').bind
+    user = @ldap.domain('uid=user1,ou=People,dc=github,dc=com').bind
 
-    assert @domain.membership(user, %w(People)).empty?,
-      "Expected `calavera` not to be a member of `People`."
+    assert @domain.membership(user, %w(ghe-admins)).empty?,
+      "Expected `user1` not to be a member of `ghe-admins`."
   end
 
   def test_membership_groups_for_members
-    user = @ldap.domain('uid=calavera,dc=github,dc=com').bind
-    groups = @domain.membership(user, %w(Enterprise People))
+    user = @ldap.domain('uid=user1,ou=People,dc=github,dc=com').bind
+    groups = @domain.membership(user, %w(ghe-users ghe-admins))
 
     assert_equal 1, groups.size
-    assert_equal 'cn=Enterprise,ou=Group,dc=github,dc=com', groups.first.dn
+    assert_equal 'cn=ghe-users,ou=Groups,dc=github,dc=com', groups.first.dn
   end
 
   def test_membership_with_virtual_attributes
     ldap = GitHub::Ldap.new(options.merge(virtual_attributes: true))
-    user = ldap.domain('uid=calavera,dc=github,dc=com').bind
-    user[:memberof] = 'cn=Enterprise,ou=Group,dc=github,dc=com'
+
+    user = ldap.domain('uid=user1,ou=People,dc=github,dc=com').bind
+    user[:memberof] = 'cn=ghe-admins,ou=Groups,dc=github,dc=com'
 
     domain = ldap.domain("dc=github,dc=com")
-    groups = domain.membership(user, %w(Enterprise People))
+    groups = domain.membership(user, %w(ghe-admins))
 
     assert_equal 1, groups.size
-    assert_equal 'cn=Enterprise,ou=Group,dc=github,dc=com', groups.first.dn
+    assert_equal 'cn=ghe-admins,ou=Groups,dc=github,dc=com', groups.first.dn
   end
 
   def test_search
     assert 1, @domain.search(
       attributes: %w(uid),
-      filter: Net::LDAP::Filter.eq('uid', 'calavera')).size
+      filter: Net::LDAP::Filter.eq('uid', 'user1')).size
   end
 
   def test_search_override_base_name
     assert 1, @domain.search(
       base: "this base name is incorrect",
       attributes: %w(uid),
-      filter: Net::LDAP::Filter.eq('uid', 'calavera')).size
+      filter: Net::LDAP::Filter.eq('uid', 'user1')).size
   end
 
   def test_user_exists
-    assert_equal 'uid=calavera,dc=github,dc=com', @domain.user?('calavera').dn
+    assert user = @domain.user?('user1')
+    assert_equal 'uid=user1,ou=People,dc=github,dc=com', user.dn
   end
 
   def test_user_wildcards_are_filtered
-    assert !@domain.user?('cal*'), 'Expected uid `cal*` to not complete'
+    refute @domain.user?('user*'), 'Expected uid `user*` to not complete'
   end
 
   def test_user_does_not_exist
-    assert !@domain.user?('foobar'), 'Expected uid `foobar` to not exist.'
+    refute @domain.user?('foobar'), 'Expected uid `foobar` to not exist.'
   end
 
   def test_user_returns_every_attribute
-    assert_equal ['calavera@github.com'], @domain.user?('calavera')[:mail]
+    assert user = @domain.user?('user1')
+    assert_equal ['user1@github.com'], user[:mail]
+  end
+
+  def test_user_returns_subset_of_attributes
+    assert entry = @domain.user?('user1', :attributes => [:cn])
+    assert_equal [:dn, :cn], entry.attribute_names
   end
 
   def test_auth_binds
-    user = @domain.user?('calavera')
-    assert @domain.auth(user, 'passworD1'), 'Expected user to be bound.'
+    assert user = @domain.user?('user1')
+    assert @domain.auth(user, 'passworD1'), 'Expected user to bind'
   end
 
   def test_auth_does_not_bind
-    user = @domain.user?('calavera')
-    assert !@domain.auth(user, 'foo'), 'Expected user not to be bound.'
+    assert user = @domain.user?('user1')
+    refute @domain.auth(user, 'foo'), 'Expected user not not bind'
   end
 end
 
@@ -143,48 +151,37 @@ class GitHubLdapDomainUnauthenticatedTest < GitHub::Ldap::UnauthenticatedTest
 end
 
 class GitHubLdapDomainNestedGroupsTest < GitHub::Ldap::Test
-  def self.test_server_options
-    {user_fixtures: FIXTURES.join('github-with-subgroups.ldif').to_s}
-  end
-
   def setup
     @ldap = GitHub::Ldap.new(options)
     @domain = @ldap.domain("dc=github,dc=com")
   end
 
   def test_membership_in_subgroups
-    user = @ldap.domain('uid=rubiojr,ou=users,dc=github,dc=com').bind
+    user = @ldap.domain('uid=user1,ou=People,dc=github,dc=com').bind
 
-    assert @domain.is_member?(user, %w(enterprise-ops)),
-      "Expected `enterprise-ops` to include the member `#{user.dn}`"
+    assert @domain.is_member?(user, %w(nested-groups)),
+      "Expected `nested-groups` to include the member `#{user.dn}`"
   end
 
   def test_membership_in_deeply_nested_subgroups
-    assert user = @ldap.domain('uid=user1.1.1.1,ou=users,dc=github,dc=com').bind
+    assert user = @ldap.domain('uid=user1,ou=People,dc=github,dc=com').bind
 
-    assert @domain.is_member?(user, %w(group1)),
-      "Expected `group1` to include the member `#{user.dn}` via deep recursion"
+    assert @domain.is_member?(user, %w(n-depth-nested-group4)),
+      "Expected `n-depth-nested-group4` to include the member `#{user.dn}` via deep recursion"
   end
 end
 
 class GitHubLdapPosixGroupsWithRecursionFallbackTest < GitHub::Ldap::Test
-  def self.test_server_options
-    {
-      custom_schemas: FIXTURES.join('posixGroup.schema.ldif'),
-      user_fixtures: FIXTURES.join('github-with-posixGroups.ldif').to_s,
-      # so we exercise the recursive group search fallback
-      recursive_group_search_fallback: true
-    }
-  end
-
   def setup
-    @ldap = GitHub::Ldap.new(options)
+    opts = options.merge \
+      recursive_group_search_fallback: true
+    @ldap = GitHub::Ldap.new(opts)
     @domain = @ldap.domain("dc=github,dc=com")
-    @cn = "enterprise-posix-devs"
+    @cn = "posix-group1"
   end
 
   def test_membership_for_posixGroups
-    assert user = @ldap.domain('uid=mtodd,ou=users,dc=github,dc=com').bind
+    assert user = @ldap.domain('uid=user1,ou=People,dc=github,dc=com').bind
 
     assert @domain.is_member?(user, [@cn]),
       "Expected `#{@cn}` to include the member `#{user.dn}`"
@@ -192,23 +189,16 @@ class GitHubLdapPosixGroupsWithRecursionFallbackTest < GitHub::Ldap::Test
 end
 
 class GitHubLdapPosixGroupsWithoutRecursionTest < GitHub::Ldap::Test
-  def self.test_server_options
-    {
-      custom_schemas: FIXTURES.join('posixGroup.schema.ldif'),
-      user_fixtures: FIXTURES.join('github-with-posixGroups.ldif').to_s,
-      # so we test the test the non-recursive group membership search
-      recursive_group_search_fallback: false
-    }
-  end
-
   def setup
-    @ldap = GitHub::Ldap.new(options)
+    opts = options.merge \
+      recursive_group_search_fallback: false
+    @ldap = GitHub::Ldap.new(opts)
     @domain = @ldap.domain("dc=github,dc=com")
-    @cn = "enterprise-posix-devs"
+    @cn = "posix-group1"
   end
 
   def test_membership_for_posixGroups
-    assert user = @ldap.domain('uid=mtodd,ou=users,dc=github,dc=com').bind
+    assert user = @ldap.domain('uid=user1,ou=People,dc=github,dc=com').bind
 
     assert @domain.is_member?(user, [@cn]),
       "Expected `#{@cn}` to include the member `#{user.dn}`"
@@ -218,25 +208,17 @@ end
 # Specifically testing that this doesn't break when posixGroups are not
 # supported.
 class GitHubLdapWithoutPosixGroupsTest < GitHub::Ldap::Test
-  def self.test_server_options
-    {
-      custom_schemas: FIXTURES.join('posixGroup.schema.ldif'),
-      user_fixtures: FIXTURES.join('github-with-posixGroups.ldif').to_s,
-      # so we test the test the non-recursive group membership search
-      recursive_group_search_fallback: false,
-      # explicitly disable posixGroup support (even if the schema supports it)
-      posix_support:                   false
-    }
-  end
-
   def setup
-    @ldap = GitHub::Ldap.new(options)
+    opts = options.merge \
+      recursive_group_search_fallback: false, # test non-recursive group membership search
+      posix_support:                   false  # disable posixGroup support
+    @ldap = GitHub::Ldap.new(opts)
     @domain = @ldap.domain("dc=github,dc=com")
-    @cn = "enterprise-posix-devs"
+    @cn = "posix-group1"
   end
 
   def test_membership_for_posixGroups
-    assert user = @ldap.domain('uid=mtodd,ou=users,dc=github,dc=com').bind
+    assert user = @ldap.domain('uid=user1,ou=People,dc=github,dc=com').bind
 
     refute @domain.is_member?(user, [@cn]),
       "Expected `#{@cn}` to not include the member `#{user.dn}`"
