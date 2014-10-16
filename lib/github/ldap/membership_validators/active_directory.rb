@@ -14,7 +14,7 @@ module GitHub
       # This means we have an efficient method of searching membership even in
       # nested groups, performed on the server side.
       class ActiveDirectory < Base
-        def perform(entry, depth = DEFAULT_MAX_DEPTH)
+        def perform(entry)
           domains.each do |domain|
             # search for the entry on the condition that the entry is a member
             # of one of the groups or their subgroups.
