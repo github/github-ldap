@@ -15,6 +15,9 @@ module GitHub
       # nested groups, performed on the server side.
       class ActiveDirectory < Base
         def perform(entry)
+          # short circuit validation if there are no groups to check against
+          return true if groups.empty?
+
           # search for the entry on the condition that the entry is a member
           # of one of the groups or their subgroups.
           #
