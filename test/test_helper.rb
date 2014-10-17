@@ -12,6 +12,7 @@ FIXTURES = Pathname(File.expand_path('fixtures', __dir__))
 require 'github/ldap'
 require 'github/ldap/server'
 
+require 'minitest/mock'
 require 'minitest/autorun'
 
 if TESTENV == "apacheds"
