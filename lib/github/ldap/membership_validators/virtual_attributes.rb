@@ -16,7 +16,7 @@ module GitHub
             membership = entry[member_of_attr]
 
             # success if any of these groups match the restricted auth groups
-            return true if membership.any? { |entry| group_dns.include?(entry.dn) }
+            return true if membership.any? { |dn| group_dns.include?(dn) }
 
             # give up if the entry has no memberships to recurse
             next if membership.empty?
@@ -24,10 +24,13 @@ module GitHub
             # recurse to at most `depth`
             depth.times do |n|
               # find groups whose members include membership groups
-              membership = domain.search(filter: membership_filter(membership), attributes: ATTRS)
+              membership = domain.search(filter: membership_filter(membership), attributes: ATTRS).map(&:dn)
+
+              # give up if the entry has no memberships to check
+              next if membership.empty?
 
               # success if any of these groups match the restricted auth groups
-              return true if membership.any? { |entry| group_dns.include?(entry.dn) }
+              return true if membership.any? { |dn| group_dns.include?(dn) }
 
               # give up if there are no more membersips to recurse
               break if membership.empty?
@@ -52,8 +55,8 @@ module GitHub
         # to inject `posixGroup` handling.
         #
         # Returns a Net::LDAP::Filter object.
-        def member_filter(entry)
-          Net::LDAP::Filter.eq(member_of_attr, entry.dn)
+        def member_filter(dn)
+          Net::LDAP::Filter.eq(member_of_attr, dn)
         end
 
         # Internal: Construct a filter to find groups whose members are the
@@ -61,7 +64,7 @@ module GitHub
         #
         # Returns a String filter.
         def membership_filter(groups)
-          groups.map { |entry| member_filter(entry) }.reduce(:|)
+          groups.map { |dn| member_filter(dn) }.reduce(:|)
         end
 
         # Internal: the group DNs to check against.
