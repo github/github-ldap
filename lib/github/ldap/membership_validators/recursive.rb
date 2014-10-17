@@ -22,6 +22,9 @@ module GitHub
         ATTRS             = %w(dn cn)
 
         def perform(entry, depth = DEFAULT_MAX_DEPTH)
+          # short circuit validation if there are no groups to check against
+          return true if groups.empty?
+
           domains.each do |domain|
             # find groups entry is an immediate member of
             membership = domain.search(filter: member_filter(entry), attributes: ATTRS)

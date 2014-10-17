@@ -7,6 +7,7 @@ module GitHub
       # it consistently with the new approach.
       class Classic < Base
         def perform(entry)
+          # short circuit validation if there are no groups to check against
           return true if groups.empty?
 
           domains.each do |domain|
