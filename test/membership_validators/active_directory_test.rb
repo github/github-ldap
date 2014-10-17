@@ -18,45 +18,50 @@ class GitHubLdapActiveDirectoryMembershipValidatorsTest < GitHub::Ldap::Test
   end
 
   def test_validates_user_in_group
+    validator = make_validator(%w(nested-group1))
+
     @ldap.stub :search, [@entry] do
-      validator = make_validator(%w(nested-group1))
       assert validator.perform(@entry)
     end
   end
 
   def test_validates_user_in_child_group
+    validator = make_validator(%w(n-depth-nested-group1))
+
     @ldap.stub :search, [@entry] do
-      validator = make_validator(%w(n-depth-nested-group1))
       assert validator.perform(@entry)
     end
   end
 
   def test_validates_user_in_grandchild_group
+    validator = make_validator(%w(n-depth-nested-group2))
+
     @ldap.stub :search, [@entry] do
-      validator = make_validator(%w(n-depth-nested-group2))
       assert validator.perform(@entry)
     end
   end
 
   def test_validates_user_in_great_grandchild_group
+    validator = make_validator(%w(n-depth-nested-group3))
+
     @ldap.stub :search, [@entry] do
-      validator = make_validator(%w(n-depth-nested-group3))
       assert validator.perform(@entry)
     end
   end
 
   def test_does_not_validate_user_not_in_group
+    validator = make_validator(%w(ghe-admins))
+
     @ldap.stub :search, [] do
-      validator = make_validator(%w(ghe-admins))
       refute validator.perform(@entry)
     end
   end
 
   def test_does_not_validate_user_not_in_any_group
     entry = @domain.user?('groupless-user1')
+    validator = make_validator(%w(all-users))
 
     @ldap.stub :search, [] do
-      validator = make_validator(%w(all-users))
       refute validator.perform(entry)
     end
   end
