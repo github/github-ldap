@@ -17,21 +17,30 @@ class GitHubLdapVirtualAttributesMembershipValidatorsTest < GitHub::Ldap::Test
   end
 
   def test_validates_user_in_group
+    # fake for ApacheDS
+    @entry['memberOf'] = %w(cn=nested-group1,ou=Groups,dc=github,dc=com) if TESTENV == "apacheds"
+
     validator = make_validator(%w(nested-group1))
     assert validator.perform(@entry)
   end
 
   def test_validates_user_in_child_group
+    skip "no memberOf support for ApacheDS" if TESTENV == "apacheds"
+
     validator = make_validator(%w(n-depth-nested-group1))
     assert validator.perform(@entry)
   end
 
   def test_validates_user_in_grandchild_group
+    skip "no memberOf support for ApacheDS" if TESTENV == "apacheds"
+
     validator = make_validator(%w(n-depth-nested-group2))
     assert validator.perform(@entry)
   end
 
   def test_validates_user_in_great_grandchild_group
+    skip "no memberOf support for ApacheDS" if TESTENV == "apacheds"
+
     validator = make_validator(%w(n-depth-nested-group3))
     assert validator.perform(@entry)
   end
@@ -53,6 +62,9 @@ class GitHubLdapVirtualAttributesMembershipValidatorsTest < GitHub::Ldap::Test
   end
 
   def test_validates_user_in_posix_group
+    # fake for ApacheDS
+    @entry['memberOf'] = %w(cn=posix-group1,ou=Groups,dc=github,dc=com) if TESTENV == "apacheds"
+
     validator = make_validator(%w(posix-group1))
     assert validator.perform(@entry)
   end
