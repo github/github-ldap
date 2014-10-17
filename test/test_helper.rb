@@ -71,7 +71,7 @@ class GitHub::Ldap::Test < Minitest::Test
           instrumentation_service: @service
       when "openldap"
         {
-          host: 'localhost',
+          host: ENV.fetch("OPENLDAP_HOST", "localhost"),
           port: 389,
           admin_user:     'uid=admin,dc=github,dc=com',
           admin_password: 'passworD1',
