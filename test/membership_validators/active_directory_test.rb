@@ -60,11 +60,4 @@ class GitHubLdapActiveDirectoryMembershipValidatorsTest < GitHub::Ldap::Test
       refute validator.perform(entry)
     end
   end
-
-  def test_validates_user_in_posix_group
-    @ldap.stub :search, [@entry] do
-      validator = make_validator(%w(posix-group1))
-      assert validator.perform(@entry)
-    end
-  end
 end
