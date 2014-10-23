@@ -36,6 +36,8 @@ module GitHub
     attr_reader :uid, :search_domains, :virtual_attributes,
                 :instrumentation_service
 
+    attr_accessor :logger
+
     def initialize(options = {})
       @uid = options[:uid] || "sAMAccountName"
 
