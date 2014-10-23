@@ -36,6 +36,28 @@ module GitHub
     attr_reader :uid, :search_domains, :virtual_attributes,
                 :instrumentation_service
 
+    # Build a new GitHub::Ldap instance
+    #
+    # ## Connection
+    #
+    # host: required string ldap server host address
+    # port: required string or number ldap server port
+    # encryption: optional string. `ssl` or `tls`. nil by default
+    # admin_user: optional string ldap administrator user dn for authentication
+    # admin_password: optional string ldap administrator user password
+    #
+    # ## Behavior
+    #
+    # uid: optional field name used to authenticate users. Defaults to `sAMAccountName` (what ActiveDirectory uses)
+    # virtual_attributes: optional. boolean true to use server's virtual attributes. Hash to specify custom mapping. Default false.
+    # recursive_group_search_fallback: optional boolean whether membership checks should recurse into nested groups when virtual attributes aren't enabled. Default false.
+    # posix_support: optional boolean `posixGroup` support. Default true.
+    # search_domains: optional array of string bases to search through
+    #
+    # ## Diagnostics
+    #
+    # instrumentation_service: optional ActiveSupport::Notifications compatible object
+    #
     def initialize(options = {})
       @uid = options[:uid] || "sAMAccountName"
 
