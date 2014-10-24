@@ -55,21 +55,10 @@ module GitHub
           capabilities[:supportcapabilities].include?(ACTIVE_DIRECTORY_V61_R2_OID)
         end
 
-        # Internal: Searches the LDAP host's Root DSE for server capabilities.
-        #
-        # Returns the Net::LDAP::Entry object containing the Root DSE
-        # results describing the server capabilities.
+        # Internal: Returns the Net::LDAP::Entry object describing the LDAP
+        # host's capabilities (via the Root DSE).
         def capabilities
-          @ldap.instrument "capabilities.github_ldap_membership_validator" do |payload|
-            @capabilities ||=
-              begin
-                ldap.search_root_dse
-              rescue Net::LDAP::LdapError => error
-                payload[:error] = error
-                # stubbed result
-                Net::LDAP::Entry.new
-              end
-          end
+          ldap.capabilities
         end
       end
     end

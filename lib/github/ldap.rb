@@ -186,6 +186,23 @@ module GitHub
       end
     end
 
+    # Internal: Searches the host LDAP server's Root DSE for capabilities and
+    # extensions.
+    #
+    # Returns a Net::LDAP::Entry object.
+    def capabilities
+      @ldap.instrument "capabilities.github_ldap" do |payload|
+        @capabilities ||=
+          begin
+            @connection.search_root_dse
+          rescue Net::LDAP::LdapError => error
+            payload[:error] = error
+            # stubbed result
+            Net::LDAP::Entry.new
+          end
+      end
+    end
+
     # Internal - Determine whether to use encryption or not.
     #
     # encryption: is the encryption method, either 'ssl', 'tls', 'simple_tls' or 'start_tls'.
