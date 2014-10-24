@@ -4,13 +4,6 @@ module GitHub
       # Detects the LDAP host's capabilities and determines the appropriate
       # membership validation strategy at runtime.
       class Detect < Base
-        # Internal: Mapping of strategy name to class.
-        STRATEGIES = {
-          :classic          => GitHub::Ldap::MembershipValidators::Classic,
-          :recursive        => GitHub::Ldap::MembershipValidators::Recursive,
-          :active_directory => GitHub::Ldap::MembershipValidators::ActiveDirectory
-        }
-
         # Internal: The capability required to use the ActiveDirectory strategy.
         # See: http://msdn.microsoft.com/en-us/library/cc223359.aspx.
         ACTIVE_DIRECTORY_V51_OID = "1.2.840.113556.1.4.1670".freeze
@@ -37,9 +30,10 @@ module GitHub
         #
         # Returns the strategy class.
         def detect_strategy
-          return STRATEGIES[strategy_config] if STRATEGIES.key?(strategy_config)
-
-          if active_directory_capability?
+          case
+          when GitHub::Ldap::MembershipValidators::STRATEGIES.key?(strategy_config)
+            GitHub::Ldap::MembershipValidators::STRATEGIES[strategy_config]
+          when active_directory_capability?
             :active_directory
           else
             :recursive

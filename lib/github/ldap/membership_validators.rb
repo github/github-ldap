@@ -14,6 +14,13 @@ module GitHub
     #   validator = GitHub::Ldap::MembershipValidators::Classic.new(ldap, groups)
     #   validator.perform(entry) #=> true
     #
-    module MembershipValidators; end
+    module MembershipValidators
+      # Internal: Mapping of strategy name to class.
+      STRATEGIES = {
+        :classic          => GitHub::Ldap::MembershipValidators::Classic,
+        :recursive        => GitHub::Ldap::MembershipValidators::Recursive,
+        :active_directory => GitHub::Ldap::MembershipValidators::ActiveDirectory
+      }
+    end
   end
 end
