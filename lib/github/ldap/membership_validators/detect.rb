@@ -6,7 +6,7 @@ module GitHub
       class Detect < Base
         # Internal: The capability required to use the ActiveDirectory strategy.
         # See: http://msdn.microsoft.com/en-us/library/cc223359.aspx.
-        ACTIVE_DIRECTORY_V51_OID = "1.2.840.113556.1.4.1670".freeze
+        ACTIVE_DIRECTORY_V61_R2_OID = "1.2.840.113556.1.4.2080".freeze
 
         def perform(entry)
           # short circuit validation if there are no groups to check against
@@ -51,7 +51,7 @@ module GitHub
         #
         # Returns true if the host is an ActiveDirectory server, false otherwise.
         def active_directory_capability?
-          capabilities[:supportcapabilities].include?(ACTIVE_DIRECTORY_V51_OID)
+          capabilities[:supportcapabilities].include?(ACTIVE_DIRECTORY_V61_R2_OID)
         end
 
         # Internal: Searches the LDAP host's Root DSE for server capabilities.
