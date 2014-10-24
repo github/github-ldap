@@ -191,8 +191,8 @@ module GitHub
     #
     # Returns a Net::LDAP::Entry object.
     def capabilities
-      @ldap.instrument "capabilities.github_ldap" do |payload|
-        @capabilities ||=
+      @capabilities ||=
+        @ldap.instrument "capabilities.github_ldap" do |payload|
           begin
             @connection.search_root_dse
           rescue Net::LDAP::LdapError => error
@@ -200,7 +200,7 @@ module GitHub
             # stubbed result
             Net::LDAP::Entry.new
           end
-      end
+        end
     end
 
     # Internal - Determine whether to use encryption or not.
