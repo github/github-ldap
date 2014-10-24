@@ -26,7 +26,8 @@ module GitHub
         # Internal: Detects LDAP host's capabilities and chooses the best
         # strategy for the host.
         #
-        # If the strategy has been
+        # If the strategy has been set explicitly, skips detection and uses the
+        # configured strategy instead.
         #
         # Returns the strategy class.
         def detect_strategy
