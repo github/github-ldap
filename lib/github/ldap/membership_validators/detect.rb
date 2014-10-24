@@ -35,9 +35,9 @@ module GitHub
           when GitHub::Ldap::MembershipValidators::STRATEGIES.key?(strategy_config)
             GitHub::Ldap::MembershipValidators::STRATEGIES[strategy_config]
           when active_directory_capability?
-            :active_directory
+            GitHub::Ldap::MembershipValidators::STRATEGIES[:active_directory]
           else
-            :recursive
+            GitHub::Ldap::MembershipValidators::STRATEGIES[:recursive]
           end
         end
 
