@@ -59,7 +59,16 @@ module GitHub
         # Returns the Net::LDAP::Entry object containing the Root DSE
         # results describing the server capabilities.
         def capabilities
-          @capabilities ||= ldap.search_root_dse
+          @ldap.instrument "capabilities.github_ldap_membership_validator" do |payload|
+            @capabilities ||=
+              begin
+                ldap.search_root_dse
+              rescue Net::LDAP::LdapError => error
+                payload[:error] = error
+                # stubbed result
+                Net::LDAP::Entry.new
+              end
+          end
         end
       end
     end
