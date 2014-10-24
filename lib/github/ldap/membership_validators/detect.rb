@@ -52,7 +52,7 @@ module GitHub
         #
         # Returns true if the host is an ActiveDirectory server, false otherwise.
         def active_directory_capability?
-          capabilities[:supportcapabilities].include?(ACTIVE_DIRECTORY_V61_R2_OID)
+          capabilities[:supportedcapabilities].include?(ACTIVE_DIRECTORY_V61_R2_OID)
         end
 
         # Internal: Returns the Net::LDAP::Entry object describing the LDAP
