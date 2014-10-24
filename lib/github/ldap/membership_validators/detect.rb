@@ -46,7 +46,7 @@ module GitHub
           ldap.membership_validator
         end
 
-        # Internal: Detect it the LDAP host is an ActiveDirectory server.
+        # Internal: Detect whether the LDAP host is an ActiveDirectory server.
         #
         # See: http://msdn.microsoft.com/en-us/library/cc223359.aspx.
         #
