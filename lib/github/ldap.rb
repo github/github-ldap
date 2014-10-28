@@ -192,7 +192,7 @@ module GitHub
     # Returns a Net::LDAP::Entry object.
     def capabilities
       @capabilities ||=
-        @ldap.instrument "capabilities.github_ldap" do |payload|
+        instrument "capabilities.github_ldap" do |payload|
           begin
             @connection.search_root_dse
           rescue Net::LDAP::LdapError => error
