@@ -2,7 +2,10 @@ module GitHub
   class Ldap
     module MembershipValidators
       # Detects the LDAP host's capabilities and determines the appropriate
-      # membership validation strategy at runtime.
+      # membership validation strategy at runtime. Currently detects for
+      # ActiveDirectory in-chain membership validation. An explicit strategy can
+      # also be defined via `GitHub::Ldap#membership_validator=`. See also
+      # `GitHub::Ldap#configure_membership_validation_strategy`.
       class Detect < Base
         # Internal: The capability required to use the ActiveDirectory strategy.
         # See: http://msdn.microsoft.com/en-us/library/cc223359.aspx.
