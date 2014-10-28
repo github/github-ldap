@@ -79,6 +79,15 @@ class GitHub::Ldap::Test < Minitest::Test
           uid: 'uid',
           instrumentation_service: @service
         }
+      when "activedirectory"
+        {
+          host: ENV.fetch("ACTIVEDIRECTORY_HOST"),
+          port: ENV.fetch("ACTIVEDIRECTORY_PORT", 389),
+          admin_user: ENV.fetch("ACTIVEDIRECTORY_USER"),
+          admin_password: ENV.fetch("ACTIVEDIRECTORY_PASSWORD"),
+          search_domains: ENV.fetch("ACTIVEDIRECTORY_SEARCH_DOMAINS"),
+          instrumentation_service: @service
+        }
       end
   end
 end
