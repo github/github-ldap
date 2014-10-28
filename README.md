@@ -130,3 +130,15 @@ end
 3. Commit your changes (`git commit -am 'Add some feature'`)
 4. Push to the branch (`git push origin my-new-feature`)
 5. Create new Pull Request
+
+## Releasing
+
+This section is for gem maintainers to cut a new version of the gem. See
+[jch/release-scripts](https://github.com/jch/release-scripts) for original
+source of release scripts.
+
+* Create a new branch from `master` named `release-x.y.z`, where `x.y.z` is the version to be released
+* Update `github-ldap.gemspec` to x.y.z following [semver](http://semver.org)
+* Run `script/changelog` and paste the draft into `CHANGELOG.md`. Edit as needed
+* Create pull request to solict feedback
+* After merging the pull request, on the master branch, run `script/release`
