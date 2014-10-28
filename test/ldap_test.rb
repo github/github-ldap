@@ -72,6 +72,14 @@ module GitHubLdapTestCases
     assert_equal "(uid=user1)",      payload[:filter].to_s
     assert_equal "dc=github,dc=com", payload[:base]
   end
+
+  def test_membership_validator_default
+    assert_equal :detect, @ldap.membership_validator
+  end
+
+  def test_capabilities
+    assert_kind_of Net::LDAP::Entry, @ldap.capabilities
+  end
 end
 
 class GitHubLdapTest < GitHub::Ldap::Test
