@@ -34,6 +34,7 @@ module GitHub
     def_delegator :@connection, :open
 
     attr_reader :uid, :search_domains, :virtual_attributes,
+                :membership_validator,
                 :instrumentation_service
 
     # Build a new GitHub::Ldap instance
@@ -86,6 +87,9 @@ module GitHub
       # search_domains is a connection of bases to perform searches
       # when a base is not explicitly provided.
       @search_domains = Array(options[:search_domains])
+
+      # configure which strategy should be used to validate user membership
+      configure_membership_validation_strategy(options[:membership_validator])
 
       # enables instrumenting queries
       @instrumentation_service = options[:instrumentation_service]
@@ -182,6 +186,23 @@ module GitHub
       end
     end
 
+    # Internal: Searches the host LDAP server's Root DSE for capabilities and
+    # extensions.
+    #
+    # Returns a Net::LDAP::Entry object.
+    def capabilities
+      @capabilities ||=
+        instrument "capabilities.github_ldap" do |payload|
+          begin
+            @connection.search_root_dse
+          rescue Net::LDAP::LdapError => error
+            payload[:error] = error
+            # stubbed result
+            Net::LDAP::Entry.new
+          end
+        end
+    end
+
     # Internal - Determine whether to use encryption or not.
     #
     # encryption: is the encryption method, either 'ssl', 'tls', 'simple_tls' or 'start_tls'.
@@ -213,6 +234,25 @@ module GitHub
       else
         VirtualAttributes.new(false)
       end
+    end
+
+    # Internal: Configure the membership validation strategy.
+    #
+    # Used by GitHub::Ldap::MembershipValidators::Detect to force a specific
+    # strategy (instead of detecting host capabilities and deciding at runtime).
+    #
+    # If `strategy` is not provided, or doesn't match a known strategy,
+    # defaults to `:detect`. Otherwise the configured strategy is selected.
+    #
+    # Returns the selected membership validator strategy Symbol.
+    def configure_membership_validation_strategy(strategy = nil)
+      @membership_validator =
+        case strategy.to_s
+        when "classic", "recursive", "active_directory"
+          strategy.to_sym
+        else
+          :detect
+        end
     end
   end
 end

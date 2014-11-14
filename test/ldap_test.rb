@@ -72,6 +72,34 @@ module GitHubLdapTestCases
     assert_equal "(uid=user1)",      payload[:filter].to_s
     assert_equal "dc=github,dc=com", payload[:base]
   end
+
+  def test_membership_validator_default
+    assert_equal :detect, @ldap.membership_validator
+  end
+
+  def test_membership_validator_configured_to_classic_strategy
+    @ldap.configure_membership_validation_strategy :classic
+    assert_equal :classic, @ldap.membership_validator
+  end
+
+  def test_membership_validator_configured_to_recursive_strategy
+    @ldap.configure_membership_validation_strategy :recursive
+    assert_equal :recursive, @ldap.membership_validator
+  end
+
+  def test_membership_validator_configured_to_active_directory_strategy
+    @ldap.configure_membership_validation_strategy :active_directory
+    assert_equal :active_directory, @ldap.membership_validator
+  end
+
+  def test_membership_validator_misconfigured_to_unrecognized_strategy_falls_back_to_default
+    @ldap.configure_membership_validation_strategy :unknown
+    assert_equal :detect, @ldap.membership_validator
+  end
+
+  def test_capabilities
+    assert_kind_of Net::LDAP::Entry, @ldap.capabilities
+  end
 end
 
 class GitHubLdapTest < GitHub::Ldap::Test
