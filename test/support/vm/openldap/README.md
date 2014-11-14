@@ -16,10 +16,10 @@ $ ip=$(vagrant ssh -- "ifconfig eth1 | grep -o -E '[0-9]+\.[0-9]+\.[0-9]+\.[0-9]
 $ cd ../../../..
 
 # run all tests against OpenLDAP
-$ time TESTENV=openldap OPENLDAP_HOST=$ip bundle exec rake
+$ time TESTENV=openldap INTEGRATION_HOST=$ip bundle exec rake
 
 # run a specific test file against OpenLDAP
-$ time TESTENV=openldap OPENLDAP_HOST=$ip bundle exec ruby test/membership_validators/recursive_test.rb
+$ time TESTENV=openldap INTEGRATION_HOST=$ip bundle exec ruby test/membership_validators/recursive_test.rb
 
 # run OpenLDAP tests by default
 $ export TESTENV=openldap

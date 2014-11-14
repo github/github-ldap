@@ -71,12 +71,21 @@ class GitHub::Ldap::Test < Minitest::Test
           instrumentation_service: @service
       when "openldap"
         {
-          host: ENV.fetch("OPENLDAP_HOST", "localhost"),
+          host: ENV.fetch("INTEGRATION_HOST", "localhost"),
           port: 389,
           admin_user:     'uid=admin,dc=github,dc=com',
           admin_password: 'passworD1',
           search_domains: %w(dc=github,dc=com),
           uid: 'uid',
+          instrumentation_service: @service
+        }
+      when "activedirectory"
+        {
+          host: ENV.fetch("INTEGRATION_HOST"),
+          port: ENV.fetch("INTEGRATION_PORT", 389),
+          admin_user: ENV.fetch("INTEGRATION_USER"),
+          admin_password: ENV.fetch("INTEGRATION_PASSWORD"),
+          search_domains: ENV.fetch("INTEGRATION_SEARCH_DOMAINS"),
           instrumentation_service: @service
         }
       end
