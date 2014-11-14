@@ -13,16 +13,16 @@ set -e
 [ $# -eq 0 ] && set -- --help
 
 # parse args
-repo=$(git remote -v | grep push | awk '{print $2}' | cut -d'/' -f4-)
+repo=$(git remote -v | grep push | awk '{print $2}' | cut -d'/' -f4- | sed 's/\.git//')
 base=$(git tag -l | sort -n | tail -n 1)
 head="HEAD"
 api_url="https://api.github.com"
 
-echo "# $base..$head"
+echo "# $repo $base..$head"
 echo
 
 # get merged PR's. Better way is to query the API for these, but this is easier
-for pr in $(git log --oneline v1.3.6..HEAD | grep "Merge pull request" | awk '{gsub("#",""); print $5}')
+for pr in $(git log --oneline $base..$head | grep "Merge pull request" | awk '{gsub("#",""); print $5}')
 do
   # frustrated with trying to pull out the right values, fell back to ruby
   curl -s "$api_url/repos/$repo/pulls/$pr" | ruby -rjson -e 'pr=JSON.parse(STDIN.read); puts "* #{pr[%q(title)]} [##{pr[%q(number)]}](#{pr[%q(html_url)]})"'
