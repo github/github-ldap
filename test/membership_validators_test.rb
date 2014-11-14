@@ -1,46 +1,31 @@
 require_relative 'test_helper'
 
-module GitHubLdapMembershipValidatorsTestCases
-  def make_validator(groups)
-    groups = @domain.groups(groups)
-    @validator.new(@ldap, groups)
-  end
-
-  def test_validates_user_in_group
-    validator = make_validator(%w(ghe-users))
-    assert validator.perform(@entry)
-  end
-
-  def test_does_not_validate_user_not_in_group
-    validator = make_validator(%w(ghe-admins))
-    refute validator.perform(@entry)
-  end
-
-  def test_does_not_validate_user_not_in_any_group
-    @entry = @domain.user?('groupless-user1')
-    validator = make_validator(%w(ghe-users ghe-admins))
-    refute validator.perform(@entry)
-  end
-end
-
-class GitHubLdapMembershipValidatorsClassicTest < GitHub::Ldap::Test
-  include GitHubLdapMembershipValidatorsTestCases
-
+class GitHubLdapMembershipValidatorsTest < GitHub::Ldap::Test
   def setup
-    @ldap      = GitHub::Ldap.new(options.merge(search_domains: "dc=github,dc=com"))
-    @domain    = @ldap.domain("dc=github,dc=com")
-    @entry     = @domain.user?('user1')
-    @validator = GitHub::Ldap::MembershipValidators::Classic
+    @ldap = GitHub::Ldap.new(options.merge(search_domains: "dc=github,dc=com"))
   end
-end
 
-class GitHubLdapMembershipValidatorsRecursiveTest < GitHub::Ldap::Test
-  include GitHubLdapMembershipValidatorsTestCases
+  def test_defaults_to_detect_strategy
+    assert_equal :detect, @ldap.membership_validator
+  end
 
-  def setup
-    @ldap      = GitHub::Ldap.new(options.merge(search_domains: "dc=github,dc=com"))
-    @domain    = @ldap.domain("dc=github,dc=com")
-    @entry     = @domain.user?('user1')
-    @validator = GitHub::Ldap::MembershipValidators::Recursive
+  def test_configured_to_classic_strategy
+    @ldap.configure_membership_validation_strategy :classic
+    assert_equal :classic, @ldap.membership_validator
+  end
+
+  def test_configured_to_recursive_strategy
+    @ldap.configure_membership_validation_strategy :recursive
+    assert_equal :recursive, @ldap.membership_validator
+  end
+
+  def test_configured_to_active_directory_strategy
+    @ldap.configure_membership_validation_strategy :active_directory
+    assert_equal :active_directory, @ldap.membership_validator
+  end
+
+  def test_misconfigured_to_unrecognized_strategy_falls_back_to_default
+    @ldap.configure_membership_validation_strategy :unknown
+    assert_equal :detect, @ldap.membership_validator
   end
 end
