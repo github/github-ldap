@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## v1.5.0
+
+* Automatically detect membership validator strategy by default [#58](https://github.com/github/github-ldap/pull/58) [#62](https://github.com/github/github-ldap/pull/62)
+* Document local integration testing with Active Directory [#61](https://github.com/github/github-ldap/pull/61)
+
 ## v1.4.0
 
 * Document constructor options [#57](https://github.com/github/github-ldap/pull/57)
