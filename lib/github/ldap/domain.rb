@@ -163,8 +163,11 @@ module GitHub
       # Get the entry for this domain.
       #
       # Returns a Net::LDAP::Entry
-      def bind
-        search(size: 1, scope: Net::LDAP::SearchScope_BaseObject).first
+      def bind(options = {})
+        options[:size]  = 1
+        options[:scope] = Net::LDAP::SearchScope_BaseObject
+        options[:attributes] ||= []
+        search(options).first
       end
     end
   end

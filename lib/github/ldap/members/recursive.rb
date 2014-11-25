@@ -12,10 +12,13 @@ module GitHub
         include Filter
 
         DEFAULT_MAX_DEPTH = 9
-        ATTRS             = %w(dn cn)
+        ATTRS             = %w(dn cn member)
 
         # Internal: The GitHub::Ldap object to search domains with.
         attr_reader :ldap
+
+        # Internal: The maximum depth to search for members.
+        attr_reader :depth
 
         # Public: Instantiate new search strategy.
         #
@@ -24,6 +27,7 @@ module GitHub
         def initialize(ldap, options = {})
           @ldap    = ldap
           @options = options
+          @depth   = options[:depth] || DEFAULT_MAX_DEPTH
         end
 
         # Internal: Domains to search through.
@@ -34,59 +38,64 @@ module GitHub
         end
         private :domains
 
-        # Public: Performs search for group members, including members of
-        # subgroups recursively.
+        # Public: Performs search for group members, including groups and
+        # members of subgroups recursively.
         #
         # Returns Array of Net::LDAP::Entry objects.
-        def perform(group, depth = DEFAULT_MAX_DEPTH)
-          members = Hash.new
+        def perform(group)
+          found = Hash.new
 
-          member_dns = group["member"]
+          members = group["member"]
+          return [] if members.empty?
 
-          domains.each do |domain|
-            # find members
-            entries = domain.search(filter: membership_filter(member_dns), attributes: ATTRS)
+          # find members (N queries)
+          entries = entries_by_dn(members)
+          return [] if entries.empty?
 
-            next if entries.empty?
-
-            return entries
+          # track found entries
+          entries.each do |entry|
+            found[entry.dn] = entry
           end
 
-          []
-        end
+          # descend to `depth` levels, at most
+          depth.times do |n|
+            # find every (new, unique) member entry
+            depth_subentries = entries.each_with_object([]) do |entry, depth_entries|
+              submembers = entry["member"]
 
-        # Internal: Construct a filter to find groups this entry is a direct
-        # member of.
-        #
-        # Overloads the included `GitHub::Ldap::Filters#member_filter` method
-        # to inject `posixGroup` handling.
-        #
-        # Returns a Net::LDAP::Filter object.
-        def member_filter(entry_or_uid, uid = ldap.uid)
-          filter = super(entry_or_uid)
+              # skip any members we've already found
+              submembers.reject! { |dn| found.key?(dn) }
 
-          if ldap.posix_support_enabled?
-            if posix_filter = posix_member_filter(entry_or_uid, uid)
-              filter |= posix_filter
+              next if submembers.empty?
+
+              # find members of subgroup, including subgroups (N queries)
+              subentries = entries_by_dn(submembers)
+
+              # track found subentries
+              subentries.each { |entry| found[entry.dn] = entry }
+
+              # collect all entries for this depth
+              depth_entries.concat subentries
             end
+
+            # stop if there are no more subgroups to search
+            break if depth_subentries.empty?
+
+            # go one level deeper
+            entries = depth_subentries
           end
 
-          filter
+          # return all found entries
+          found.values
         end
 
-        # Internal: Construct a filter to find groups whose members are the
-        # Array of String group DNs passed in.
+        # Internal: Bind a list of DNs to their respective entries.
         #
-        # Returns a String filter.
-        def membership_filter(groups)
-          groups.map { |entry| member_filter(entry, :cn) }.reduce(:|)
-        end
-
-        # Internal: the group DNs to check against.
-        #
-        # Returns an Array of String DNs.
-        def group_dns
-          @group_dns ||= groups.map(&:dn)
+        # Returns an Array of Net::LDAP::Entry objects.
+        def entries_by_dn(members)
+          members.map do |dn|
+            ldap.domain(dn).bind(attributes: ATTRS)
+          end.compact
         end
       end
     end
