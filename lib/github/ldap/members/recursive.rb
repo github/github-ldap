@@ -3,16 +3,13 @@ module GitHub
     module Members
       # Look up group members recursively.
       #
-      # In this case, we're returning User Net::LDAP::Entry objects, not entries
-      # for LDAP Groups.
-      #
-      # This results in a maximum of `depth` queries (per domain) to look up
+      # This results in a maximum of `depth` iterations/recursions to look up
       # members of a group and its subgroups.
       class Recursive
         include Filter
 
         DEFAULT_MAX_DEPTH = 9
-        ATTRS             = %w(dn cn member)
+        ATTRS             = %w(dn member)
 
         # Internal: The GitHub::Ldap object to search domains with.
         attr_reader :ldap
@@ -29,14 +26,6 @@ module GitHub
           @options = options
           @depth   = options[:depth] || DEFAULT_MAX_DEPTH
         end
-
-        # Internal: Domains to search through.
-        #
-        # Returns an Array of GitHub::Ldap::Domain objects.
-        def domains
-          @domains ||= ldap.search_domains.map { |base| ldap.domain(base) }
-        end
-        private :domains
 
         # Public: Performs search for group members, including groups and
         # members of subgroups recursively.
