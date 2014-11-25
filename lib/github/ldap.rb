@@ -9,6 +9,7 @@ module GitHub
     require 'github/ldap/virtual_group'
     require 'github/ldap/virtual_attributes'
     require 'github/ldap/instrumentation'
+    require 'github/ldap/members'
     require 'github/ldap/membership_validators'
 
     include Instrumentation
