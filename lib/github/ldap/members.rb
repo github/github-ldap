@@ -1,3 +1,4 @@
+require 'github/ldap/members/classic'
 require 'github/ldap/members/recursive'
 
 module GitHub
@@ -13,6 +14,7 @@ module GitHub
     module Members
       # Internal: Mapping of strategy name to class.
       STRATEGIES = {
+        :classic   => GitHub::Ldap::Members::Classic,
         :recursive => GitHub::Ldap::Members::Recursive
       }
     end
