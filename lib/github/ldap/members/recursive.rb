@@ -9,7 +9,7 @@ module GitHub
         include Filter
 
         DEFAULT_MAX_DEPTH = 9
-        ATTRS             = %w(dn member)
+        ATTRS             = %w(dn member uniqueMember memberUid)
 
         # Internal: The GitHub::Ldap object to search domains with.
         attr_reader :ldap
