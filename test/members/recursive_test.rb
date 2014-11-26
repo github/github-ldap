@@ -27,6 +27,11 @@ class GitHubLdapRecursiveMembersTest < GitHub::Ldap::Test
     assert_includes members, @entry.dn
   end
 
+  def test_finds_posix_group_members
+    members = @strategy.perform(find_group("posix-group1")).map(&:dn)
+    assert_includes members, @entry.dn
+  end
+
   def test_respects_configured_depth_limit
     strategy = GitHub::Ldap::Members::Recursive.new(@ldap, depth: 2)
     members = strategy.perform(find_group("n-depth-nested-group9")).map(&:dn)

@@ -34,11 +34,8 @@ module GitHub
         def perform(group)
           found = Hash.new
 
-          members = group["member"]
-          return [] if members.empty?
-
           # find members (N queries)
-          entries = entries_by_dn(members)
+          entries = member_entries(group)
           return [] if entries.empty?
 
           # track found entries
@@ -55,10 +52,9 @@ module GitHub
               # skip any members we've already found
               submembers.reject! { |dn| found.key?(dn) }
 
-              next if submembers.empty?
-
               # find members of subgroup, including subgroups (N queries)
-              subentries = entries_by_dn(submembers)
+              subentries = member_entries(entry)
+              next if subentries.empty?
 
               # track found subentries
               subentries.each { |entry| found[entry.dn] = entry }
@@ -78,6 +74,17 @@ module GitHub
           found.values
         end
 
+        # Internal: Fetch member entries, including subgroups, for the given
+        # entry.
+        #
+        # Returns an Array of Net::LDAP::Entry objects.
+        def member_entries(entry)
+          dns = member_dns(entry)
+          return [] if dns.empty?
+
+          entries_by_dn(dns)
+        end
+
         # Internal: Bind a list of DNs to their respective entries.
         #
         # Returns an Array of Net::LDAP::Entry objects.
@@ -86,6 +93,34 @@ module GitHub
             ldap.domain(dn).bind(attributes: ATTRS)
           end.compact
         end
+
+        def entries_by_uid(members)
+          filter = members.map { |uid| Net::LDAP::Filter.eq(ldap.uid, uid) }.reduce(:|)
+          domains.each_with_object([]) do |domain, entries|
+            entries.concat domain.search(filter: filter, attributes: ATTRS)
+          end.compact
+        end
+
+        # Internal: Returns an Array of String DNs for `groupOfNames` and
+        # `uniqueGroupOfNames` members.
+        def member_dns(entry)
+          MEMBERSHIP_NAMES.each_with_object([]) do |attr_name, members|
+            members.concat entry[attr_name]
+          end
+        end
+
+        # Internal: Returns an Array of String UIDs for PosixGroups members.
+        def member_uids(entry)
+          entry["memberUid"]
+        end
+
+        # Internal: Domains to search through.
+        #
+        # Returns an Array of GitHub::Ldap::Domain objects.
+        def domains
+          @domains ||= ldap.search_domains.map { |base| ldap.domain(base) }
+        end
+        private :domains
       end
     end
   end
