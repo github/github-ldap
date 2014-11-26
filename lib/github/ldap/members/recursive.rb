@@ -79,10 +79,14 @@ module GitHub
         #
         # Returns an Array of Net::LDAP::Entry objects.
         def member_entries(entry)
-          dns = member_dns(entry)
-          return [] if dns.empty?
+          entries = []
+          dns     = member_dns(entry)
+          uids    = member_uids(entry)
 
-          entries_by_dn(dns)
+          entries.concat entries_by_uid(uids) unless uids.empty?
+          entries.concat entries_by_dn(dns)   unless dns.empty?
+
+          entries
         end
 
         # Internal: Bind a list of DNs to their respective entries.
