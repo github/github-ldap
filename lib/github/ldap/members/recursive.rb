@@ -88,6 +88,7 @@ module GitHub
 
           entries
         end
+        private :member_entries
 
         # Internal: Bind a list of DNs to their respective entries.
         #
@@ -97,13 +98,18 @@ module GitHub
             ldap.domain(dn).bind(attributes: ATTRS)
           end.compact
         end
+        private :entries_by_dn
 
+        # Internal: Fetch entries by UID.
+        #
+        # Returns an Array of Net::LDAP::Entry objects.
         def entries_by_uid(members)
           filter = members.map { |uid| Net::LDAP::Filter.eq(ldap.uid, uid) }.reduce(:|)
           domains.each_with_object([]) do |domain, entries|
             entries.concat domain.search(filter: filter, attributes: ATTRS)
           end.compact
         end
+        private :entries_by_uid
 
         # Internal: Returns an Array of String DNs for `groupOfNames` and
         # `uniqueGroupOfNames` members.
@@ -112,11 +118,13 @@ module GitHub
             members.concat entry[attr_name]
           end
         end
+        private :member_dns
 
         # Internal: Returns an Array of String UIDs for PosixGroups members.
         def member_uids(entry)
           entry["memberUid"]
         end
+        private :member_uids
 
         # Internal: Domains to search through.
         #
