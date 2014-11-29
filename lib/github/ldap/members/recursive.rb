@@ -9,13 +9,16 @@ module GitHub
         include Filter
 
         DEFAULT_MAX_DEPTH = 9
-        ATTRS             = %w(member uniqueMember memberUid)
+        DEFAULT_ATTRS     = %w(member uniqueMember memberUid)
 
         # Internal: The GitHub::Ldap object to search domains with.
         attr_reader :ldap
 
         # Internal: The maximum depth to search for members.
         attr_reader :depth
+
+        # Internal: The attributes to search for.
+        attr_reader :attrs
 
         # Public: Instantiate new search strategy.
         #
@@ -25,6 +28,7 @@ module GitHub
           @ldap    = ldap
           @options = options
           @depth   = options[:depth] || DEFAULT_MAX_DEPTH
+          @attrs   = Array(options[:attrs]).concat DEFAULT_ATTRS
         end
 
         # Public: Performs search for group members, including groups and
@@ -95,7 +99,7 @@ module GitHub
         # Returns an Array of Net::LDAP::Entry objects.
         def entries_by_dn(members)
           members.map do |dn|
-            ldap.domain(dn).bind(attributes: ATTRS)
+            ldap.domain(dn).bind(attributes: attrs)
           end.compact
         end
         private :entries_by_dn
@@ -106,7 +110,7 @@ module GitHub
         def entries_by_uid(members)
           filter = members.map { |uid| Net::LDAP::Filter.eq(ldap.uid, uid) }.reduce(:|)
           domains.each_with_object([]) do |domain, entries|
-            entries.concat domain.search(filter: filter, attributes: ATTRS)
+            entries.concat domain.search(filter: filter, attributes: attrs)
           end.compact
         end
         private :entries_by_uid
