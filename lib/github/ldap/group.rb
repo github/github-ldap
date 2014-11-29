@@ -69,6 +69,11 @@ module GitHub
         end
       end
 
+      # Internal: Returns true if the object class(es) provided match a group's.
+      def group?(object_class)
+        self.class.group?(object_class)
+      end
+
       # Internal - Check if an object class includes the member names
       # Use `&` rathen than `include?` because both are arrays.
       #
@@ -76,7 +81,7 @@ module GitHub
       # will fail to match correctly unless we also downcase our group classes.
       #
       # Returns true if the object class includes one of the group class names.
-      def group?(object_class)
+      def self.group?(object_class)
         !(GROUP_CLASS_NAMES.map(&:downcase) & object_class.map(&:downcase)).empty?
       end
 
