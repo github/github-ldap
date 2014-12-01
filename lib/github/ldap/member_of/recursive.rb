@@ -10,13 +10,17 @@ module GitHub
         # Internal: The GitHub::Ldap object to search domains with.
         attr_reader :ldap
 
+        # Internal: The maximum depth to search for subgroups.
+        attr_reader :depth
+
         # Public: Instantiate new search strategy.
         #
         # - ldap:    GitHub::Ldap object
-        # - options: Hash of options (unused)
+        # - options: Hash of options
         def initialize(ldap, options = {})
           @ldap    = ldap
           @options = options
+          @depth   = options[:depth]
         end
 
         # Public: Performs search for groups an entry is a member of, including
@@ -51,7 +55,9 @@ module GitHub
         # subgroups with.
         def search_strategy
           @search_strategy ||=
-            GitHub::Ldap::Members::Recursive.new(ldap, attrs: %w(objectClass))
+            GitHub::Ldap::Members::Recursive.new ldap,
+              depth: depth,
+              attrs: %w(objectClass)
         end
 
         # Internal: Returns true if the entry is a group.
