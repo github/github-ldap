@@ -12,7 +12,7 @@ class GitHubLdapClassicMemberOfTest < GitHub::Ldap::Test
     @domain.groups([cn]).first
   end
 
-  def test_finds_groups_entry_is_a_member_of
+  def test_finds_groups_entry_is_a_direct_member_of
     member_of = @strategy.perform(@entry)
     assert_includes member_of.map(&:dn), find_group("nested-group1").dn
   end
@@ -22,5 +22,10 @@ class GitHubLdapClassicMemberOfTest < GitHub::Ldap::Test
     member_of = @strategy.perform(@entry)
     assert_includes member_of.map(&:dn), find_group("head-group").dn
     assert_includes member_of.map(&:dn), find_group("tail-group").dn
+  end
+
+  def test_excludes_groups_entry_is_not_a_member_of
+    member_of = @strategy.perform(@entry)
+    refute_includes member_of.map(&:dn), find_group("ghe-admins").dn
   end
 end
