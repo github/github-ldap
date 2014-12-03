@@ -1,6 +1,6 @@
 module GitHub
   class Ldap
-    module Members
+    module MemberSearch
       # Look up group members recursively.
       #
       # This results in a maximum of `depth` iterations/recursions to look up

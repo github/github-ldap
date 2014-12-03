@@ -1,6 +1,6 @@
 module GitHub
   class Ldap
-    module Members
+    module MemberSearch
       # Look up group members using the existing `Group#members` and
       # `Group#subgroups` API.
       class Classic

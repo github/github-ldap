@@ -1,5 +1,5 @@
-require 'github/ldap/members/classic'
-require 'github/ldap/members/recursive'
+require 'github/ldap/member_search/classic'
+require 'github/ldap/member_search/recursive'
 
 module GitHub
   class Ldap
@@ -8,14 +8,14 @@ module GitHub
     # For example:
     #
     #   group = domain.groups(%w(Engineering)).first
-    #   strategy = GitHub::Ldap::Members::Recursive.new(ldap)
+    #   strategy = GitHub::Ldap::MemberSearch::Recursive.new(ldap)
     #   strategy.perform(group) #=> [#<Net::LDAP::Entry>]
     #
-    module Members
+    module MemberSearch
       # Internal: Mapping of strategy name to class.
       STRATEGIES = {
-        :classic   => GitHub::Ldap::Members::Classic,
-        :recursive => GitHub::Ldap::Members::Recursive
+        :classic   => GitHub::Ldap::MemberSearch::Classic,
+        :recursive => GitHub::Ldap::MemberSearch::Recursive
       }
     end
   end
