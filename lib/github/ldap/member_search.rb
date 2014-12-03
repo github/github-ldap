@@ -1,3 +1,4 @@
+require 'github/ldap/member_search/detect'
 require 'github/ldap/member_search/classic'
 require 'github/ldap/member_search/recursive'
 
