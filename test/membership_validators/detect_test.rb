@@ -5,6 +5,8 @@ require_relative '../test_helper'
 # and test against what AD *would* respond with.
 
 class GitHubLdapDetectMembershipValidatorsTest < GitHub::Ldap::Test
+  include GitHub::Ldap::Capabilities
+
   def setup
     @ldap      = GitHub::Ldap.new(options.merge(search_domains: %w(dc=github,dc=com)))
     @domain    = @ldap.domain("dc=github,dc=com")
@@ -26,8 +28,7 @@ class GitHubLdapDetectMembershipValidatorsTest < GitHub::Ldap::Test
 
   def test_detects_active_directory
     caps = Net::LDAP::Entry.new
-    caps[:supportedcapabilities] =
-      [GitHub::Ldap::MembershipValidators::Detect::ACTIVE_DIRECTORY_V61_R2_OID]
+    caps[:supportedcapabilities] = [ACTIVE_DIRECTORY_V61_R2_OID]
 
     validator = make_validator(%w(group))
     @ldap.stub :capabilities, caps do
