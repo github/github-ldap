@@ -1,6 +1,7 @@
 require 'github/ldap/member_search/detect'
 require 'github/ldap/member_search/classic'
 require 'github/ldap/member_search/recursive'
+require 'github/ldap/member_search/active_directory'
 
 module GitHub
   class Ldap
@@ -15,8 +16,9 @@ module GitHub
     module MemberSearch
       # Internal: Mapping of strategy name to class.
       STRATEGIES = {
-        :classic   => GitHub::Ldap::MemberSearch::Classic,
-        :recursive => GitHub::Ldap::MemberSearch::Recursive
+        :classic          => GitHub::Ldap::MemberSearch::Classic,
+        :recursive        => GitHub::Ldap::MemberSearch::Recursive,
+        :active_directory => GitHub::Ldap::MemberSearch::ActiveDirectory
       }
     end
   end
