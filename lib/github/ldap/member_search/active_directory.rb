@@ -10,16 +10,13 @@ module GitHub
       #
       # This means we have an efficient method of searching for group members,
       # even in nested groups, performed on the server side.
-      class ActiveDirectory
+      class ActiveDirectory < Base
         OID = "1.2.840.113556.1.4.1941"
 
         # Internal: The default attributes to query for.
         # NOTE: We technically don't need any by default, but if we left this
         # empty, we'd be querying for *all* attributes which is less ideal.
         DEFAULT_ATTRS = %w(objectClass)
-
-        # Internal: The GitHub::Ldap object to search domains with.
-        attr_reader :ldap
 
         # Internal: The attributes to search for.
         attr_reader :attrs
@@ -28,10 +25,11 @@ module GitHub
         #
         # - ldap:    GitHub::Ldap object
         # - options: Hash of options
+        #
+        # NOTE: This overrides default behavior to configure attrs`.
         def initialize(ldap, options = {})
-          @ldap    = ldap
-          @options = options
-          @attrs   = Array(options[:attrs]).concat DEFAULT_ATTRS
+          super
+          @attrs = Array(options[:attrs]).concat DEFAULT_ATTRS
         end
 
         # Public: Performs search for group members, including groups and
@@ -56,14 +54,6 @@ module GitHub
         def member_of_in_chain_filter(entry)
           Net::LDAP::Filter.ex("memberOf:#{OID}", entry.dn)
         end
-
-        # Internal: Domains to search through.
-        #
-        # Returns an Array of GitHub::Ldap::Domain objects.
-        def domains
-          @domains ||= ldap.search_domains.map { |base| ldap.domain(base) }
-        end
-        private :domains
       end
     end
   end

@@ -5,14 +5,11 @@ module GitHub
       #
       # This results in a maximum of `depth` iterations/recursions to look up
       # members of a group and its subgroups.
-      class Recursive
+      class Recursive < Base
         include Filter
 
         DEFAULT_MAX_DEPTH = 9
         DEFAULT_ATTRS     = %w(member uniqueMember memberUid)
-
-        # Internal: The GitHub::Ldap object to search domains with.
-        attr_reader :ldap
 
         # Internal: The maximum depth to search for members.
         attr_reader :depth
@@ -24,11 +21,12 @@ module GitHub
         #
         # - ldap:    GitHub::Ldap object
         # - options: Hash of options
+        #
+        # NOTE: This overrides default behavior to configure `depth` and `attrs`.
         def initialize(ldap, options = {})
-          @ldap    = ldap
-          @options = options
-          @depth   = options[:depth] || DEFAULT_MAX_DEPTH
-          @attrs   = Array(options[:attrs]).concat DEFAULT_ATTRS
+          super
+          @depth = options[:depth] || DEFAULT_MAX_DEPTH
+          @attrs = Array(options[:attrs]).concat DEFAULT_ATTRS
         end
 
         # Public: Performs search for group members, including groups and
@@ -129,14 +127,6 @@ module GitHub
           entry["memberUid"]
         end
         private :member_uids
-
-        # Internal: Domains to search through.
-        #
-        # Returns an Array of GitHub::Ldap::Domain objects.
-        def domains
-          @domains ||= ldap.search_domains.map { |base| ldap.domain(base) }
-        end
-        private :domains
       end
     end
   end
