@@ -7,9 +7,8 @@ module GitHub
       # also be defined via `GitHub::Ldap#membership_validator=`. See also
       # `GitHub::Ldap#configure_membership_validation_strategy`.
       class Detect < Base
-        # Internal: The capability required to use the ActiveDirectory strategy.
-        # See: http://msdn.microsoft.com/en-us/library/cc223359.aspx.
-        ACTIVE_DIRECTORY_V61_R2_OID = "1.2.840.113556.1.4.2080".freeze
+        # Defines `active_directory_capability?` and necessary helpers.
+        include GitHub::Ldap::Capabilities
 
         def perform(entry)
           # short circuit validation if there are no groups to check against
@@ -47,21 +46,6 @@ module GitHub
         # Internal: Returns the configured membership validator strategy Symbol.
         def strategy_config
           ldap.membership_validator
-        end
-
-        # Internal: Detect whether the LDAP host is an ActiveDirectory server.
-        #
-        # See: http://msdn.microsoft.com/en-us/library/cc223359.aspx.
-        #
-        # Returns true if the host is an ActiveDirectory server, false otherwise.
-        def active_directory_capability?
-          capabilities[:supportedcapabilities].include?(ACTIVE_DIRECTORY_V61_R2_OID)
-        end
-
-        # Internal: Returns the Net::LDAP::Entry object describing the LDAP
-        # host's capabilities (via the Root DSE).
-        def capabilities
-          ldap.capabilities
         end
       end
     end

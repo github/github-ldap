@@ -9,7 +9,8 @@ module GitHub
     require 'github/ldap/virtual_group'
     require 'github/ldap/virtual_attributes'
     require 'github/ldap/instrumentation'
-    require 'github/ldap/members'
+    require 'github/ldap/capabilities'
+    require 'github/ldap/member_search'
     require 'github/ldap/membership_validators'
 
     include Instrumentation
@@ -36,6 +37,7 @@ module GitHub
 
     attr_reader :uid, :search_domains, :virtual_attributes,
                 :membership_validator,
+                :member_search_strategy,
                 :instrumentation_service
 
     # Build a new GitHub::Ldap instance
@@ -91,6 +93,9 @@ module GitHub
 
       # configure which strategy should be used to validate user membership
       configure_membership_validation_strategy(options[:membership_validator])
+
+      # configure which strategy should be used for member search
+      configure_member_search_strategy(options[:member_search_strategy])
 
       # enables instrumenting queries
       @instrumentation_service = options[:instrumentation_service]
@@ -254,6 +259,25 @@ module GitHub
         else
           :detect
         end
+    end
+
+    # Internal: Configure the member search strategy.
+    #
+    # Used by GitHub::Ldap::MemberSearch::Detect to force a specific strategy
+    # (instead of detecting the host capabilities and deciding at runtime).
+    #
+    # If `strategy` is not provided, or doesn't match a known strategy,
+    # defaults to `:detect`. Otherwise the configured strategy is selected.
+    #
+    # Returns the selected strategy Symbol.
+    def configure_member_search_strategy(strategy = nil)
+      @member_search_strategy =
+      case strategy.to_s
+      when "classic", "recursive"
+        strategy.to_sym
+      else
+        :detect
+      end
     end
   end
 end

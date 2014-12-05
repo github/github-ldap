@@ -1,11 +1,11 @@
 require_relative '../test_helper'
 
-class GitHubLdapRecursiveMembersTest < GitHub::Ldap::Test
+class GitHubLdapRecursiveMemberSearchTest < GitHub::Ldap::Test
   def setup
     @ldap     = GitHub::Ldap.new(options.merge(search_domains: %w(dc=github,dc=com)))
     @domain   = @ldap.domain("dc=github,dc=com")
     @entry     = @domain.user?('user1')
-    @strategy = GitHub::Ldap::Members::Classic.new(@ldap)
+    @strategy = GitHub::Ldap::MemberSearch::Classic.new(@ldap)
   end
 
   def find_group(cn)
@@ -33,7 +33,7 @@ class GitHubLdapRecursiveMembersTest < GitHub::Ldap::Test
   end
 
   def test_does_not_respect_configured_depth_limit
-    strategy = GitHub::Ldap::Members::Classic.new(@ldap, depth: 2)
+    strategy = GitHub::Ldap::MemberSearch::Classic.new(@ldap, depth: 2)
     members = strategy.perform(find_group("n-depth-nested-group9")).map(&:dn)
     assert_includes members, @entry.dn
   end

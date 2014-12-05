@@ -1,21 +1,9 @@
 module GitHub
   class Ldap
-    module Members
+    module MemberSearch
       # Look up group members using the existing `Group#members` and
       # `Group#subgroups` API.
-      class Classic
-        # Internal: The GitHub::Ldap object to search domains with.
-        attr_reader :ldap
-
-        # Public: Instantiate new search strategy.
-        #
-        # - ldap:    GitHub::Ldap object
-        # - options: Hash of options (unused)
-        def initialize(ldap, options = {})
-          @ldap    = ldap
-          @options = options
-        end
-
+      class Classic < Base
         # Public: Performs search for group members, including groups and
         # members of subgroups recursively.
         #
