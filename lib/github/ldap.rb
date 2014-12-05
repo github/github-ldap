@@ -1,18 +1,19 @@
+require 'net/ldap'
+require 'forwardable'
+
+require 'github/ldap/filter'
+require 'github/ldap/domain'
+require 'github/ldap/group'
+require 'github/ldap/posix_group'
+require 'github/ldap/virtual_group'
+require 'github/ldap/virtual_attributes'
+require 'github/ldap/instrumentation'
+require 'github/ldap/capabilities'
+require 'github/ldap/member_search'
+require 'github/ldap/membership_validators'
+
 module GitHub
   class Ldap
-    require 'net/ldap'
-    require 'forwardable'
-    require 'github/ldap/filter'
-    require 'github/ldap/domain'
-    require 'github/ldap/group'
-    require 'github/ldap/posix_group'
-    require 'github/ldap/virtual_group'
-    require 'github/ldap/virtual_attributes'
-    require 'github/ldap/instrumentation'
-    require 'github/ldap/capabilities'
-    require 'github/ldap/member_search'
-    require 'github/ldap/membership_validators'
-
     include Instrumentation
 
     extend Forwardable
