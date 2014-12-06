@@ -1,21 +1,25 @@
+require 'net/ldap'
+require 'forwardable'
+
+require 'github/ldap/filter'
+require 'github/ldap/domain'
+require 'github/ldap/group'
+require 'github/ldap/posix_group'
+require 'github/ldap/virtual_group'
+require 'github/ldap/virtual_attributes'
+require 'github/ldap/instrumentation'
+require 'github/ldap/member_search'
+require 'github/ldap/membership_validators'
+
 module GitHub
   class Ldap
-    require 'net/ldap'
-    require 'forwardable'
-    require 'github/ldap/filter'
-    require 'github/ldap/domain'
-    require 'github/ldap/group'
-    require 'github/ldap/posix_group'
-    require 'github/ldap/virtual_group'
-    require 'github/ldap/virtual_attributes'
-    require 'github/ldap/instrumentation'
-    require 'github/ldap/capabilities'
-    require 'github/ldap/member_search'
-    require 'github/ldap/membership_validators'
-
     include Instrumentation
 
     extend Forwardable
+
+    # Internal: The capability required to use ActiveDirectory features.
+    # See: http://msdn.microsoft.com/en-us/library/cc223359.aspx.
+    ACTIVE_DIRECTORY_V61_R2_OID = "1.2.840.113556.1.4.2080".freeze
 
     # Utility method to get the last operation result with a human friendly message.
     #
@@ -91,11 +95,8 @@ module GitHub
       # when a base is not explicitly provided.
       @search_domains = Array(options[:search_domains])
 
-      # configure which strategy should be used to validate user membership
-      configure_membership_validation_strategy(options[:membership_validator])
-
-      # configure which strategy should be used for member search
-      configure_member_search_strategy(options[:member_search_strategy])
+      # configure both the membership validator and the member search strategies
+      configure_search_strategy(options[:search_strategy])
 
       # enables instrumenting queries
       @instrumentation_service = options[:instrumentation_service]
@@ -242,42 +243,78 @@ module GitHub
       end
     end
 
+    # Internal: Configure the member search and membership validation strategies.
+    #
+    # TODO: Inline the logic in these two methods here.
+    #
+    # Returns nothing.
+    def configure_search_strategy(strategy = nil)
+      # configure which strategy should be used to validate user membership
+      configure_membership_validation_strategy(strategy)
+
+      # configure which strategy should be used for member search
+      configure_member_search_strategy(strategy)
+    end
+
     # Internal: Configure the membership validation strategy.
     #
-    # Used by GitHub::Ldap::MembershipValidators::Detect to force a specific
-    # strategy (instead of detecting host capabilities and deciding at runtime).
+    # If no known strategy is provided, detects ActiveDirectory capabilities or
+    # falls back to the Recursive strategy by default.
     #
-    # If `strategy` is not provided, or doesn't match a known strategy,
-    # defaults to `:detect`. Otherwise the configured strategy is selected.
-    #
-    # Returns the selected membership validator strategy Symbol.
+    # Returns the membership validator strategy Class.
     def configure_membership_validation_strategy(strategy = nil)
       @membership_validator =
         case strategy.to_s
-        when "classic", "recursive", "active_directory"
-          strategy.to_sym
+        when "classic"
+          GitHub::Ldap::MembershipValidators::Classic
+        when "recursive"
+          GitHub::Ldap::MembershipValidators::Recursive
+        when "active_directory"
+          GitHub::Ldap::MembershipValidators::ActiveDirectory
         else
-          :detect
+          # fallback to detection, defaulting to recursive strategy
+          if active_directory_capability?
+            GitHub::Ldap::MembershipValidators::ActiveDirectory
+          else
+            GitHub::Ldap::MembershipValidators::Recursive
+          end
         end
     end
 
     # Internal: Configure the member search strategy.
     #
-    # Used by GitHub::Ldap::MemberSearch::Detect to force a specific strategy
-    # (instead of detecting the host capabilities and deciding at runtime).
     #
-    # If `strategy` is not provided, or doesn't match a known strategy,
-    # defaults to `:detect`. Otherwise the configured strategy is selected.
+    # If no known strategy is provided, detects ActiveDirectory capabilities or
+    # falls back to the Recursive strategy by default.
     #
-    # Returns the selected strategy Symbol.
+    # Returns the selected strategy Class.
     def configure_member_search_strategy(strategy = nil)
       @member_search_strategy =
-      case strategy.to_s
-      when "classic", "recursive"
-        strategy.to_sym
-      else
-        :detect
-      end
+        case strategy.to_s
+        when "classic"
+          GitHub::Ldap::MemberSearch::Classic
+        when "recursive"
+          GitHub::Ldap::MemberSearch::Recursive
+        when "active_directory"
+          GitHub::Ldap::MemberSearch::ActiveDirectory
+        else
+          # fallback to detection, defaulting to recursive strategy
+          if active_directory_capability?
+            GitHub::Ldap::MemberSearch::ActiveDirectory
+          else
+            GitHub::Ldap::MemberSearch::Recursive
+          end
+        end
     end
+
+    # Internal: Detect whether the LDAP host is an ActiveDirectory server.
+    #
+    # See: http://msdn.microsoft.com/en-us/library/cc223359.aspx.
+    #
+    # Returns true if the host is an ActiveDirectory server, false otherwise.
+    def active_directory_capability?
+      capabilities[:supportedcapabilities].include?(ACTIVE_DIRECTORY_V61_R2_OID)
+    end
+    private :active_directory_capability?
   end
 end

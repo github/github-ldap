@@ -73,28 +73,45 @@ module GitHubLdapTestCases
     assert_equal "dc=github,dc=com", payload[:base]
   end
 
-  def test_membership_validator_default
-    assert_equal :detect, @ldap.membership_validator
+  def test_search_strategy_defaults
+    assert_equal GitHub::Ldap::MembershipValidators::Recursive, @ldap.membership_validator
+    assert_equal GitHub::Ldap::MemberSearch::Recursive,         @ldap.member_search_strategy
   end
 
-  def test_membership_validator_configured_to_classic_strategy
-    @ldap.configure_membership_validation_strategy :classic
-    assert_equal :classic, @ldap.membership_validator
+  def test_search_strategy_detects_active_directory
+    caps = Net::LDAP::Entry.new
+    caps[:supportedcapabilities] = [GitHub::Ldap::ACTIVE_DIRECTORY_V61_R2_OID]
+
+    @ldap.stub :capabilities, caps do
+      @ldap.configure_search_strategy :detect
+
+      assert_equal GitHub::Ldap::MembershipValidators::ActiveDirectory, @ldap.membership_validator
+      assert_equal GitHub::Ldap::MemberSearch::ActiveDirectory,         @ldap.member_search_strategy
+    end
   end
 
-  def test_membership_validator_configured_to_recursive_strategy
-    @ldap.configure_membership_validation_strategy :recursive
-    assert_equal :recursive, @ldap.membership_validator
+  def test_search_strategy_configured_to_classic
+    @ldap.configure_search_strategy :classic
+    assert_equal GitHub::Ldap::MembershipValidators::Classic, @ldap.membership_validator
+    assert_equal GitHub::Ldap::MemberSearch::Classic,         @ldap.member_search_strategy
   end
 
-  def test_membership_validator_configured_to_active_directory_strategy
-    @ldap.configure_membership_validation_strategy :active_directory
-    assert_equal :active_directory, @ldap.membership_validator
+  def test_search_strategy_configured_to_recursive
+    @ldap.configure_search_strategy :recursive
+    assert_equal GitHub::Ldap::MembershipValidators::Recursive, @ldap.membership_validator
+    assert_equal GitHub::Ldap::MemberSearch::Recursive,         @ldap.member_search_strategy
   end
 
-  def test_membership_validator_misconfigured_to_unrecognized_strategy_falls_back_to_default
-    @ldap.configure_membership_validation_strategy :unknown
-    assert_equal :detect, @ldap.membership_validator
+  def test_search_strategy_configured_to_active_directory
+    @ldap.configure_search_strategy :active_directory
+    assert_equal GitHub::Ldap::MembershipValidators::ActiveDirectory, @ldap.membership_validator
+    assert_equal GitHub::Ldap::MemberSearch::ActiveDirectory,         @ldap.member_search_strategy
+  end
+
+  def test_search_strategy_misconfigured_to_unrecognized_strategy_falls_back_to_default
+    @ldap.configure_search_strategy :unknown
+    assert_equal GitHub::Ldap::MembershipValidators::Recursive, @ldap.membership_validator
+    assert_equal GitHub::Ldap::MemberSearch::Recursive,         @ldap.member_search_strategy
   end
 
   def test_capabilities
