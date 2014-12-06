@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## v1.6.0
+
+* Expose `GitHub::Ldap::Group.group?` for testing if entry is a group [#67](https://github.com/github/github-ldap/pull/67)
+* Add *Member Search* strategies [#64](https://github.com/github/github-ldap/pull/64) [#68](https://github.com/github/github-ldap/pull/68) [#69](https://github.com/github/github-ldap/pull/69)
+* Simplify *Member Search* and *Membership Validation* search strategy configuration, detection, and default behavior [#70](https://github.com/github/github-ldap/pull/70)
+
 ## v1.5.0
 
 * Automatically detect membership validator strategy by default [#58](https://github.com/github/github-ldap/pull/58) [#62](https://github.com/github/github-ldap/pull/62)
