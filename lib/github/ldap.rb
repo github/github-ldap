@@ -258,11 +258,8 @@ module GitHub
 
     # Internal: Configure the membership validation strategy.
     #
-    # Used by GitHub::Ldap::MembershipValidators::Detect to force a specific
-    # strategy (instead of detecting host capabilities and deciding at runtime).
-    #
-    # If `strategy` is not provided, or doesn't match a known strategy,
-    # defaults to `:detect`. Otherwise the configured strategy is selected.
+    # If no known strategy is provided, detects ActiveDirectory capabilities or
+    # falls back to the Recursive strategy by default.
     #
     # Returns the membership validator strategy Class.
     def configure_membership_validation_strategy(strategy = nil)
@@ -286,13 +283,11 @@ module GitHub
 
     # Internal: Configure the member search strategy.
     #
-    # Used by GitHub::Ldap::MemberSearch::Detect to force a specific strategy
-    # (instead of detecting the host capabilities and deciding at runtime).
     #
-    # If `strategy` is not provided, or doesn't match a known strategy,
-    # defaults to `:detect`. Otherwise the configured strategy is selected.
+    # If no known strategy is provided, detects ActiveDirectory capabilities or
+    # falls back to the Recursive strategy by default.
     #
-    # Returns the selected strategy Symbol.
+    # Returns the selected strategy Class.
     def configure_member_search_strategy(strategy = nil)
       @member_search_strategy =
         case strategy.to_s
