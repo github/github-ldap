@@ -21,7 +21,22 @@ module GitHub
         DEFAULT_MAX_DEPTH = 9
         ATTRS             = %w(dn cn)
 
-        def perform(entry, depth = DEFAULT_MAX_DEPTH)
+        # Internal: The maximum depth to search for membership.
+        attr_reader :depth
+
+        # Public: Instantiate new search strategy.
+        #
+        # - ldap:    GitHub::Ldap object
+        # - options: Hash of options
+        # - groups: Array of Net::LDAP::Entry group objects
+        #
+        # NOTE: This overrides default behavior to configure `depth`.
+        def initialize(ldap, groups, options = {})
+          super
+          @depth = options[:depth] || DEFAULT_MAX_DEPTH
+        end
+
+        def perform(entry)
           # short circuit validation if there are no groups to check against
           return true if groups.empty?
 
