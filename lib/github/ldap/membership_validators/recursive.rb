@@ -37,7 +37,7 @@ module GitHub
           @depth = options[:depth] || DEFAULT_MAX_DEPTH
         end
 
-        def perform(entry)
+        def perform(entry, depth_override = nil)
           # short circuit validation if there are no groups to check against
           return true if groups.empty?
 
@@ -52,7 +52,7 @@ module GitHub
             next if membership.empty?
 
             # recurse to at most `depth`
-            depth.times do |n|
+            (depth_override || depth).times do |n|
               # find groups whose members include membership groups
               membership = domain.search(filter: membership_filter(membership), attributes: ATTRS)
 
