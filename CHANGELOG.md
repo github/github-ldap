@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## v1.7.0
+
+* Accept `:depth` option for Recursive membership validator strategy instance [#73](https://github.com/github/github-ldap/pull/73)
+* Deprecate `depth` argument to `Recursive` membership validator `perform` method
+* Bump net-ldap dependency to 0.10.0 at minimum [#72](https://github.com/github/github-ldap/pull/72)
+
 ## v1.6.0
 
 * Expose `GitHub::Ldap::Group.group?` for testing if entry is a group [#67](https://github.com/github/github-ldap/pull/67)
