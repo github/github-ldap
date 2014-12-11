@@ -38,6 +38,14 @@ module GitHub
         end
 
         def perform(entry, depth_override = nil)
+          if depth_override
+            warn "DEPRECATION WARNING: Calling Recursive#perform with a second argument is deprecated."
+            warn "Usage:"
+            warn "  strategy = GitHub::Ldap::MembershipValidators::Recursive.new \\"
+            warn "    ldap, depth: 5"
+            warn "  strategy#perform(entry)"
+          end
+
           # short circuit validation if there are no groups to check against
           return true if groups.empty?
 
