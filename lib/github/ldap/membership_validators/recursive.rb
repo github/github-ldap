@@ -27,8 +27,9 @@ module GitHub
         # Public: Instantiate new search strategy.
         #
         # - ldap:    GitHub::Ldap object
+        # - groups:  Array of Net::LDAP::Entry group objects
         # - options: Hash of options
-        # - groups: Array of Net::LDAP::Entry group objects
+        #   depth:   Integer limit of recursion
         #
         # NOTE: This overrides default behavior to configure `depth`.
         def initialize(ldap, groups, options = {})
