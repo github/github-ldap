@@ -8,9 +8,9 @@ class GitHubLdapRecursiveMembershipValidatorsTest < GitHub::Ldap::Test
     @validator = GitHub::Ldap::MembershipValidators::Recursive
   end
 
-  def make_validator(groups)
+  def make_validator(groups, options = {})
     groups = @domain.groups(groups)
-    @validator.new(@ldap, groups)
+    @validator.new(@ldap, groups, options)
   end
 
   def test_validates_user_in_group
@@ -34,8 +34,8 @@ class GitHubLdapRecursiveMembershipValidatorsTest < GitHub::Ldap::Test
   end
 
   def test_does_not_validate_user_in_great_granchild_group_with_depth
-    validator = make_validator(%w(n-depth-nested-group3))
-    refute validator.perform(@entry, 2)
+    validator = make_validator(%w(n-depth-nested-group3), depth: 2)
+    refute validator.perform(@entry)
   end
 
   def test_does_not_validate_user_not_in_group

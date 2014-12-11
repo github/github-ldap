@@ -13,9 +13,11 @@ module GitHub
         #
         # - ldap:   GitHub::Ldap object
         # - groups: Array of Net::LDAP::Entry group objects
-        def initialize(ldap, groups)
-          @ldap   = ldap
-          @groups = groups
+        # - options: Hash of options
+        def initialize(ldap, groups, options = {})
+          @ldap    = ldap
+          @groups  = groups
+          @options = options
         end
 
         # Abstract: Performs the membership validation check.

@@ -21,7 +21,31 @@ module GitHub
         DEFAULT_MAX_DEPTH = 9
         ATTRS             = %w(dn cn)
 
-        def perform(entry, depth = DEFAULT_MAX_DEPTH)
+        # Internal: The maximum depth to search for membership.
+        attr_reader :depth
+
+        # Public: Instantiate new search strategy.
+        #
+        # - ldap:    GitHub::Ldap object
+        # - groups:  Array of Net::LDAP::Entry group objects
+        # - options: Hash of options
+        #   depth:   Integer limit of recursion
+        #
+        # NOTE: This overrides default behavior to configure `depth`.
+        def initialize(ldap, groups, options = {})
+          super
+          @depth = options[:depth] || DEFAULT_MAX_DEPTH
+        end
+
+        def perform(entry, depth_override = nil)
+          if depth_override
+            warn "DEPRECATION WARNING: Calling Recursive#perform with a second argument is deprecated."
+            warn "Usage:"
+            warn "  strategy = GitHub::Ldap::MembershipValidators::Recursive.new \\"
+            warn "    ldap, depth: 5"
+            warn "  strategy#perform(entry)"
+          end
+
           # short circuit validation if there are no groups to check against
           return true if groups.empty?
 
@@ -36,7 +60,7 @@ module GitHub
             next if membership.empty?
 
             # recurse to at most `depth`
-            depth.times do |n|
+            (depth_override || depth).times do |n|
               # find groups whose members include membership groups
               membership = domain.search(filter: membership_filter(membership), attributes: ATTRS)
 
