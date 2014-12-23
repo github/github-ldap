@@ -3,7 +3,8 @@ module GitHub
     module Filter
       ALL_GROUPS_FILTER = Net::LDAP::Filter.eq("objectClass", "groupOfNames") |
                           Net::LDAP::Filter.eq("objectClass", "groupOfUniqueNames") |
-                          Net::LDAP::Filter.eq("objectClass", "posixGroup")
+                          Net::LDAP::Filter.eq("objectClass", "posixGroup") |
+                          Net::LDAP::Filter.eq("objectClass", "group")
 
       MEMBERSHIP_NAMES  = %w(member uniqueMember)
 
