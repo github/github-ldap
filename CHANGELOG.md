@@ -1,5 +1,9 @@
 # CHANGELOG
 
+# v1.7.1
+
+* Add Active Directory group filter [#75](https://github.com/github/github-ldap/pull/75)
+
 ## v1.7.0
 
 * Accept `:depth` option for Recursive membership validator strategy instance [#73](https://github.com/github/github-ldap/pull/73)
