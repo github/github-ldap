@@ -224,3 +224,15 @@ class GitHubLdapWithoutPosixGroupsTest < GitHub::Ldap::Test
       "Expected `#{@cn}` to not include the member `#{user.dn}`"
   end
 end
+
+class GitHubLdapActiveDirectoryGroupsTest < GitHub::Ldap::Test
+  def run(*)
+    self.class.test_env != "activedirectory" ? super : self
+  end
+
+  def test_filter_groups
+    domain = @ldap.domain("DC=ad,DC=ghe,DC=local")
+    results = domain.filter_groups("ghe-admins")
+    assert_equal 1, results.size
+  end
+end
