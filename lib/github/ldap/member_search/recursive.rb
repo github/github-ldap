@@ -94,14 +94,14 @@ module GitHub
           # entries to return
           entries  = []
 
-          # pull member DNs, discarding dupes and subgroup DNs
-          member_dns = found.values.each_with_object([]) do |group, member_dns|
+          # collect all member DNs, discarding dupes and subgroup DNs
+          members = found.values.each_with_object([]) do |group, dns|
             entries << group
-            member_dns.concat member_dns(group)
+            dns.concat member_dns(group)
           end.uniq.reject { |dn| found.key?(dn) }
 
           # wrap member DNs in Net::LDAP::Entry objects
-          entries.concat member_dns.map { |dn| Net::LDAP::Entry.new(dn) }
+          entries.concat members.map! { |dn| Net::LDAP::Entry.new(dn) }
 
           entries
         end
