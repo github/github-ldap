@@ -78,8 +78,4 @@ class FilterTest < Minitest::Test
     assert_equal "(|(uid=calavera)(uid=mtodd))",
       @subject.all_members_by_uid(%w(calavera mtodd), :uid).to_s
   end
-
-  def test_active_directory_group
-
-  end
 end
