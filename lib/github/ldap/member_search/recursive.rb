@@ -89,12 +89,14 @@ module GitHub
             end
           end
 
-          # take found groups and combine groups and members into list of entries
-          found.values.each do |group|
+          # pull member DNs, discarding dupes and subgroup DNs
+          member_dns = found.values.each_with_object([]) do |group, member_dns|
             entries << group
-            # just need member DNs as Net::LDAP::Entry objects
-            entries.concat member_dns(group).map { |dn| Net::LDAP::Entry.new(dn) }
-          end
+            member_dns.concat member_dns(group)
+          end.uniq.reject { |dn| found.key?(dn) }
+
+          # wrap member DNs in Net::LDAP::Entry objects
+          entries.concat member_dns.map { |dn| Net::LDAP::Entry.new(dn) }
 
           entries
         end
