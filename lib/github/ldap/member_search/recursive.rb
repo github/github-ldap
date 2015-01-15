@@ -125,7 +125,7 @@ module GitHub
             attributes: attrs,
             filter: ALL_GROUPS_FILTER
         end
-        private :find_group_by_dn
+        private :find_groups_by_dn
 
         # Internal: Fetch entries by UID.
         #
