@@ -37,8 +37,8 @@ module GitHub
           # track groups found
           found = Hash.new
 
-          # track DNs searched for (so we don't repeat searches)
-          searched = []
+          # track all DNs searched for (so we don't repeat searches)
+          searched = Set.new
 
           # if this is a posixGroup, return members immediately (no nesting)
           uids = member_uids(group)
