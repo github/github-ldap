@@ -50,7 +50,7 @@ module GitHub
             # find every (new, unique) member entry
             depth_subentries = entries.each_with_object([]) do |entry, depth_entries|
               # find members of subgroup, including subgroups (N queries)
-              subentries = member_entries(entry)
+              subentries = member_entries(entry, found)
               next if subentries.empty?
 
               # track found subentries
@@ -75,10 +75,14 @@ module GitHub
         # entry.
         #
         # Returns an Array of Net::LDAP::Entry objects.
-        def member_entries(entry)
+        def member_entries(entry, found = {})
           entries = []
           dns     = member_dns(entry)
           uids    = member_uids(entry)
+
+          # skip any entries we've already found
+          dns.reject!  { |dn| found.key?(dn) }
+          uids.reject! { |uid| found.any? { |entry| entry['uid'].include?(uid) } }
 
           entries.concat entries_by_uid(uids) unless uids.empty?
           entries.concat entries_by_dn(dns)   unless dns.empty?
