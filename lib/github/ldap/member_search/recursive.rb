@@ -49,11 +49,6 @@ module GitHub
           depth.times do |n|
             # find every (new, unique) member entry
             depth_subentries = entries.each_with_object([]) do |entry, depth_entries|
-              submembers = entry["member"]
-
-              # skip any members we've already found
-              submembers.reject! { |dn| found.key?(dn) }
-
               # find members of subgroup, including subgroups (N queries)
               subentries = member_entries(entry)
               next if subentries.empty?
