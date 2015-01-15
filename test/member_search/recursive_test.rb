@@ -32,6 +32,16 @@ class GitHubLdapRecursiveMemberSearchTest < GitHub::Ldap::Test
     assert_includes members, @entry.dn
   end
 
+  def test_excludes_nonmembers
+    members = @strategy.perform(find_group("n-depth-nested-group1")).map(&:dn)
+
+    # entry not in any group
+    refute_includes members, "uid=groupless-user1,ou=People,dc=github,dc=com"
+
+    # entry in an unrelated group
+    refute_includes members, "uid=admin1,ou=People,dc=github,dc=com"
+  end
+
   def test_respects_configured_depth_limit
     strategy = GitHub::Ldap::MemberSearch::Recursive.new(@ldap, depth: 2)
     members = strategy.perform(find_group("n-depth-nested-group9")).map(&:dn)
