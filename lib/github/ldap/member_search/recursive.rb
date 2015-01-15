@@ -52,9 +52,8 @@ module GitHub
           dns = member_dns(group)
 
           # search for base group's subgroups
-          filter = ALL_GROUPS_FILTER
           groups = dns.each_with_object([]) do |dn, groups|
-            groups.concat ldap.search(base: dn, scope: Net::LDAP::SearchScope_BaseObject, attributes: attrs, filter: filter)
+            groups.concat find_groups_by_dn(dn)
             searched << dn
           end
 
@@ -77,13 +76,14 @@ module GitHub
 
               # search for subgroups
               subgroups = sub_dns.each_with_object([]) do |dn, subgroups|
-                subgroups.concat ldap.search(base: dn, scope: Net::LDAP::SearchScope_BaseObject, attributes: attrs, filter: filter)
-                searched << dn
+                subgroups.concat find_groups_by_dn(dn)
+                searched  << dn
               end
 
+              # give up if there were no subgroups found
               break if subgroups.empty?
 
-              # track found groups
+              # track found subgroups
               subgroups.each { |g| found[g.dn] = g }
 
               # descend another level
@@ -105,6 +105,27 @@ module GitHub
 
           entries
         end
+
+        # Internal: Search for Groups by DN.
+        #
+        # Given a Distinguished Name (DN) String value, find the Group entry
+        # that matches it. The DN may map to a `person` entry, but we want to
+        # filter those out.
+        #
+        # This will find zero or one entry most of the time, but it's not
+        # guaranteed so we account for the possibility of more.
+        #
+        # This method is intended to be used with `Array#concat` by the caller.
+        #
+        # Returns an Array of zero or more Net::LDAP::Entry objects.
+        def find_groups_by_dn(dn)
+          ldap.search \
+            base: dn,
+            scope: Net::LDAP::SearchScope_BaseObject,
+            attributes: attrs,
+            filter: ALL_GROUPS_FILTER
+        end
+        private :find_group_by_dn
 
         # Internal: Fetch entries by UID.
         #
