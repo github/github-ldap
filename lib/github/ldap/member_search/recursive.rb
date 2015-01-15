@@ -34,9 +34,11 @@ module GitHub
         #
         # Returns Array of Net::LDAP::Entry objects.
         def perform(group)
-          found    = Hash.new
+          # track groups found
+          found = Hash.new
+
+          # track DNs searched for (so we don't repeat searches)
           searched = []
-          entries  = []
 
           # if this is a posixGroup, return members immediately (no nesting)
           uids = member_uids(group)
@@ -88,6 +90,9 @@ module GitHub
               groups = subgroups
             end
           end
+
+          # entries to return
+          entries  = []
 
           # pull member DNs, discarding dupes and subgroup DNs
           member_dns = found.values.each_with_object([]) do |group, member_dns|
