@@ -34,84 +34,16 @@ module GitHub
         #
         # Returns Array of Net::LDAP::Entry objects.
         def perform(group)
-          found = Hash.new
-
-          # find members (N queries)
-          entries = member_entries(group)
-          return [] if entries.empty?
-
-          # track found entries
-          entries.each do |entry|
-            found[entry.dn] = entry
-          end
-
-          # descend to `depth` levels, at most
-          depth.times do |n|
-            # find every (new, unique) member entry
-            depth_subentries = entries.each_with_object([]) do |entry, depth_entries|
-              submembers = entry["member"]
-
-              # skip any members we've already found
-              submembers.reject! { |dn| found.key?(dn) }
-
-              # find members of subgroup, including subgroups (N queries)
-              subentries = member_entries(entry)
-              next if subentries.empty?
-
-              # track found subentries
-              subentries.each { |entry| found[entry.dn] = entry }
-
-              # collect all entries for this depth
-              depth_entries.concat subentries
+          domains.each_with_object([]) do |domain, members|
+            domain.search(base: group.dn, filter: ALL_GROUPS_FILTER, attributes: attrs) do |subgroup|
+              members.concat member_dns(subgroup)
+              members.concat member_uids(subgroup)
             end
-
-            # stop if there are no more subgroups to search
-            break if depth_subentries.empty?
-
-            # go one level deeper
-            entries = depth_subentries
+          end.uniq.compact.map do |dn|
+            # NOTE: keeps API backwards compatible
+            Net::LDAP::Entry.new(dn)
           end
-
-          # return all found entries
-          found.values
         end
-
-        # Internal: Fetch member entries, including subgroups, for the given
-        # entry.
-        #
-        # Returns an Array of Net::LDAP::Entry objects.
-        def member_entries(entry)
-          entries = []
-          dns     = member_dns(entry)
-          uids    = member_uids(entry)
-
-          entries.concat entries_by_uid(uids) unless uids.empty?
-          entries.concat entries_by_dn(dns)   unless dns.empty?
-
-          entries
-        end
-        private :member_entries
-
-        # Internal: Bind a list of DNs to their respective entries.
-        #
-        # Returns an Array of Net::LDAP::Entry objects.
-        def entries_by_dn(members)
-          members.map do |dn|
-            ldap.domain(dn).bind(attributes: attrs)
-          end.compact
-        end
-        private :entries_by_dn
-
-        # Internal: Fetch entries by UID.
-        #
-        # Returns an Array of Net::LDAP::Entry objects.
-        def entries_by_uid(members)
-          filter = members.map { |uid| Net::LDAP::Filter.eq(ldap.uid, uid) }.reduce(:|)
-          domains.each_with_object([]) do |domain, entries|
-            entries.concat domain.search(filter: filter, attributes: attrs)
-          end.compact
-        end
-        private :entries_by_uid
 
         # Internal: Returns an Array of String DNs for `groupOfNames` and
         # `uniqueGroupOfNames` members.
