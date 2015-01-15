@@ -231,7 +231,7 @@ class GitHubLdapActiveDirectoryGroupsTest < GitHub::Ldap::Test
   end
 
   def test_filter_groups
-    domain = @ldap.domain("DC=ad,DC=ghe,DC=local")
+    domain = GitHub::Ldap.new(options).domain("DC=ad,DC=ghe,DC=local")
     results = domain.filter_groups("ghe-admins")
     assert_equal 1, results.size
   end
