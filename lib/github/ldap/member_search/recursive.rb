@@ -77,7 +77,7 @@ module GitHub
               # search for subgroups
               subgroups = sub_dns.each_with_object([]) do |dn, subgroups|
                 subgroups.concat find_groups_by_dn(dn)
-                searched  << dn
+                searched << dn
               end
 
               # give up if there were no subgroups found
