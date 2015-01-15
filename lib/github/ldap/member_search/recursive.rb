@@ -69,11 +69,11 @@ module GitHub
                 sub_dns.concat member_dns(subgroup)
               end
 
-              # give up if there's nothing else to search for
-              break if sub_dns.empty?
-
               # filter out if already searched for
               sub_dns.reject! { |dn| searched.include?(dn) }
+
+              # give up if there's nothing else to search for
+              break if sub_dns.empty?
 
               # search for subgroups
               subgroups = sub_dns.each_with_object([]) do |dn, subgroups|
