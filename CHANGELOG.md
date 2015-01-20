@@ -1,5 +1,9 @@
 # CHANGELOG
 
+# v1.8.0
+
+* Optimize Recursive *Member Search* strategy [#78](https://github.com/github/github-ldap/pull/78)
+
 # v1.7.1
 
 * Add Active Directory group filter [#75](https://github.com/github/github-ldap/pull/75)
