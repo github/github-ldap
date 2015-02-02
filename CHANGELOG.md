@@ -1,5 +1,9 @@
 # CHANGELOG
 
+# v1.8.1
+
+* Expand supported ActiveDirectory capabilities to include Windows Server 2003 [#80](https://github.com/github/github-ldap/pull/80)
+
 # v1.8.0
 
 * Optimize Recursive *Member Search* strategy [#78](https://github.com/github/github-ldap/pull/78)
