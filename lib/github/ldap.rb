@@ -19,7 +19,7 @@ module GitHub
 
     # Internal: The capability required to use ActiveDirectory features.
     # See: http://msdn.microsoft.com/en-us/library/cc223359.aspx.
-    ACTIVE_DIRECTORY_V60_OID = "1.2.840.113556.1.4.1935".freeze
+    ACTIVE_DIRECTORY_V51_OID = "1.2.840.113556.1.4.1670".freeze
 
     # Utility method to get the last operation result with a human friendly message.
     #
@@ -313,7 +313,7 @@ module GitHub
     #
     # Returns true if the host is an ActiveDirectory server, false otherwise.
     def active_directory_capability?
-      capabilities[:supportedcapabilities].include?(ACTIVE_DIRECTORY_V60_OID)
+      capabilities[:supportedcapabilities].include?(ACTIVE_DIRECTORY_V51_OID)
     end
     private :active_directory_capability?
   end

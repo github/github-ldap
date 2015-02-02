@@ -80,7 +80,7 @@ module GitHubLdapTestCases
 
   def test_search_strategy_detects_active_directory
     caps = Net::LDAP::Entry.new
-    caps[:supportedcapabilities] = [GitHub::Ldap::ACTIVE_DIRECTORY_V60_OID]
+    caps[:supportedcapabilities] = [GitHub::Ldap::ACTIVE_DIRECTORY_V51_OID]
 
     @ldap.stub :capabilities, caps do
       @ldap.configure_search_strategy :detect
