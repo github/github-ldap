@@ -123,4 +123,13 @@ class GitHubLdapActiveDirectoryMembershipValidatorsIntegrationTest < GitHub::Lda
     validator = make_validator(%w(posix-group1))
     assert validator.perform(@entry)
   end
+
+  def test_validates_user_in_group_with_differently_cased_dn
+    validator = make_validator(%w(all-users))
+    @entry[:dn].map(&:upcase!)
+    assert validator.perform(@entry)
+
+    @entry[:dn].map(&:downcase!)
+    assert validator.perform(@entry)
+  end
 end

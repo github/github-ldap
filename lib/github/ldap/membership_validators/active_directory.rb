@@ -31,7 +31,8 @@ module GitHub
             attributes: ATTRS
 
           # membership validated if entry was matched and returned as a result
-          matched.map(&:dn).include?(entry.dn)
+          # Active Directory DNs are case-insensitive
+          matched.map { |m| m.dn.downcase }.include?(entry.dn.downcase)
         end
 
         # Internal: Constructs a membership filter using the "in chain"
