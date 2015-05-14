@@ -1,5 +1,9 @@
 # CHANGELOG
 
+# v1.8.2
+
+* Ignore case when comparing ActiveDirectory DNs [#82](https://github.com/github/github-ldap/pull/82)
+
 # v1.8.1
 
 * Expand supported ActiveDirectory capabilities to include Windows Server 2003 [#80](https://github.com/github/github-ldap/pull/80)
