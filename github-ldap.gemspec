@@ -2,7 +2,7 @@
 
 Gem::Specification.new do |spec|
   spec.name          = "github-ldap"
-  spec.version       = "1.8.2"
+  spec.version       = "1.9.0"
   spec.authors       = ["David Calavera", "Matt Todd"]
   spec.email         = ["david.calavera@gmail.com", "chiology@gmail.com"]
   spec.description   = %q{LDAP authentication for humans}
