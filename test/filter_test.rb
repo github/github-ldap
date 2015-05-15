@@ -1,6 +1,6 @@
 require_relative 'test_helper'
 
-class FilterTest < Minitest::Test
+class FilterTest < GitHub::Ldap::Test
   class Subject
     include GitHub::Ldap::Filter
     def initialize(ldap)
@@ -16,7 +16,7 @@ class FilterTest < Minitest::Test
   end
 
   def setup
-    @ldap    = GitHub::Ldap.new(:uid => 'uid')
+    @ldap    = GitHub::Ldap.new(options.merge(:uid => 'uid'))
     @subject = Subject.new(@ldap)
     @me      = 'uid=calavera,dc=github,dc=com'
     @uid     = "calavera"
