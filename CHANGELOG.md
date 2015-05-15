@@ -1,5 +1,9 @@
 # CHANGELOG
 
+# v1.9.0
+
+* Update net-ldap dependency to `~> 0.11.0` [#84](https://github.com/github/github-ldap/pull/84)
+
 # v1.8.2
 
 * Ignore case when comparing ActiveDirectory DNs [#82](https://github.com/github/github-ldap/pull/82)
