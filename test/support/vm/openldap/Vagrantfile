@@ -16,8 +16,6 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   # If install the openldap with apt-get failed, you can comment this line.
   config.vm.provision "shell", inline: "apt-get update; exec env /vagrant_data/script/install-openldap"
 
-  config.vm.provision "shell", inline: 'echo "HIIIIIII"', run: "always"
-
   config.vm.synced_folder "../../../..", "/vagrant_data"
 
   config.vm.provider "vmware_fusion" do |vb, override|
