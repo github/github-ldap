@@ -1,5 +1,6 @@
 require 'net/ldap'
 require 'forwardable'
+require 'uri'
 
 require 'github/ldap/filter'
 require 'github/ldap/domain'
@@ -100,6 +101,9 @@ module GitHub
 
       # enables instrumenting queries
       @instrumentation_service = options[:instrumentation_service]
+
+      # referral connection handle
+      @referrals = {}
     end
 
     # Public - Whether membership checks should recurse into nested groups when
@@ -187,7 +191,51 @@ module GitHub
               result.concat Array(rs) unless rs == false
             end
           end
+        if options[:return_referrals]
+          ref_result = []
+          result.delete_if do |entry|
+            if entry.respond_to?('search_referrals')
+              rs = search_referrals(entry[:search_referrals], options, &block)
+              ref_result.concat Array(rs) unless rs == false
+              true
+            else
+              false
+            end
+          end
+          result.concat ref_result
+        end
+        return [] if result == false
+        Array(result)
+      end
+    end
 
+    # Internal: Searches the referral LDAP servers
+    #
+    # referal_hosts: list of referral hosts uris
+    # options: is a hash with the same options that Net::LDAP::Connection#search supports.
+    # block: is an optional block to pass to the search.
+    #
+    # Returns an Array of Net::LDAP::Entry.
+    def search_referrals(referral_uris, options, &block)
+      instrument "search_referrals.github_ldap", options.dup do |payload|
+        options.delete(:return_referrals)
+        result = []
+        referral_uris.each do |referral_url|
+          unless @referrals.has_key? referral_url
+            uri = URI(referral_url)
+            @referrals[referral_url] = Net::LDAP.new({
+              host: uri.host,
+              port: uri.port,
+              base: uri.path.sub(/^\//, ''),
+              auth: @connection.instance_variable_get(:@auth),
+              encryption: @connection.instance_variable_get(:@encryption),
+              instrumentation_service: @connection.instance_variable_get(:@instrumentation_service)
+            })
+          end
+            options.delete(:base)
+            rs = @referrals[referral_url].search(options, &block)
+            result.concat Array(rs) unless rs == false
+        end
         return [] if result == false
         Array(result)
       end

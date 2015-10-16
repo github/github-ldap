@@ -123,7 +123,8 @@ module GitHub
             base: dn,
             scope: Net::LDAP::SearchScope_BaseObject,
             attributes: attrs,
-            filter: ALL_GROUPS_FILTER
+            filter: ALL_GROUPS_FILTER,
+            return_referrals: true
         end
         private :find_groups_by_dn
 
@@ -133,7 +134,7 @@ module GitHub
         def entries_by_uid(members)
           filter = members.map { |uid| Net::LDAP::Filter.eq(ldap.uid, uid) }.reduce(:|)
           domains.each_with_object([]) do |domain, entries|
-            entries.concat domain.search(filter: filter, attributes: attrs)
+            entries.concat domain.search(filter: filter, attributes: attrs, return_referrals: true)
           end.compact
         end
         private :entries_by_uid
