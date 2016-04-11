@@ -50,6 +50,9 @@ module GitHub
     #
     # host: required string ldap server host address
     # port: required string or number ldap server port
+    # hosts: an enumerable of pairs of hosts and corresponding ports with
+    #   which to attempt opening connections (default [[host, port]]). Overrides
+    #   host and port if set.
     # encryption: optional string. `ssl` or `tls`. nil by default
     # admin_user: optional string ldap administrator user dn for authentication
     # admin_password: optional string ldap administrator user password
@@ -72,6 +75,7 @@ module GitHub
       @connection = Net::LDAP.new({
         host: options[:host],
         port: options[:port],
+        hosts: options[:hosts],
         instrumentation_service: options[:instrumentation_service]
       })
 
