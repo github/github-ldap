@@ -100,6 +100,9 @@ module GitHub
 
       # enables instrumenting queries
       @instrumentation_service = options[:instrumentation_service]
+
+      # active directory forest
+      @forest = get_domain_forest(options[:search_forest])
     end
 
     # Public - Whether membership checks should recurse into nested groups when
@@ -180,16 +183,36 @@ module GitHub
       instrument "search.github_ldap", options.dup do |payload|
         result =
           if options[:base]
-            @connection.search(options, &block)
+            forest_search(options, &block)
           else
             search_domains.each_with_object([]) do |base, result|
-              rs = @connection.search(options.merge(:base => base), &block)
+              rs = forest_search(options.merge(:base => base), &block)
               result.concat Array(rs) unless rs == false
             end
           end
 
         return [] if result == false
         Array(result)
+      end
+    end
+
+    # Internal: Search within a ldap forest
+    #
+    # Returns an Array of Net::LDAP::Entry.
+    def forest_search(options, &block)
+      instrument "forest_search.github_ldap" do |payload|
+        result =
+          if @forest.empty?
+            @connection.search(options, &block)
+          else
+            @forest.each_with_object([]) do |(rootdn, server), res|
+              if options[:base].end_with?(rootdn)
+                rs = server.search(options, &block)
+                res.concat Array(rs) unless rs == false
+              end
+            end
+          end
+        return result
       end
     end
 
@@ -201,7 +224,8 @@ module GitHub
       @capabilities ||=
         instrument "capabilities.github_ldap" do |payload|
           begin
-            @connection.search_root_dse
+            rs = @connection.search(:ignore_server_caps => true, :base => "", :scope => Net::LDAP::SearchScope_BaseObject)
+            (rs and rs.first)
           rescue Net::LDAP::LdapError => error
             payload[:error] = error
             # stubbed result
@@ -305,6 +329,37 @@ module GitHub
             GitHub::Ldap::MemberSearch::Recursive
           end
         end
+    end
+
+    # Internal: Queries configuration for available domains
+    #
+    # Membership of local or global groups need to be evaluated by contacting referral Donmain Controllers
+    #
+    # Returns all Domain Controllers within the forest
+    def get_domain_forest(search_forest)
+      instrument "get_domain_forest.github_ldap" do |payload|
+
+        # if we are talking to an active directory
+        if search_forest and active_directory_capability? and capabilities[:configurationnamingcontext].any?
+          domains = @connection.search(
+            base: capabilities[:configurationnamingcontext].first,
+            search_referrals: true,
+            filter: Net::LDAP::Filter.eq("nETBIOSName", "*")
+          )
+          return domains.each_with_object({}) do |server, result|
+            if server[:ncname].any? and server[:dnsroot].any?
+              result[server[:ncname].first] = Net::LDAP.new({
+                host: server[:dnsroot].first,
+                port: @connection.instance_variable_get(:@encryption)? 636 : 389,
+                auth: @connection.instance_variable_get(:@auth),
+                encryption: @connection.instance_variable_get(:@encryption),
+                instrumentation_service: @connection.instance_variable_get(:@instrumentation_service)
+              })
+            end
+          end
+        end
+        return {}
+      end
     end
 
     # Internal: Detect whether the LDAP host is an ActiveDirectory server.
