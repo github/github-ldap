@@ -100,6 +100,9 @@ module GitHub
 
       # enables instrumenting queries
       @instrumentation_service = options[:instrumentation_service]
+
+      # active directory forest
+      @forest = get_domain_forest()
     end
 
     # Public - Whether membership checks should recurse into nested groups when
@@ -178,15 +181,30 @@ module GitHub
     # Returns an Array of Net::LDAP::Entry.
     def search(options, &block)
       instrument "search.github_ldap", options.dup do |payload|
-        result =
-          if options[:base]
-            @connection.search(options, &block)
-          else
-            search_domains.each_with_object([]) do |base, result|
-              rs = @connection.search(options.merge(:base => base), &block)
-              result.concat Array(rs) unless rs == false
+        if @forest.empty?
+          result =
+            if options[:base]
+              @connection.search(options, &block)
+            else
+              search_domains.each_with_object([]) do |base, result|
+                rs = @connection.search(options.merge(:base => base), &block)
+                result.concat Array(rs) unless rs == false
+              end
             end
+        else
+          result =
+            @forest.each_with_object([]) do |ldap, res|
+              if options[:base]
+                rs = ldap.search(options, &block)
+                res.concat Array(rs) unless rs == false
+              else
+                search_domains.each_with_object([]) do |base, result|
+                  rs = ldap.search(options.merge(:base => base), &block)
+                  res.concat Array(rs) unless rs == false
+                end
+              end
           end
+        end
 
         return [] if result == false
         Array(result)
@@ -305,6 +323,33 @@ module GitHub
             GitHub::Ldap::MemberSearch::Recursive
           end
         end
+    end
+
+    # Internal: Queries Global Catalog for available Domain Controllers
+    #
+    # If Global Catalog is used as LDAP server only universal groups within the forest will be visible
+    # Membership of local or global groups need to be evaluated by contacting Donmain Controller directly
+    #
+    # Returns all Domain Controllers within the forest
+    def get_domain_forest()
+      if active_directory_capability?
+        result = @connection.search(
+          base: '',
+          filter: Net::LDAP::Filter.eq('objectCategory', 'computer') & Net::LDAP::Filter.ex('userAccountControl:1.2.840.113556.1.4.803', '8192')
+        )
+        if result
+          return result.each_with_object([]) do |server, result|
+            result << Net::LDAP.new({
+              host: server.dNSHostName[0],
+              port: @connection.instance_variable_get(:@encryption)? 636 : 389,
+              auth: @connection.instance_variable_get(:@auth),
+              encryption: @connection.instance_variable_get(:@encryption),
+              instrumentation_service: @connection.instance_variable_get(:@instrumentation_service)
+            })
+          end
+        end
+      end
+      return []
     end
 
     # Internal: Detect whether the LDAP host is an ActiveDirectory server.
