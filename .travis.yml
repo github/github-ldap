@@ -7,6 +7,9 @@ env:
   - TESTENV=openldap
   - TESTENV=apacheds
 
+before_install:
+  - gem update bundler
+
 install:
   - if [ "$TESTENV" = "openldap" ]; then ./script/install-openldap; fi
   - bundle install
