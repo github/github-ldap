@@ -26,6 +26,8 @@ module GitHub
 
       private
 
+      attr_reader :connection
+
       # Internal: Queries configuration for available domains
       #
       # Membership of local or global groups need to be evaluated by contacting referral Donmain Controllers
@@ -51,7 +53,7 @@ module GitHub
           end
         end
       end
-      attr_reader :connection
+
     end
   end
 end
