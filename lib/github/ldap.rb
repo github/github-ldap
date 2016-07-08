@@ -261,13 +261,18 @@ module GitHub
       configure_member_search_strategy(strategy)
     end
 
+    # Internal: Configure the entry search strategy.
+    #
+    # If the user has configured GHE to use forest searches AND we have an active
+    # Directory instance that has the right capabilities, use a ForestSearch
+    # strategy. Otherwise, the entry search strategy is simple the existing LDAP
+    # connection object.
+    #
     def configure_entry_search_strategy(use_forest_search)
-      @entry_search_strategy = begin
-        if use_forest_search && active_directory_capability? &&  capabilities[:configurationnamingcontext].any?
-          @entry_search_strategy = GitHub::Ldap::ForestSearch.new(@connection)
-        else
-          @entry_search_strategy = @connection
-        end
+      @entry_search_strategy = if use_forest_search && active_directory_capability? && capabilities[:configurationnamingcontext].any?
+        @entry_search_strategy = GitHub::Ldap::ForestSearch.new(@connection)
+      else
+        @entry_search_strategy = @connection
       end
     end
 
@@ -321,7 +326,6 @@ module GitHub
           end
         end
     end
-
 
     # Internal: Detect whether the LDAP host is an ActiveDirectory server.
     #
