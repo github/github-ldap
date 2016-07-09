@@ -20,10 +20,10 @@ module GitHub
               @connection.search(options, &block)
             else
               @forest.each_with_object([]) do |(rootdn, server), res|
-              if options[:base].end_with?(rootdn)
-                rs = server.search(options, &block)
-                res.concat Array(rs) unless rs == false
-              end
+                if options[:base].end_with?(rootdn)
+                  rs = server.search(options, &block)
+                  res.concat Array(rs) unless rs == false
+                end
               end
             end
           return result
