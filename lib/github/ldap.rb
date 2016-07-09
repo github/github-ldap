@@ -9,6 +9,7 @@ require 'github/ldap/virtual_group'
 require 'github/ldap/virtual_attributes'
 require 'github/ldap/instrumentation'
 require 'github/ldap/member_search'
+require 'github/ldap/forest_search'
 require 'github/ldap/membership_validators'
 
 module GitHub
