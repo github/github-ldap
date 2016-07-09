@@ -42,21 +42,24 @@ module GitHub
       def get_domain_forest
         instrument "get_domain_forest.github_ldap" do |payload|
           domains = @connection.search(
-            base: capabilities[:configurationnamingcontext].first,
+            base: naming_context,
             search_referrals: true,
             filter: Net::LDAP::Filter.eq("nETBIOSName", "*")
           )
-          return domains.each_with_object({}) do |server, result|
-            if server[:ncname].any? and server[:dnsroot].any?
-              result[server[:ncname].first] = Net::LDAP.new({
-                host: server[:dnsroot].first,
-                port: @connection.instance_variable_get(:@encryption)? 636 : 389,
-                auth: @connection.instance_variable_get(:@auth),
-                encryption: @connection.instance_variable_get(:@encryption),
-                instrumentation_service: @connection.instance_variable_get(:@instrumentation_service)
-              })
+          unless domains.nil?
+            return domains.each_with_object({}) do |server, result|
+              if server[:ncname].any? and server[:dnsroot].any?
+                result[server[:ncname].first] = Net::LDAP.new({
+                  host: server[:dnsroot].first,
+                  port: @connection.instance_variable_get(:@encryption)? 636 : 389,
+                  auth: @connection.instance_variable_get(:@auth),
+                  encryption: @connection.instance_variable_get(:@encryption),
+                  instrumentation_service: @connection.instance_variable_get(:@instrumentation_service)
+                })
+              end
             end
           end
+          return {}
         end
       end
 
