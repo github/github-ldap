@@ -1,8 +1,14 @@
+require 'github/ldap/instrumentation'
+
 module GitHub
   class Ldap
+    # For ActiveDirectory environments that have a forest with multiple domain controllers,
+    # this strategy class allows for entry searches across all domains in that forest.
     class ForestSearch
+      include Instrumentation
 
-      def initialize(connection)
+      def initialize(connection, naming_context)
+        @naming_context = naming_context
         @connection = connection
         @forest = get_domain_forest
       end
@@ -26,7 +32,7 @@ module GitHub
 
       private
 
-      attr_reader :connection
+      attr_reader :connection, :naming_context
 
       # Internal: Queries configuration for available domains
       #
