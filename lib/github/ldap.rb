@@ -271,7 +271,7 @@ module GitHub
     #
     def configure_entry_search_strategy(use_forest_search)
       @entry_search_strategy = if use_forest_search && active_directory_capability? && capabilities[:configurationnamingcontext].any?
-        @entry_search_strategy = GitHub::Ldap::ForestSearch.new(@connection)
+        @entry_search_strategy = GitHub::Ldap::ForestSearch.new(@connection, capabilities[:configurationnamingcontext].first)
       else
         @entry_search_strategy = @connection
       end
