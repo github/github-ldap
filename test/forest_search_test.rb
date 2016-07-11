@@ -92,7 +92,7 @@ class GitHubLdapForestSearchTest < GitHub::Ldap::Test
     assert_equal results, ["entry1"]
   end
 
-  def test_searches_domain_controllers_from_differet_domains
+  def test_searches_domain_controllers_from_different_domains
     server1 = {:ncname => ["DC=ghe,DC=local"], :dnsroot => ["ghe.local"]}
     server2 = {:ncname => ["DC=ad,DC=ghe,DC=local"], :dnsroot => ["ad.ghe.local"]}
     server3 = {:ncname => ["DC=eng,DC=ad,DC=ghe,DC=local"], :dnsroot => ["eng.ad.ghe.local"]}
