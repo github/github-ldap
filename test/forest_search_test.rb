@@ -53,4 +53,23 @@ class GitHubLdapForestSearchTest < GitHub::Ldap::Test
     @forest_search.search({:base => base})
   end
 
+  def test_returns_concatenated_search_results_from_forest
+    mock_domains = Object.new
+    mock_domain_controller = Object.new
+
+    mock_dc_connection1 = Object.new
+    mock_dc_connection2 = Object.new
+    rootdn = "DC=ad,DC=ghe,DC=local"
+    forest = [[rootdn, mock_dc_connection1],[rootdn, mock_dc_connection2]]
+
+    @connection.expects(:search).returns(mock_domains)
+    mock_domains.expects(:each_with_object).returns(forest)
+
+    mock_dc_connection1.expects(:search).returns(["entry1"])
+    mock_dc_connection2.expects(:search).returns(["entry2"])
+    base = "CN=user1,CN=Users,DC=ad,DC=ghe,DC=local"
+    results = @forest_search.search({:base => base})
+    assert_equal results, ["entry1", "entry2"]
+  end
+
 end
