@@ -19,4 +19,13 @@ class GitHubLdapForestSearchTest < GitHub::Ldap::Test
     @connection.expects(:search)
     @forest_search.search({})
   end
+
+  def test_uses_connection_search_when_domains_nil
+    # First search returns nil
+    @connection.expects(:search).returns(nil)
+    # Since the forest is empty, should fall back on the base connection
+    @connection.expects(:search)
+    @forest_search.search({})
+  end
+
 end
