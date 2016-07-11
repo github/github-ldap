@@ -12,7 +12,11 @@ class GitHubLdapForestSearchTest < GitHub::Ldap::Test
     @forest_search = GitHub::Ldap::ForestSearch.new(@connection, configuration_naming_context)
   end
 
-  def test_search
+  def test_uses_connection_search_when_no_forest_present
+    # First search returns an empty Hash of domain controllers
+    @connection.expects(:search).returns({})
+    # Since the forest is empty, should fall back on the base connection
+    @connection.expects(:search)
     @forest_search.search({})
     assert true
   end
