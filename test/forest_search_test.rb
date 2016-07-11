@@ -8,8 +8,8 @@ class GitHubLdapForestSearchTest < GitHub::Ldap::Test
       port: options[:port],
       instrumentation_service: options[:instrumentation_service]
     })
-    #@connection.stub(:search, {}, ['search-forest'])
-    @forest_search = GitHub::Ldap::ForestSearch.new(@connection, "naming")
+    configuration_naming_context = "CN=Configuration,DC=ad,DC=ghe,DC=local"
+    @forest_search = GitHub::Ldap::ForestSearch.new(@connection, configuration_naming_context)
   end
 
   def test_search
