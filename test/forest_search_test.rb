@@ -72,4 +72,24 @@ class GitHubLdapForestSearchTest < GitHub::Ldap::Test
     assert_equal results, ["entry1", "entry2"]
   end
 
+  def test_does_not_search_from_different_rootdn
+    mock_domains = Object.new
+    mock_domain_controller = Object.new
+
+    mock_dc_connection1 = Object.new
+    mock_dc_connection2 = Object.new
+    forest = {"DC=ad,DC=ghe,DC=local" => mock_dc_connection1,
+              "DC=fu,DC=bar,DC=local" => mock_dc_connection2}
+
+    @connection.expects(:search).returns(mock_domains)
+    mock_domains.expects(:each_with_object).returns(forest)
+
+    mock_dc_connection1.expects(:search).returns(["entry1"])
+    mock_dc_connection2.expects(:search).never
+
+    base = "CN=user1,CN=Users,DC=ad,DC=ghe,DC=local"
+    results = @forest_search.search({:base => base})
+    assert_equal results, ["entry1"]
+  end
+
 end
