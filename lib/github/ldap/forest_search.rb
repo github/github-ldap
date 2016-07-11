@@ -53,30 +53,44 @@ module GitHub
 
       # Internal: Queries configuration for available domains
       #
-      # Membership of local or global groups need to be evaluated by contacting referral Donmain Controllers
+      # Membership of local or global groups need to be evaluated by contacting referral
+      # Domain Controllers
       #
-      # Returns all Domain Controllers within the forest
-      def get_domain_forest
-        instrument "get_domain_forest.github_ldap" do |payload|
-          domains = @connection.search(
-            base: naming_context,
-            search_referrals: true,
-            filter: Net::LDAP::Filter.eq("nETBIOSName", "*")
-          )
-          unless domains.nil?
-            return domains.each_with_object({}) do |server, result|
-              if server[:ncname].any? and server[:dnsroot].any?
-                result[server[:ncname].first] = Net::LDAP.new({
-                  host: server[:dnsroot].first,
-                  port: @connection.instance_variable_get(:@encryption)? 636 : 389,
-                  auth: @connection.instance_variable_get(:@auth),
-                  encryption: @connection.instance_variable_get(:@encryption),
-                  instrumentation_service: @connection.instance_variable_get(:@instrumentation_service)
-                })
+      # returns: A memoized Hash of Domain Controllers from this AD forest in the format:
+      #
+      #           {<nCNname> => <connection>}
+      #
+      # where "nCName" specifies the distinguished name of the naming context for the domain
+      # controller, and "connection" is an instance of Net::LDAP that represents a connection
+      # to that domain controller, for instance:
+      #
+      #           {"DC=ad,DC=ghe,DC=local" => <Net::LDAP:0x007f9c3e20b200>,
+      #            "DC=fu,DC=bar,DC=local" => <Net::LDAP:0x007f9c3e20b890>}
+      #
+      def forest
+        @forest ||= begin
+          instrument "get_domain_forest.github_ldap" do
+            domains = @connection.search(
+              base: naming_context,
+              search_referrals: true,
+              filter: Net::LDAP::Filter.eq("nETBIOSName", "*")
+            )
+            if domains
+              domains.each_with_object({}) do |server, result|
+                if server[:ncname].any? && server[:dnsroot].any?
+                  result[server[:ncname].first] = Net::LDAP.new({
+                    host: server[:dnsroot].first,
+                    port: @connection.instance_variable_get(:@encryption)? 636 : 389,
+                    auth: @connection.instance_variable_get(:@auth),
+                    encryption: @connection.instance_variable_get(:@encryption),
+                    instrumentation_service: @connection.instance_variable_get(:@instrumentation_service)
+                  })
+                end
               end
+            else
+              {}
             end
           end
-          return {}
         end
       end
 
