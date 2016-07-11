@@ -92,4 +92,28 @@ class GitHubLdapForestSearchTest < GitHub::Ldap::Test
     assert_equal results, ["entry1"]
   end
 
+  def test_searches_domain_controllers_from_differet_domains
+    server1 = {:ncname => ["DC=ghe,DC=local"], :dnsroot => ["ghe.local"]}
+    server2 = {:ncname => ["DC=ad,DC=ghe,DC=local"], :dnsroot => ["ad.ghe.local"]}
+    server3 = {:ncname => ["DC=eng,DC=ad,DC=ghe,DC=local"], :dnsroot => ["eng.ad.ghe.local"]}
+    mock_domains = [server1,server2,server3]
+
+    mock_domain_controller = Object.new
+    @connection.expects(:search).returns(mock_domains)
+
+    mock_dc_connection1 = Object.new
+    mock_dc_connection2 = Object.new
+    mock_dc_connection3 = Object.new
+
+    Net::LDAP.expects(:new).returns(mock_dc_connection1)
+    Net::LDAP.expects(:new).returns(mock_dc_connection2)
+    Net::LDAP.expects(:new).returns(mock_dc_connection3)
+
+    mock_dc_connection1.expects(:search).once
+    mock_dc_connection2.expects(:search).once
+    mock_dc_connection3.expects(:search).once
+
+    base = "CN=user1,CN=Users,DC=eng,DC=ad,DC=ghe,DC=local"
+    @forest_search.search({:base => base})
+  end
 end
