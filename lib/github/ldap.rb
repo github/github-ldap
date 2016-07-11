@@ -85,7 +85,7 @@ module GitHub
       end
 
       configure_virtual_attributes(options[:virtual_attributes])
-      configure_entry_search_strategy(options[:search_forest])
+      configure_entry_search_strategy(options[:use_forest_search])
 
       # enable fallback recursive group search unless option is false
       @recursive_group_search_fallback = (options[:recursive_group_search_fallback] != false)
