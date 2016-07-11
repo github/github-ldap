@@ -28,4 +28,29 @@ class GitHubLdapForestSearchTest < GitHub::Ldap::Test
     @forest_search.search({})
   end
 
+  def test_iterates_over_domain_controllers_when_forest_present
+    mock_domains = Object.new
+    mock_domain_controller = Object.new
+
+    # Mock out two Domain Controller connections (Net::LDAP objects)
+    mock_dc_connection1 = Object.new
+    mock_dc_connection2 = Object.new
+    rootdn = "DC=ad,DC=ghe,DC=local"
+    # Create a mock forest that contains the two mock DCs
+    # This assumes a single-l
+    forest = [[rootdn, mock_dc_connection1],[rootdn, mock_dc_connection2]]
+
+    # First search returns the Hash of domain controllers
+    # This is what the forest is built from.
+    @connection.expects(:search).returns(mock_domains)
+    mock_domains.expects(:each_with_object).returns(forest)
+
+    # Then we expect that a search will be performed on the LDAP object
+    # created from the returned forest of domain controllers
+    mock_dc_connection1.expects(:search)
+    mock_dc_connection2.expects(:search)
+    base = "CN=user1,CN=Users,DC=ad,DC=ghe,DC=local"
+    @forest_search.search({:base => base})
+  end
+
 end
