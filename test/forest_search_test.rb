@@ -18,6 +18,5 @@ class GitHubLdapForestSearchTest < GitHub::Ldap::Test
     # Since the forest is empty, should fall back on the base connection
     @connection.expects(:search)
     @forest_search.search({})
-    assert true
   end
 end
