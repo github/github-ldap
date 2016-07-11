@@ -1,4 +1,5 @@
 require_relative 'test_helper'
+require 'mocha/mini_test'
 
 class GitHubLdapForestSearchTest < GitHub::Ldap::Test
   def setup
