@@ -22,8 +22,8 @@ module GitHub
 
       # Search over all domain controllers in the ActiveDirectory forest.
       #
-      # options: options hash passed in from GitHub::Ldap#search
-      # &block:  optional block passed in from GitHub::Ldap#search
+      # options: is a hash with the same options that Net::LDAP::Connection#search supports.
+      # block: is an optional block to pass to the search.
       #
       # If no domain controllers are found in the forest, fall back on searching
       # the main GitHub::Ldap object in @connection.
