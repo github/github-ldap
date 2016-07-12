@@ -37,7 +37,6 @@ class GitHubLdapForestSearchTest < GitHub::Ldap::Test
     mock_dc_connection2 = Object.new
     rootdn = "DC=ad,DC=ghe,DC=local"
     # Create a mock forest that contains the two mock DCs
-    # This assumes a single-l
     forest = [[rootdn, mock_dc_connection1],[rootdn, mock_dc_connection2]]
 
     # First search returns the Hash of domain controllers
