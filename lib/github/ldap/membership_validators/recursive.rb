@@ -51,7 +51,7 @@ module GitHub
 
           domains.each do |domain|
             # find groups entry is an immediate member of
-            membership = domain.search(filter: member_filter(entry), attributes: ATTRS)
+            membership = domain.search(filter: member_filter(entry), attributes: ATTRS, return_referrals: true)
 
             # success if any of these groups match the restricted auth groups
             return true if membership.any? { |entry| group_dns.include?(entry.dn) }
@@ -62,7 +62,7 @@ module GitHub
             # recurse to at most `depth`
             (depth_override || depth).times do |n|
               # find groups whose members include membership groups
-              membership = domain.search(filter: membership_filter(membership), attributes: ATTRS)
+              membership = domain.search(filter: membership_filter(membership), attributes: ATTRS, return_referrals: true)
 
               # success if any of these groups match the restricted auth groups
               return true if membership.any? { |entry| group_dns.include?(entry.dn) }
@@ -115,3 +115,4 @@ module GitHub
     end
   end
 end
+
