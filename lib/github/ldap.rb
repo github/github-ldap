@@ -9,6 +9,7 @@ require 'github/ldap/virtual_group'
 require 'github/ldap/virtual_attributes'
 require 'github/ldap/instrumentation'
 require 'github/ldap/member_search'
+require 'github/ldap/forest_search'
 require 'github/ldap/membership_validators'
 
 module GitHub
@@ -84,6 +85,7 @@ module GitHub
       end
 
       configure_virtual_attributes(options[:virtual_attributes])
+      configure_entry_search_strategy(options[:use_forest_search])
 
       # enable fallback recursive group search unless option is false
       @recursive_group_search_fallback = (options[:recursive_group_search_fallback] != false)
@@ -180,10 +182,10 @@ module GitHub
       instrument "search.github_ldap", options.dup do |payload|
         result =
           if options[:base]
-            @connection.search(options, &block)
+            @entry_search_strategy.search(options, &block)
           else
             search_domains.each_with_object([]) do |base, result|
-              rs = @connection.search(options.merge(:base => base), &block)
+              rs = @entry_search_strategy.search(options.merge(:base => base), &block)
               result.concat Array(rs) unless rs == false
             end
           end
@@ -201,7 +203,11 @@ module GitHub
       @capabilities ||=
         instrument "capabilities.github_ldap" do |payload|
           begin
-            @connection.search_root_dse
+            rs = @connection.search(
+              :ignore_server_caps => true,
+              :base => "",
+              :scope => Net::LDAP::SearchScope_BaseObject)
+            (rs and rs.first) || Net::LDAP::Entry.new
           rescue Net::LDAP::LdapError => error
             payload[:error] = error
             # stubbed result
@@ -254,6 +260,21 @@ module GitHub
 
       # configure which strategy should be used for member search
       configure_member_search_strategy(strategy)
+    end
+
+    # Internal: Configure the entry search strategy.
+    #
+    # If the user has configured GHE to use forest searches AND we have an active
+    # Directory instance that has the right capabilities, use a ForestSearch
+    # strategy. Otherwise, the entry search strategy is simple the existing LDAP
+    # connection object.
+    #
+    def configure_entry_search_strategy(use_forest_search)
+      @entry_search_strategy = if use_forest_search && active_directory_capability? && capabilities[:configurationnamingcontext].any?
+        @entry_search_strategy = GitHub::Ldap::ForestSearch.new(@connection, capabilities[:configurationnamingcontext].first)
+      else
+        @entry_search_strategy = @connection
+      end
     end
 
     # Internal: Configure the membership validation strategy.
