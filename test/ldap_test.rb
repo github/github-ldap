@@ -153,6 +153,8 @@ module GitHubLdapTestCases
     global_catalog = @ldap.global_catalog_connection
     instrumentation_service = global_catalog.instance_variable_get(:@instrumentation_service)
 
+    auth = global_catalog.instance_variable_get(:@auth)
+    assert_equal :simple, auth[:method]
     assert_equal "localhost", global_catalog.host
     assert_equal 3268, global_catalog.port
     assert_equal "MockInstrumentationService", instrumentation_service.class.name

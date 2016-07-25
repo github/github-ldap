@@ -217,7 +217,7 @@ module GitHub
       if active_directory_capability?
         @global_catalog_connection ||= Net::LDAP.new({
           host: @connection.host,
-          auth: {username: admin_user, password: admin_password},
+          auth: {method: :simple, username: admin_user, password: admin_password},
           instrumentation_service: instrumentation_service,
           port: 3268,
         })
