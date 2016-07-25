@@ -68,6 +68,9 @@ module GitHub
     #
     def initialize(options = {})
       @uid = options[:uid] || "sAMAccountName"
+      @instrumentation_service = options[:instrumentation_service]
+      @admin_user = options[:admin_user]
+      @admin_password = options[:admin_password]
 
       @connection = Net::LDAP.new({
         host: options[:host],
@@ -215,8 +218,8 @@ module GitHub
       if active_directory_capability?
         @global_catalog_connection ||= Net::LDAP.new({
           host: @connection.host,
-          auth: @connection.instance_variable_get(:@auth),
-          instrumentation_service: @connection.instance_variable_get(:@instrumentation_service),
+          auth: {username: admin_user, password: admin_password},
+          instrumentation_service: instrumentation_service,
           port: 3268,
         })
       end
@@ -344,5 +347,9 @@ module GitHub
     def active_directory_capability?
       capabilities[:supportedcapabilities].include?(ACTIVE_DIRECTORY_V51_OID)
     end
+
+    private
+
+    attr_reader :admin_user, :admin_password
   end
 end
