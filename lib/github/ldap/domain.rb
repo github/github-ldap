@@ -122,8 +122,7 @@ module GitHub
         if @ldap.active_directory_capability?
           # when doing a global search for a user's DN, set the search base to blank
           options[:base] = ""
-          @ldap.global_catalog_search(options)
-
+          @ldap.global_catalog_search(options).first
         else
           search(options).first
         end
