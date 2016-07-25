@@ -1,4 +1,5 @@
 require_relative 'test_helper'
+require 'mocha/mini_test'
 
 module GitHubLdapTestCases
   def setup
@@ -116,6 +117,23 @@ module GitHubLdapTestCases
 
   def test_capabilities
     assert_kind_of Net::LDAP::Entry, @ldap.capabilities
+  end
+
+  def test_global_catalog_returns_empty_array_for_no_results
+    mock_global_catalog_connection = Object.new
+    mock_global_catalog_connection.expects(:search).returns(nil)
+    Net::LDAP.expects(:new).returns(mock_global_catalog_connection)
+    results = @ldap.global_catalog_search({})
+    assert_equal [], results
+  end
+
+  def test_global_catalog_returns_array_of_results
+    mock_global_catalog_connection = Object.new
+    stub_entry = Object.new
+    mock_global_catalog_connection.expects(:search).returns(stub_entry)
+    Net::LDAP.expects(:new).returns(mock_global_catalog_connection)
+    results = @ldap.global_catalog_search({})
+    assert_equal [stub_entry], results
   end
 
   module GitHubLdapUnauthenticatedTestCases
