@@ -120,7 +120,10 @@ module GitHub
           size: 1
 
         if @ldap.active_directory_capability?
-          global_catalog_search(options).first
+          # when doing a global search for a user's DN, set the search base to blank
+          options[:base] = ""
+          @ldap.global_catalog_search(options)
+
         else
           search(options).first
         end
@@ -163,10 +166,6 @@ module GitHub
         options[:paged_searches_supported] = true
 
         @ldap.search(options, &block)
-      end
-
-      def global_catalog_search(options, &block)
-        @ldap.global_catalog_search(options, &block)
       end
 
       # Get the entry for this domain.

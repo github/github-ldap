@@ -205,7 +205,6 @@ module GitHub
     #
     # Returns an Array of Net::LDAP::Entry.
     def global_catalog_search(options, &block)
-      options[:base] = ""
       Array(global_catalog_connection.search(options, &block))
     end
 

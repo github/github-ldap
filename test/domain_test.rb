@@ -144,7 +144,7 @@ module GitHubLdapDomainTestCases
 
   def test_use_global_catalog_if_active_directory
     @ldap.stubs(:active_directory_capability?).returns(true)
-    @domain.expects(:global_catalog_search).returns([])
+    @ldap.expects(:global_catalog_search).returns([])
     @domain.user?('user1', :attributes => [:cn])
   end
 
