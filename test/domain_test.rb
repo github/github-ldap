@@ -148,6 +148,12 @@ module GitHubLdapDomainTestCases
     @domain.user?('user1', :attributes => [:cn])
   end
 
+  def test_global_catalog_has_empty_search_base
+    @ldap.stubs(:active_directory_capability?).returns(true)
+    @ldap.expects(:global_catalog_search).with(has_entry(:base => "")).returns([])
+    @domain.user?('user1', :attributes => [:cn])
+  end
+
   def test_use_default_search_if_not_active_directory
     @ldap.stubs(:active_directory_capability?).returns(false)
     @domain.expects(:search).returns([])
