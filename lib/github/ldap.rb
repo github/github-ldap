@@ -193,6 +193,14 @@ module GitHub
       end
     end
 
+    # Public - Search entries in the configured Active Directory Global Catalog
+    #
+    # options: is a hash with the same options that Net::LDAP::Connection#search supports.
+    # block: is an optional block to pass to the search.
+    #
+    # see: http://msdn.microsoft.com/en-us/library/cc223359.aspx.
+    #
+    # Returns an Array of Net::LDAP::Entry.
     def global_catalog_search(options, &block)
       options[:base] = ""
       Array(global_catalog_connection.search(options, &block))
