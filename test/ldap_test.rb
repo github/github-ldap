@@ -151,9 +151,11 @@ module GitHubLdapTestCases
   def test_global_catalog_default_settings
     @ldap.expects(:active_directory_capability?).returns(true)
     global_catalog = @ldap.global_catalog_connection
+    instrumentation_service = global_catalog.instance_variable_get(:@instrumentation_service)
 
     assert_equal "localhost", global_catalog.host
     assert_equal 3268, global_catalog.port
+    assert_equal "MockInstrumentationService", instrumentation_service.class.name
   end
 
   module GitHubLdapUnauthenticatedTestCases
