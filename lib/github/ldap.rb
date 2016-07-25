@@ -214,7 +214,7 @@ module GitHub
       end
     end
 
-    # Internal: Searches the host LDAP server's Root DSE for capabilities and
+    # Public: Searches the host LDAP server's Root DSE for capabilities and
     # extensions.
     #
     # Returns a Net::LDAP::Entry object.
