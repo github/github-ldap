@@ -126,7 +126,7 @@ module GitHubLdapTestCases
 
   def test_global_catalog_connection_is_null_if_not_active_directory
     @ldap.expects(:active_directory_capability?).returns(true)
-    refute_nil @ldap.global_catalog_connection, "Expected Global Catalog to not be nil"
+    refute_nil @ldap.global_catalog_connection
   end
 
   def test_global_catalog_returns_empty_array_for_no_results
