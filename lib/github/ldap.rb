@@ -204,12 +204,14 @@ module GitHub
     # See: https://technet.microsoft.com/en-us/library/cc728188(v=ws.10).aspx
     #
     def global_catalog_connection
-      @global_catalog_connection ||= Net::LDAP.new({
-        host: @connection.instance_variable_get(:@host),
-        auth: @connection.instance_variable_get(:@auth),
-        instrumentation_service: @connection.instance_variable_get(:@instrumentation_service),
-        port: 3268,
-      })
+      if active_directory_capability?
+        @global_catalog_connection ||= Net::LDAP.new({
+          host: @connection.host,
+          auth: @connection.instance_variable_get(:@auth),
+          instrumentation_service: @connection.instance_variable_get(:@instrumentation_service),
+          port: 3268,
+        })
+      end
     end
 
     # Internal: Searches the host LDAP server's Root DSE for capabilities and

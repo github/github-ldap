@@ -119,7 +119,18 @@ module GitHubLdapTestCases
     assert_kind_of Net::LDAP::Entry, @ldap.capabilities
   end
 
+  def test_global_catalog_connection_is_null_if_not_active_directory
+    @ldap.expects(:active_directory_capability?).returns(false)
+    assert_equal nil, @ldap.global_catalog_connection
+  end
+
+  def test_global_catalog_connection_is_null_if_not_active_directory
+    @ldap.expects(:active_directory_capability?).returns(true)
+    refute_nil @ldap.global_catalog_connection, "Expected Global Catalog to not be nil"
+  end
+
   def test_global_catalog_returns_empty_array_for_no_results
+    @ldap.expects(:active_directory_capability?).returns(true)
     mock_global_catalog_connection = Object.new
     mock_global_catalog_connection.expects(:search).returns(nil)
     Net::LDAP.expects(:new).returns(mock_global_catalog_connection)
@@ -128,6 +139,7 @@ module GitHubLdapTestCases
   end
 
   def test_global_catalog_returns_array_of_results
+    @ldap.expects(:active_directory_capability?).returns(true)
     mock_global_catalog_connection = Object.new
     stub_entry = Object.new
     mock_global_catalog_connection.expects(:search).returns(stub_entry)
@@ -137,6 +149,7 @@ module GitHubLdapTestCases
   end
 
   def test_global_catalog_default_settings
+    @ldap.expects(:active_directory_capability?).returns(true)
     global_catalog = @ldap.global_catalog_connection
 
     assert_equal "localhost", global_catalog.host
@@ -145,6 +158,7 @@ module GitHubLdapTestCases
 
   module GitHubLdapUnauthenticatedTestCases
     def test_global_catalog_unauthenticated_default_settings
+      @ldap.expects(:active_directory_capability?).returns(true)
       global_catalog = @ldap.global_catalog_connection
       # this is ugly, but currently the only way to test Net::LDAP#auth values
       auth = global_catalog.instance_variable_get(:@auth)
@@ -156,6 +170,7 @@ module GitHubLdapTestCases
 
   module GitHubLdapAuthenticatedTestCases
     def test_global_catalog_authenticated_default_settings
+      @ldap.expects(:active_directory_capability?).returns(true)
       global_catalog = @ldap.global_catalog_connection
       # this is ugly, but currently the only way to test Net::LDAP#auth values
       auth = global_catalog.instance_variable_get(:@auth)
