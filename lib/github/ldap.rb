@@ -193,6 +193,20 @@ module GitHub
       end
     end
 
+    def global_catalog_search(options, &block)
+      options[:base] = ""
+      Array(global_catalog_connection.search(options, &block))
+    end
+
+    def global_catalog_connection
+      @global_catalog_connection ||= Net::LDAP.new({
+        host: @connection.instance_variable_get(:@host),
+        auth: @connection.instance_variable_get(:@auth),
+        instrumentation_service: @connection.instance_variable_get(:@instrumentation_service),
+        port: 3268,
+      })
+    end
+
     # Internal: Searches the host LDAP server's Root DSE for capabilities and
     # extensions.
     #
