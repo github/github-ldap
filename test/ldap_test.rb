@@ -117,12 +117,40 @@ module GitHubLdapTestCases
   def test_capabilities
     assert_kind_of Net::LDAP::Entry, @ldap.capabilities
   end
+
+  module GitHubLdapUnauthenticatedTestCases
+    def test_global_catalog_default_settings
+      global_catalog = @ldap.global_catalog_connection
+      # this is ugly, but currently the only way to test Net::LDAP#auth values
+      auth = global_catalog.instance_variable_get(:@auth)
+
+      assert_equal "localhost", global_catalog.host
+      assert_equal 3268, global_catalog.port
+      assert_equal nil, auth[:password]
+      assert_equal nil, auth[:username]
+    end
+  end
+
+  module GitHubLdapAuthenticatedTestCases
+    def test_global_catalog_default_settings
+      global_catalog = @ldap.global_catalog_connection
+      # this is ugly, but currently the only way to test Net::LDAP#auth values
+      auth = global_catalog.instance_variable_get(:@auth)
+
+      assert_equal "localhost", global_catalog.host
+      assert_equal 3268, global_catalog.port
+      assert_equal "passworD1", auth[:password]
+      assert_equal "uid=admin,dc=github,dc=com", auth[:username]
+    end
+  end
 end
 
 class GitHubLdapTest < GitHub::Ldap::Test
   include GitHubLdapTestCases
+  include GitHubLdapAuthenticatedTestCases
 end
 
 class GitHubLdapUnauthenticatedTest < GitHub::Ldap::UnauthenticatedTest
   include GitHubLdapTestCases
+  include GitHubLdapUnauthenticatedTestCases
 end
