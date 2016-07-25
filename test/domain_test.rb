@@ -1,4 +1,5 @@
 require_relative 'test_helper'
+require 'mocha/mini_test'
 
 module GitHubLdapDomainTestCases
   def setup
@@ -139,6 +140,12 @@ module GitHubLdapDomainTestCases
   def test_auth_does_not_bind
     assert user = @domain.user?('user1')
     refute @domain.auth(user, 'foo'), 'Expected user not not bind'
+  end
+
+  def test_use_global_catalog_if_active_directory
+    @ldap.stubs(:active_directory_capability?).returns(true)
+    @domain.expects(:global_catalog_search).returns([])
+    @domain.user?('user1', :attributes => [:cn])
   end
 end
 
