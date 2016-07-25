@@ -118,7 +118,12 @@ module GitHub
         options = search_options.merge \
           filter: login_filter(@uid, login),
           size: 1
-        search(options).first
+
+        if @ldap.active_directory_capability?
+          global_catalog_search(options).first
+        else
+          search(options).first
+        end
       end
 
       # Check if a user can be bound with a password.
@@ -158,6 +163,10 @@ module GitHub
         options[:paged_searches_supported] = true
 
         @ldap.search(options, &block)
+      end
+
+      def global_catalog_search(options, &block)
+        @ldap.global_catalog_search(options, &block)
       end
 
       # Get the entry for this domain.

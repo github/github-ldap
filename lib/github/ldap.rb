@@ -329,6 +329,5 @@ module GitHub
     def active_directory_capability?
       capabilities[:supportedcapabilities].include?(ACTIVE_DIRECTORY_V51_OID)
     end
-    private :active_directory_capability?
   end
 end
