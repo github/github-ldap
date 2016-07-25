@@ -68,7 +68,8 @@ module GitHub
     #
     def initialize(options = {})
       @uid = options[:uid] || "sAMAccountName"
-      @instrumentation_service = options[:instrumentation_service]
+
+      # Keep a reference to these as default auth for a Global Catalog if needed
       @admin_user = options[:admin_user]
       @admin_password = options[:admin_password]
 
