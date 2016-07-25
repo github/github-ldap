@@ -198,6 +198,11 @@ module GitHub
       Array(global_catalog_connection.search(options, &block))
     end
 
+    # Returns a late-bound, memoized connection to an Active Directory Global Catalog
+    # if the server is an Active Directory instance, otherwise returns nil.
+    #
+    # See: https://technet.microsoft.com/en-us/library/cc728188(v=ws.10).aspx
+    #
     def global_catalog_connection
       @global_catalog_connection ||= Net::LDAP.new({
         host: @connection.instance_variable_get(:@host),
