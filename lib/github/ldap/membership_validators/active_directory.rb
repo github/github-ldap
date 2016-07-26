@@ -45,7 +45,29 @@ module GitHub
 
           # membership validated if entry was matched and returned as a result
           # Active Directory DNs are case-insensitive
-          matched.map { |m| m.dn.downcase }.include?(entry.dn.downcase)
+          Array(matched).map { |m| m.dn.downcase }.include?(entry.dn.downcase)
+        end
+
+        def chase_referral(referral_entries)
+          referral = referral_entries.first
+          uri = URI(referral[:search_referrals].first)
+
+          new_filter = "(memberOf:1.2.840.113556.1.4.1941:=CN=ghe-admins,CN=Users,DC=dc4,DC=ghe,DC=local)"
+          new_auth = {:method=>:simple, :username=>"CN=Administrator,CN=Users,DC=dc4,DC=ghe,DC=local", :password=>"vagrant"}
+
+          new_base = URI.unescape(uri.path.sub(/^\//, ''))
+
+          referral_connection = Net::LDAP.new({
+            host: uri.host,
+            port: uri.port,
+            filter: new_filter,
+            base: new_base,
+            auth: new_auth,
+            instrumentation_service: ldap.instance_variable_get(:@instrumentation_service)
+          })
+
+          referral_connection.bind
+          referral_connection.search
         end
 
         # Internal: Constructs a membership filter using the "in chain"
