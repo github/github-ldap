@@ -24,11 +24,24 @@ module GitHub
           # Sets the entry to the base and scopes the search to the base,
           # according to the source documentation, found here:
           # http://msdn.microsoft.com/en-us/library/aa746475(v=vs.85).aspx
-          matched = ldap.search \
-            filter: membership_in_chain_filter(entry),
+
+          filter = membership_in_chain_filter(entry)
+          options = {
+            filter: filter,
             base:   entry.dn,
             scope:  Net::LDAP::SearchScope_BaseObject,
+            return_referrals: true,
             attributes: ATTRS
+          }
+
+          referral_entries = []
+          matched = ldap.search(options) do |ref|
+            referral_entries << ref
+          end
+
+          unless !matched.blank? || referral_entries.blank?
+            matched = chase_referral(referral_entries)
+          end
 
           # membership validated if entry was matched and returned as a result
           # Active Directory DNs are case-insensitive
