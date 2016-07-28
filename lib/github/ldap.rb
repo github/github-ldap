@@ -292,6 +292,7 @@ module GitHub
         end
     end
 
+<<<<<<< 9afe1646fef081392687f26eaab13d471e6e5a2e
     # Internal:  Set the user search strategy that will be used by
     #            Domain#user?.
     #
@@ -313,6 +314,27 @@ module GitHub
           GitHub::Ldap::UserSearch::Default.new(self)
         end
       end
+=======
+    def chase_referral(referral_entries, filter)
+      referral = referral_entries.first
+      uri = URI(referral[:search_referrals].first)
+
+      #new_filter = "(memberOf:1.2.840.113556.1.4.1941:=CN=ghe-admins,CN=Users,DC=dc4,DC=ghe,DC=local)"
+
+      new_base = URI.unescape(uri.path.sub(/^\//, ''))
+      options = {
+        filter: filter,
+        base: new_base,
+        instrumentation_service: instrumentation_service,
+        scope: Net::LDAP::SearchScope_BaseObject,
+        attributes: ["dn"]
+      }
+
+      results = []
+      referral_connection = get_connection_by_host(uri.host)
+      puts "OPTIONS #{options}"
+      referral_connection.search(options)
+>>>>>>> Moved chase_referral to ldap class
     end
 
     # Internal: Configure the member search strategy.
