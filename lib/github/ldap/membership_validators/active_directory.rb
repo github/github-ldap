@@ -3,6 +3,7 @@ module GitHub
     module MembershipValidators
       ATTRS = %w(dn)
       OID   = "1.2.840.113556.1.4.1941"
+      DN_BASE_MATCHER = /DC=.*/
 
       # Validates membership using the ActiveDirectory "in chain" matching rule.
       #
@@ -48,6 +49,9 @@ module GitHub
           Array(matched).map { |m| m.dn.downcase }.include?(entry.dn.downcase)
         end
 
+        def set_new_base_dn(filter, entry)
+          base_dn = DN_BASE_MATCHER.match(entry.dn)[0]
+          filter.to_s.sub(DN_BASE_MATCHER, base_dn)
         end
 
         # Internal: Constructs a membership filter using the "in chain"
