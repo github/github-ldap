@@ -337,6 +337,21 @@ module GitHub
 >>>>>>> Moved chase_referral to ldap class
     end
 
+    def get_connection_by_host(host, port=389, auth=nil)
+      auth ||= {:method => :simple, :username => @admin_user, :password => @admin_password}
+
+      @connections ||= Hash.new do |cache, host|
+        conn =  Net::LDAP.new({
+          host: host,
+          port: port,
+          auth: auth
+        })
+        conn.authenticate(auth[:username], auth[:password])
+        cache[host] = conn
+      end
+      @connections[host]
+    end
+
     # Internal: Configure the member search strategy.
     #
     #
