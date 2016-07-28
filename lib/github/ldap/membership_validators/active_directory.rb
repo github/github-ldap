@@ -41,7 +41,8 @@ module GitHub
           end
 
           unless !matched.blank? || referral_entries.blank?
-            matched = chase_referral(referral_entries)
+            filter = set_new_base_dn(filter, entry)
+            matched = ldap.chase_referral(referral_entries, filter)
           end
 
           # membership validated if entry was matched and returned as a result
