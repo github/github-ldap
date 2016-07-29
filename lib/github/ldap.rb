@@ -12,6 +12,7 @@ require 'github/ldap/member_search'
 require 'github/ldap/membership_validators'
 require 'github/ldap/user_search/default'
 require 'github/ldap/user_search/active_directory'
+require 'github/ldap/connection_pool'
 
 module GitHub
   class Ldap
@@ -292,7 +293,6 @@ module GitHub
         end
     end
 
-<<<<<<< 9afe1646fef081392687f26eaab13d471e6e5a2e
     # Internal:  Set the user search strategy that will be used by
     #            Domain#user?.
     #
@@ -314,24 +314,6 @@ module GitHub
           GitHub::Ldap::UserSearch::Default.new(self)
         end
       end
-=======
-    def chase_referral(referral_entries, filter)
-      referral = referral_entries.first
-      uri = URI(referral[:search_referrals].first)
-
-      new_base = URI.unescape(uri.path.sub(/^\//, ''))
-      options = {
-        filter: filter,
-        base: new_base,
-        instrumentation_service: instrumentation_service,
-        scope: Net::LDAP::SearchScope_BaseObject,
-        attributes: ["dn"]
-      }
-
-      results = []
-      referral_connection = get_connection_by_host(uri.host)
-      referral_connection.search(options)
->>>>>>> Moved chase_referral to ldap class
     end
 
     def get_connection_by_host(host, port=389, auth=nil)
