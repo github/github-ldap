@@ -319,8 +319,6 @@ module GitHub
       referral = referral_entries.first
       uri = URI(referral[:search_referrals].first)
 
-      #new_filter = "(memberOf:1.2.840.113556.1.4.1941:=CN=ghe-admins,CN=Users,DC=dc4,DC=ghe,DC=local)"
-
       new_base = URI.unescape(uri.path.sub(/^\//, ''))
       options = {
         filter: filter,
@@ -332,7 +330,6 @@ module GitHub
 
       results = []
       referral_connection = get_connection_by_host(uri.host)
-      puts "OPTIONS #{options}"
       referral_connection.search(options)
 >>>>>>> Moved chase_referral to ldap class
     end
