@@ -13,6 +13,7 @@ require 'github/ldap/membership_validators'
 require 'github/ldap/user_search/default'
 require 'github/ldap/user_search/active_directory'
 require 'github/ldap/connection_pool'
+require 'github/ldap/referral_chaser'
 
 module GitHub
   class Ldap
@@ -47,7 +48,9 @@ module GitHub
                 :member_search_strategy,
                 :instrumentation_service,
                 :user_search_strategy,
-                :connection
+                :connection,
+                :admin_user,
+                :admin_password
 
     # Build a new GitHub::Ldap instance
     #
