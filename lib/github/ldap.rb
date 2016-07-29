@@ -338,12 +338,11 @@ module GitHub
       auth ||= {:method => :simple, :username => @admin_user, :password => @admin_password}
 
       @connections ||= Hash.new do |cache, host|
-        conn =  Net::LDAP.new({
+        conn =  GitHub::Ldap.new({
           host: host,
           port: port,
           auth: auth
         })
-        conn.authenticate(auth[:username], auth[:password])
         cache[host] = conn
       end
       @connections[host]
