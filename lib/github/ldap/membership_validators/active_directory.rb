@@ -3,7 +3,6 @@ module GitHub
     module MembershipValidators
       ATTRS = %w(dn)
       OID   = "1.2.840.113556.1.4.1941"
-      DN_BASE_MATCHER = /DC=.*/
 
       # Validates membership using the ActiveDirectory "in chain" matching rule.
       #
