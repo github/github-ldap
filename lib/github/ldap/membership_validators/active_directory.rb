@@ -40,19 +40,15 @@ module GitHub
             referral_entries << ref
           end
 
-          unless !matched.blank? || referral_entries.blank?
-            filter = set_new_base_dn(filter, entry)
+          if referral_entries.present?
             matched = ldap.chase_referral(referral_entries, filter)
           end
 
           # membership validated if entry was matched and returned as a result
           # Active Directory DNs are case-insensitive
-          Array(matched).map { |m| m.dn.downcase }.include?(entry.dn.downcase)
-        end
 
-        def set_new_base_dn(filter, entry)
-          base_dn = DN_BASE_MATCHER.match(entry.dn)[0]
-          filter.to_s.sub(DN_BASE_MATCHER, base_dn)
+          result = Array(matched).map { |m| m.dn.downcase }.include?(entry.dn.downcase)
+          result
         end
 
         # Internal: Constructs a membership filter using the "in chain"
