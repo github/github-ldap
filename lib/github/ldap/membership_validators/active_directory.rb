@@ -40,14 +40,17 @@ module GitHub
           end
 
           if referral_entries.present?
-            matched = ldap.chase_referral(referral_entries, filter)
+            chaser = GitHub::Ldap::ReferralChaser.new(referral_entries, ldap.admin_user, ldap.admin_password)
+            chaser.with_referrals do |referral|
+              options[:base] = referral.search_base
+              matched = referral.connection.search(options)
+            end
           end
 
           # membership validated if entry was matched and returned as a result
           # Active Directory DNs are case-insensitive
 
           result = Array(matched).map { |m| m.dn.downcase }.include?(entry.dn.downcase)
-          result
         end
 
         # Internal: Constructs a membership filter using the "in chain"
