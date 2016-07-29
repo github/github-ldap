@@ -12,10 +12,13 @@ class GitHubLdapConnectionPoolTestCases < GitHub::Ldap::Test
     conn1 = GitHub::Ldap::ConnectionPool.get_connection({:host => "ghe.local"})
     conn2 = GitHub::Ldap::ConnectionPool.get_connection({:host => "ghe.local"})
     assert_equal conn1.object_id, conn2.object_id
+  end
 
+  def test_creates_new_connections_per_host
+    conn1 = GitHub::Ldap::ConnectionPool.get_connection({:host => "ghe.local"})
+    conn2 = GitHub::Ldap::ConnectionPool.get_connection({:host => "ghe.dev"})
     conn3 = GitHub::Ldap::ConnectionPool.get_connection({:host => "ghe.dev"})
-    conn4 = GitHub::Ldap::ConnectionPool.get_connection({:host => "ghe.dev"})
-    refute_equal conn1.object_id, conn3.object_id
-    assert_equal conn3.object_id, conn4.object_id
+    refute_equal conn1.object_id, conn2.object_id
+    assert_equal conn2.object_id, conn3.object_id
   end
 end
