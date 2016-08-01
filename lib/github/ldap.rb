@@ -10,6 +10,10 @@ require 'github/ldap/virtual_attributes'
 require 'github/ldap/instrumentation'
 require 'github/ldap/member_search'
 require 'github/ldap/membership_validators'
+require 'github/ldap/connection_cache'
+require 'github/ldap/referral_chaser'
+require 'github/ldap/url'
+require 'github/ldap/user_search/active_directory.rb'
 
 module GitHub
   class Ldap
