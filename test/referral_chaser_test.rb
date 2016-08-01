@@ -88,9 +88,4 @@ class GitHubLdapReferralChaserTestCases < GitHub::Ldap::Test
     GitHub::Ldap::ConnectionCache.expects(:get_connection).with(has_entry(host: "dc4.ghe.local"))
     GitHub::Ldap::ReferralChaser::Referral.new("ldap://dc4.ghe.local/CN=Maggie%20Mae,CN=Users,DC=dc4,DC=ghe,DC=local", "", "")
   end
-
-  def test_referral_should_use_host_from_referral_string
-    GitHub::Ldap::ConnectionCache.expects(:get_connection).with(has_entry(host: "dc4.ghe.local"))
-    GitHub::Ldap::ReferralChaser::Referral.new("ldap://dc4.ghe.local/CN=Maggie%20Mae,CN=Users,DC=dc4,DC=ghe,DC=local", "", "")
-  end
 end
