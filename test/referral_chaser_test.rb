@@ -84,6 +84,13 @@ class GitHubLdapReferralChaserTestCases < GitHub::Ldap::Test
     assert_equal(["result", "result"], results)
   end
 
+  def test_returns_referral_search_results
+    @mock_connection.expects(:search).yields({ foo: ["not a referral"] })
+
+    GitHub::Ldap::ReferralChaser::Referral.expects(:new).never
+    results = @chaser.search({})
+  end
+
   def test_referral_should_use_host_from_referral_string
     GitHub::Ldap::ConnectionCache.expects(:get_connection).with(has_entry(host: "dc4.ghe.local"))
     GitHub::Ldap::ReferralChaser::Referral.new("ldap://dc4.ghe.local/CN=Maggie%20Mae,CN=Users,DC=dc4,DC=ghe,DC=local", "", "")

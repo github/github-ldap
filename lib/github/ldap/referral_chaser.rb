@@ -44,8 +44,10 @@ module GitHub
         search_results = []
         referral_entries = []
 
-        search_results = connection.search(options) do |referral_entry|
-          referral_entries << referral_entry
+        search_results = connection.search(options) do |entry|
+          if entry[:search_referrals]
+            referral_entries << entry
+          end
         end
 
         unless referral_entries.empty?
