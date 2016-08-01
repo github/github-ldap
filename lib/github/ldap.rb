@@ -13,7 +13,9 @@ require 'github/ldap/membership_validators'
 require 'github/ldap/user_search/default'
 require 'github/ldap/user_search/active_directory'
 require 'github/ldap/connection_pool'
+require 'github/ldap/connection_cache'
 require 'github/ldap/referral_chaser'
+require 'github/ldap/url'
 
 module GitHub
   class Ldap
@@ -50,7 +52,8 @@ module GitHub
                 :user_search_strategy,
                 :connection,
                 :admin_user,
-                :admin_password
+                :admin_password,
+                :port
 
     # Build a new GitHub::Ldap instance
     #
@@ -80,6 +83,7 @@ module GitHub
       # Keep a reference to these as default auth for a Global Catalog if needed
       @admin_user = options[:admin_user]
       @admin_password = options[:admin_password]
+      @port = options[:port]
 
       @connection = Net::LDAP.new({
         host: options[:host],

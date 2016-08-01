@@ -16,11 +16,11 @@ module GitHub
           referral_entries << referral_entry
         end
 
-        referral_entries.each do |entry|
-          entry[:search_referrals].each do |referral_string|
-            referral = Referral.new(referral_string, admin_user, admin_password)
-            search_results.concat(referral.search(options))
-          end
+        unless referral_entries.empty?
+          entry = referral_entries.first
+          referral_string = entry[:search_referrals].first
+          referral = Referral.new(referral_string, admin_user, admin_password, port)
+          search_results = referral.search(options)
         end
 
         search_results
@@ -28,20 +28,27 @@ module GitHub
 
       private
 
-      attr_reader :connection, :admin_user, :admin_password
+      attr_reader :connection, :admin_user, :admin_password, :port
 
+      # Represents a referral entry from an LDAP search result. Constructs a corresponding
+      # GitHub::Ldap object from the paramaters on the referral_url and provides a #search
+      # method to continue the search on the referred domain.
       class Referral
-        def initialize(referral_string, admin_user, admin_password)
-          uri = URI(referral_string)
-          @search_base = URI.unescape(uri.path.sub(/^\//, ''))
+        def initialize(referral_url, admin_user, admin_password, port=nil)
+          url = GitHub::Ldap::URL.new(referral_url)
+          @search_base = url.dn
 
           connection_options = {
-            host: uri.host,
+            host: url.host,
+            port: port || url.port,
+            scope: url.scope,
             admin_user: admin_user,
             admin_password: admin_password
           }
 
-          @connection = GitHub::Ldap::ConnectionPool.get_connection(connection_options)
+          @connection = GitHub::Ldap::ConnectionCache.get_connection(connection_options)
+        end
+
         end
 
         attr_reader :search_base, :connection
