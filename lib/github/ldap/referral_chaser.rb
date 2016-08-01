@@ -49,6 +49,10 @@ module GitHub
           @connection = GitHub::Ldap::ConnectionCache.get_connection(connection_options)
         end
 
+        # Search the referred domain controller with options, merging in the referred search
+        # base DN onto options[:base].
+        def search(options)
+          connection.search(options.merge(base: search_base))
         end
 
         attr_reader :search_base, :connection

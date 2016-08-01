@@ -34,18 +34,10 @@ module GitHub
             attributes: ATTRS
           }
 
-          referral_entries = []
-          matched = ldap.search(options) do |ref|
-            referral_entries << ref
-          end
-
-          if referral_entries.present?
-            chaser = GitHub::Ldap::ReferralChaser.new(referral_entries, ldap.admin_user, ldap.admin_password)
-            chaser.with_referrals do |referral|
-              options[:base] = referral.search_base
-              matched = referral.connection.search(options)
-            end
-          end
+          # Chase any potential referrals for an entry that may be owned by a different
+          # domain controller.
+          chaser = GitHub::Ldap::ReferralChaser.new(ldap)
+          matched = chaser.search(options)
 
           # membership validated if entry was matched and returned as a result
           # Active Directory DNs are case-insensitive
