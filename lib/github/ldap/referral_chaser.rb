@@ -1,13 +1,45 @@
 module GitHub
   class Ldap
+
+    # This class adds referral chasing capability to a GitHub::Ldap connection.
+    #
+    # See: https://technet.microsoft.com/en-us/library/cc978014.aspx
+    #      http://www.umich.edu/~dirsvcs/ldap/doc/other/ldap-ref.html
+    #
     class ReferralChaser
 
+      # Public - Creates a ReferralChaser that decorates an instance of GitHub::Ldap
+      # with additional functionality to the #search method, allowing it to chase
+      # any referral entries and aggregate the results into a single response.
+      #
+      # connection - The instance of GitHub::Ldap to use for searching. Will use
+      # the connection's authentication, (admin_user and admin_password) as credentials
+      # for connecting to referred domain controllers.
       def initialize(connection)
         @connection = connection
         @admin_user = connection.admin_user
         @admin_password = connection.admin_password
+        @port = connection.port
       end
 
+      # Public - Search the domain controller represented by this instance's connection.
+      # If a referral is returned, search only one of the domain controllers indicated
+      # by the referral entries, per RFC 4511 (https://tools.ietf.org/html/rfc4511):
+      #
+      # "If the client wishes to progress the operation, it contacts one of
+      #  the supported services found in the referral.  If multiple URIs are
+      #  present, the client assumes that any supported URI may be used to
+      #  progress the operation."
+      #
+      # options - is a hash with the same options that Net::LDAP::Connection#search supports.
+      #           Referral searches will use the given options, but will replace options[:base]
+      #           with the referral URL's base search dn.
+      #
+      # Does not take a block argument as GitHub::Ldap and Net::LDAP::Connection#search do.
+      #
+      # Will not recursively follow any subsequent referrals.
+      #
+      # Returns an Array of Net::LDAP::Entry.
       def search(options)
         search_results = []
         referral_entries = []
