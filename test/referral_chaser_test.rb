@@ -1,47 +1,96 @@
 require_relative 'test_helper'
+require 'mocha/mini_test'
 
 class GitHubLdapReferralChaserTestCases < GitHub::Ldap::Test
 
   def setup
-    referral_entries = [
-      {:search_referrals => ["ldap://dc4.ghe.local/CN=Maggie%20Mae,CN=Users,DC=dc4,DC=ghe,DC=local"]}
-    ]
-    @chaser = GitHub::Ldap::ReferralChaser.new(referral_entries, "admin1", "passworD1")
+    @mock_connection = GitHub::Ldap.new({
+        admin_user: "Joe",
+        admin_password: "passworD1",
+        port: 888
+    })
+    @chaser = GitHub::Ldap::ReferralChaser.new(@mock_connection)
   end
 
-  def test_creates_connection
-    @chaser.with_referrals do |referral|
-      assert_equal GitHub::Ldap, referral.connection.class
-    end
+  def test_creates_referral_with_connection_credentials
+    @mock_connection.expects(:search).yields({ search_referrals: ["referral string"]}).returns([])
+
+    referral = Object.new
+    referral.stubs(:search).returns([])
+
+    GitHub::Ldap::ReferralChaser::Referral.expects(:new)
+      .with("referral string", "Joe", "passworD1", 888)
+      .returns(referral)
+
+    @chaser.search({})
   end
 
-  def test_returns_url_escaped_search_base
-    @chaser.with_referrals do |referral|
-      assert_equal "CN=Maggie Mae,CN=Users,DC=dc4,DC=ghe,DC=local", referral.search_base
-    end
+  def test_creates_referral_with_default_port
+    mock_connection = GitHub::Ldap.new({
+        admin_user: "Joe",
+        admin_password: "passworD1"
+    })
+    mock_connection.expects(:search).yields({ search_referrals: ["ldap://dc1.ghe.local/CN=Maggie%20Mae,CN=Users,DC=dc4,DC=ghe,DC=local"]}).returns([])
+
+    stub_conn = Object.new
+    stub_conn.stubs(:search).returns([])
+    GitHub::Ldap::ConnectionCache.expects(:get_connection).with(has_entry(port: 389)).returns(stub_conn)
+    chaser = GitHub::Ldap::ReferralChaser.new(mock_connection)
+    chaser.search({})
   end
 
-  def test_executes_for_every_entry
-    referral_entries = [
-      {:search_referrals => ["test1"]},
-      {:search_referrals => ["test2"]}
-    ]
-    chaser = GitHub::Ldap::ReferralChaser.new(referral_entries, "admin1", "passworD1")
+  def test_creates_referral_for_first_referral_string
+    @mock_connection.expects(:search).multiple_yields([
+      { search_referrals:
+        ["ldap://dc1.ghe.local/CN=Maggie%20Mae,CN=Users,DC=dc4,DC=ghe,DC=local",
+         "ldap://dc2.ghe.local/CN=Maggie%20Mae,CN=Users,DC=dc4,DC=ghe,DC=local"]
+      }
+    ],[
+      { search_referrals:
+        ["ldap://dc3.ghe.local/CN=Maggie%20Mae,CN=Users,DC=dc4,DC=ghe,DC=local",
+         "ldap://dc4.ghe.local/CN=Maggie%20Mae,CN=Users,DC=dc4,DC=ghe,DC=local"]
+      }
+    ]).returns([])
 
-    called = 0
-    chaser.with_referrals { called += 1 }
-    assert_equal 2, called
+    referral = Object.new
+    referral.stubs(:search).returns([])
+
+    GitHub::Ldap::ReferralChaser::Referral.expects(:new)
+      .with("ldap://dc1.ghe.local/CN=Maggie%20Mae,CN=Users,DC=dc4,DC=ghe,DC=local", "Joe", "passworD1", 888)
+      .returns(referral)
+
+    @chaser.search({})
   end
 
-  def test_executes_for_every_referral
-    referral_entries = [
-      {:search_referrals => ["test1"]},
-      {:search_referrals => ["test2", "test3"]}
-    ]
-    chaser = GitHub::Ldap::ReferralChaser.new(referral_entries, "admin1", "passworD1")
+  def test_returns_referral_search_results
+    @mock_connection.expects(:search).multiple_yields([
+      { search_referrals:
+        ["ldap://dc1.ghe.local/CN=Maggie%20Mae,CN=Users,DC=dc4,DC=ghe,DC=local",
+         "ldap://dc2.ghe.local/CN=Maggie%20Mae,CN=Users,DC=dc4,DC=ghe,DC=local"]
+      }
+    ],[
+      { search_referrals:
+        ["ldap://dc3.ghe.local/CN=Maggie%20Mae,CN=Users,DC=dc4,DC=ghe,DC=local",
+         "ldap://dc4.ghe.local/CN=Maggie%20Mae,CN=Users,DC=dc4,DC=ghe,DC=local"]
+      }
+    ]).returns([])
 
-    called = 0
-    chaser.with_referrals { called += 1 }
-    assert_equal 3, called
+    referral = Object.new
+    referral.expects(:search).returns(["result", "result"])
+
+    GitHub::Ldap::ReferralChaser::Referral.expects(:new).returns(referral)
+
+    results = @chaser.search({})
+    assert_equal(["result", "result"], results)
+  end
+
+  def test_referral_should_use_host_from_referral_string
+    GitHub::Ldap::ConnectionCache.expects(:get_connection).with(has_entry(host: "dc4.ghe.local"))
+    GitHub::Ldap::ReferralChaser::Referral.new("ldap://dc4.ghe.local/CN=Maggie%20Mae,CN=Users,DC=dc4,DC=ghe,DC=local", "", "")
+  end
+
+  def test_referral_should_use_host_from_referral_string
+    GitHub::Ldap::ConnectionCache.expects(:get_connection).with(has_entry(host: "dc4.ghe.local"))
+    GitHub::Ldap::ReferralChaser::Referral.new("ldap://dc4.ghe.local/CN=Maggie%20Mae,CN=Users,DC=dc4,DC=ghe,DC=local", "", "")
   end
 end
