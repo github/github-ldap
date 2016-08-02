@@ -36,13 +36,16 @@ module GitHub
 
           # Chase any potential referrals for an entry that may be owned by a different
           # domain controller.
-          chaser = GitHub::Ldap::ReferralChaser.new(ldap)
-          matched = chaser.search(options)
+          matched = referral_chaser.search(options)
 
           # membership validated if entry was matched and returned as a result
           # Active Directory DNs are case-insensitive
 
           result = Array(matched).map { |m| m.dn.downcase }.include?(entry.dn.downcase)
+        end
+
+        def referral_chaser
+          @referral_chaser ||= GitHub::Ldap::ReferralChaser.new(@ldap)
         end
 
         # Internal: Constructs a membership filter using the "in chain"
