@@ -6,8 +6,6 @@ module GitHub
         # Public - Overridden from base class to set the base to "", and use the
         # Global Catalog to perform the user search.
         def search(search_options)
-          # when doing a global search for a user's DN, set the search base to blank
-          options[:base] = ""
           Array(global_catalog_connection.search(search_options.merge(options)))
         end
 
@@ -18,6 +16,11 @@ module GitHub
         #
         def global_catalog_connection
           GlobalCatalog.connection(ldap)
+        end
+
+        # When doing a global search for a user's DN, set the search base to blank
+        def options
+          super.merge(base: "")
         end
       end
 
