@@ -42,28 +42,4 @@ class GitHubLdapActiveDirectoryUserSearchTests < GitHub::Ldap::Test
     assert_equal 3268, global_catalog.port
     assert_equal "MockInstrumentationService", instrumentation_service.class.name
   end
-
-  module GitHubLdapUnauthenticatedTestCases
-    def test_global_catalog_unauthenticated_default_settings
-      @ad_user_search.expects(:active_directory_capability?).returns(true)
-      global_catalog = @ad_user_search.global_catalog_connection
-      # this is ugly, but currently the only way to test Net::LDAP#auth values
-      auth = global_catalog.instance_variable_get(:@auth)
-
-      assert_equal nil, auth[:password]
-      assert_equal nil, auth[:username]
-    end
-  end
-
-  module GitHubLdapAuthenticatedTestCases
-    def test_global_catalog_authenticated_default_settings
-      @ad_user_search.expects(:active_directory_capability?).returns(true)
-      global_catalog = @ad_user_search.global_catalog_connection
-      # this is ugly, but currently the only way to test Net::LDAP#auth values
-      auth = global_catalog.instance_variable_get(:@auth)
-
-      assert_equal "passworD1", auth[:password]
-      assert_equal "uid=admin,dc=github,dc=com", auth[:username]
-    end
-  end
 end
