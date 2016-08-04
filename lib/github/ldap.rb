@@ -107,7 +107,7 @@ module GitHub
       configure_search_strategy(options[:search_strategy])
 
       # configure both the membership validator and the member search strategies
-      configure_user_search_strategy(options[:global_catalog_user_search])
+      configure_user_search_strategy(options[:user_search_strategy])
 
       # enables instrumenting queries
       @instrumentation_service = options[:instrumentation_service]
@@ -292,10 +292,17 @@ module GitHub
         end
     end
 
-    def configure_user_search_strategy(global_catalog_user_search)
+    def configure_user_search_strategy(strategy)
       @user_search_strategy = begin
-        if global_catalog_user_search && active_directory_capability?
-          GitHub::Ldap::UserSearch::ActiveDirectory.new(self)
+        case strategy.to_s
+        when "default"
+          GitHub::Ldap::UserSearch::Default.new(self)
+        when "global_catalog"
+          if active_directory_capability?
+            GitHub::Ldap::UserSearch::ActiveDirectory.new(self)
+          else
+            GitHub::Ldap::UserSearch::Default.new(self)
+          end
         else
           GitHub::Ldap::UserSearch::Default.new(self)
         end
