@@ -116,8 +116,19 @@ module GitHubLdapTestCases
   end
 
   def test_user_search_strategy_active_directory_when_configured_and_has_capability
+    @ldap.stubs(:active_directory_capability?).returns(true)
     @ldap.configure_user_search_strategy true
-    @ldap.stubs(:active_directory_capability).returns(false)
+    assert_equal GitHub::Ldap::UserSearch::ActiveDirectory, @ldap.user_search_strategy.class
+  end
+
+  def test_user_search_strategy_not_active_directory_without_capability
+    @ldap.stubs(:active_directory_capability?).returns(false)
+    @ldap.configure_user_search_strategy true
+    assert_equal GitHub::Ldap::UserSearch::Default, @ldap.user_search_strategy.class
+  end
+
+  def test_user_search_strategy_default_when_configured
+    @ldap.configure_user_search_strategy false
     assert_equal GitHub::Ldap::UserSearch::Default, @ldap.user_search_strategy.class
   end
 
