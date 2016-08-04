@@ -310,11 +310,7 @@ module GitHub
         when "default"
           GitHub::Ldap::UserSearch::Default.new(self)
         when "global_catalog"
-          if active_directory_capability?
-            GitHub::Ldap::UserSearch::ActiveDirectory.new(self)
-          else
-            GitHub::Ldap::UserSearch::Default.new(self)
-          end
+          GitHub::Ldap::UserSearch::ActiveDirectory.new(self)
         else
           GitHub::Ldap::UserSearch::Default.new(self)
         end

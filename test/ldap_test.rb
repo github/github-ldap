@@ -121,14 +121,15 @@ module GitHubLdapTestCases
     assert_kind_of GitHub::Ldap::UserSearch::ActiveDirectory, @ldap.user_search_strategy
   end
 
-  def test_user_search_strategy_not_active_directory_without_capability
+  def test_user_search_strategy_is_active_directory_even_without_capability
     @ldap.stubs(:active_directory_capability?).returns(false)
     @ldap.configure_user_search_strategy("global_catalog")
-    assert_kind_of GitHub::Ldap::UserSearch::Default, @ldap.user_search_strategy
+    assert_kind_of GitHub::Ldap::UserSearch::ActiveDirectory, @ldap.user_search_strategy
   end
 
   def test_user_search_strategy_default_when_configured
     @ldap.configure_user_search_strategy("default")
+    refute_kind_of GitHub::Ldap::UserSearch::ActiveDirectory, @ldap.user_search_strategy
     assert_kind_of GitHub::Ldap::UserSearch::Default, @ldap.user_search_strategy
   end
 
