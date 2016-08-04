@@ -132,6 +132,14 @@ module GitHubLdapDomainTestCases
     assert_equal [:dn, :cn], entry.attribute_names
   end
 
+  def test_user_returns_subset_of_attributes_for_global_catalog_search
+    @ldap.stubs(:active_directory_capability?).returns(true)
+    @ldap.configure_user_search_strategy(true)
+    assert_equal GitHub::Ldap::UserSearch::ActiveDirectory, @ldap.user_search_strategy.class
+    assert entry = @domain.user?('user1', :attributes => [:cn])
+    assert_equal [:dn, :cn], entry.attribute_names
+  end
+
   def test_auth_binds
     assert user = @domain.user?('user1')
     assert @domain.auth(user, 'passworD1'), 'Expected user to bind'
@@ -142,30 +150,13 @@ module GitHubLdapDomainTestCases
     refute @domain.auth(user, 'foo'), 'Expected user not not bind'
   end
 
-  def test_use_global_catalog_if_active_directory
-    @ldap.stubs(:active_directory_capability?).returns(true)
-    @ldap.expects(:global_catalog_search).returns([])
-    @domain.user?('user1', :attributes => [:cn])
-  end
-
-  def test_global_catalog_search_returns_first_entry
-    @ldap.stubs(:active_directory_capability?).returns(true)
+  def test_user_search_returns_first_entry
     entry = Object.new
-    @ldap.expects(:global_catalog_search).returns([entry])
+    search_strategy = Object.new
+    search_strategy.stubs(:perform).returns([entry])
+    @ldap.expects(:user_search_strategy).returns(search_strategy)
     user = @domain.user?('user1', :attributes => [:cn])
     assert_equal entry, user
-  end
-
-  def test_global_catalog_has_empty_search_base
-    @ldap.stubs(:active_directory_capability?).returns(true)
-    @ldap.expects(:global_catalog_search).with(has_entry(:base => "")).returns([])
-    @domain.user?('user1', :attributes => [:cn])
-  end
-
-  def test_use_default_search_if_not_active_directory
-    @ldap.stubs(:active_directory_capability?).returns(false)
-    @domain.expects(:search).returns([])
-    @domain.user?('user1', :attributes => [:cn])
   end
 end
 
