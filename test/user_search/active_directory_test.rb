@@ -8,20 +8,11 @@ class GitHubLdapActiveDirectoryUserSearchTests < GitHub::Ldap::Test
     @ad_user_search = GitHub::Ldap::UserSearch::ActiveDirectory.new(@ldap)
   end
 
-  def test_global_catalog_connection_is_null_if_not_active_directory
-    @ad_user_search.expects(:active_directory_capability?).returns(false)
-    assert_nil @ad_user_search.global_catalog_connection
-  end
-
-  def test_global_catalog_connection_is_null_if_not_active_directory
-    refute_nil @ad_user_search.global_catalog_connection
-  end
-
   def test_global_catalog_returns_empty_array_for_no_results
     mock_global_catalog_connection = Object.new
     mock_global_catalog_connection.expects(:search).returns(nil)
     Net::LDAP.expects(:new).returns(mock_global_catalog_connection)
-    results = @ad_user_search.global_catalog_search({})
+    results = @ad_user_search.perform("login", "CN=Joe", "uid", {})
     assert_equal [], results
   end
 
@@ -30,8 +21,15 @@ class GitHubLdapActiveDirectoryUserSearchTests < GitHub::Ldap::Test
     stub_entry = Object.new
     mock_global_catalog_connection.expects(:search).returns(stub_entry)
     Net::LDAP.expects(:new).returns(mock_global_catalog_connection)
-    results = @ad_user_search.global_catalog_search({})
+    results = @ad_user_search.perform("login", "CN=Joe", "uid", {})
     assert_equal [stub_entry], results
+  end
+
+  def test_searches_with_empty_base_dn
+    mock_global_catalog_connection = Object.new
+    mock_global_catalog_connection.expects(:search).with(has_entry(:base => ""))
+    Net::LDAP.expects(:new).returns(mock_global_catalog_connection)
+    @ad_user_search.perform("login", "CN=Joe", "uid", {})
   end
 
   def test_global_catalog_default_settings
