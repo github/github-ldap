@@ -9,10 +9,11 @@ module GitHub
 
         def initialize(ldap)
           @ldap = ldap
-          @options = {}
-          @options[:attributes] = []
-          @options[:paged_searches_supported] = true
-          @options[:size] = 1
+          @options = {
+            :attributes => [],
+            :paged_searches_supported => true,
+            :size => 1
+          }
         end
 
         # Performs a normal search on the configured domain controller
