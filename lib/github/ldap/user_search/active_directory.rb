@@ -3,18 +3,20 @@ module GitHub
     module UserSearch
       class ActiveDirectory < Default
 
-        # Public - Overridden from base class to set the base to "", and use the
-        # Global Catalog to perform the user search.
-        def search(search_options)
-          Array(global_catalog_connection.search(search_options.merge(options)))
-        end
-
         # Returns a connection to the Active Directory Global Catalog
         #
         # See: https://technet.microsoft.com/en-us/library/cc728188(v=ws.10).aspx
         #
         def global_catalog_connection
           GlobalCatalog.connection(ldap)
+        end
+
+        private
+
+        # Private - Overridden from base class to set the base to "", and use the
+        # Global Catalog to perform the user search.
+        def search(search_options)
+          Array(global_catalog_connection.search(search_options.merge(options)))
         end
 
         # When doing a global search for a user's DN, set the search base to blank
