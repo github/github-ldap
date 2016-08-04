@@ -115,17 +115,7 @@ module GitHub
       # Returns the user if the login matches any `uid`.
       # Returns nil if there are no matches.
       def user?(login, search_options = {})
-        options = search_options.merge \
-          filter: login_filter(@uid, login),
-          size: 1
-
-        if @ldap.active_directory_capability?
-          # when doing a global search for a user's DN, set the search base to blank
-          options[:base] = ""
-          @ldap.global_catalog_search(options).first
-        else
-          search(options).first
-        end
+        @ldap.ldap_user_search_strategy.perform(login, @base_name, @uid, search_options)
       end
 
       # Check if a user can be bound with a password.
