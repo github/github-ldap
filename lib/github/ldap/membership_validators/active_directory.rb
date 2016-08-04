@@ -36,7 +36,7 @@ module GitHub
 
           # membership validated if entry was matched and returned as a result
           # Active Directory DNs are case-insensitive
-          result = Array(matched).map { |m| m.dn.downcase }.include?(entry.dn.downcase)
+          Array(matched).map { |m| m.dn.downcase }.include?(entry.dn.downcase)
         end
 
         def referral_chaser
