@@ -115,14 +115,7 @@ module GitHubLdapTestCases
     assert_equal GitHub::Ldap::MemberSearch::Recursive,         @ldap.member_search_strategy
   end
 
-  def test_user_search_strategy_global_catalog_when_configured_and_has_capability
-    @ldap.stubs(:active_directory_capability?).returns(true)
-    @ldap.configure_user_search_strategy("global_catalog")
-    assert_kind_of GitHub::Ldap::UserSearch::ActiveDirectory, @ldap.user_search_strategy
-  end
-
-  def test_user_search_strategy_is_active_directory_even_without_capability
-    @ldap.stubs(:active_directory_capability?).returns(false)
+  def test_user_search_strategy_global_catalog_when_configured
     @ldap.configure_user_search_strategy("global_catalog")
     assert_kind_of GitHub::Ldap::UserSearch::ActiveDirectory, @ldap.user_search_strategy
   end
