@@ -3,18 +3,12 @@ module GitHub
     module UserSearch
       class ActiveDirectory < Default
 
-        def initialize(ldap)
-          @ldap = ldap
-        end
-
-        def search(options)
+        # Public - Overridden from base class to set the base to "", and use the
+        # Global Catalog to perform the user search.
+        def search(search_options)
           # when doing a global search for a user's DN, set the search base to blank
           options[:base] = ""
-          global_catalog_search(options).first
-        end
-
-        def global_catalog_search(options, &block)
-          Array(global_catalog_connection.search(options, &block))
+          Array(global_catalog_connection.search(search_options.merge(options)))
         end
 
         # Returns a memoized connection to an Active Directory Global Catalog
