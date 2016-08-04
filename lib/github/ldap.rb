@@ -301,9 +301,7 @@ module GitHub
     #            to the controller's domain context.
     #            'global_catalog' will search the entire forest
     #            using Active Directory's Global Catalog
-    #            functionality. If the server is not an Active
-    #            Directory, will use the default strategy regardless
-    #            of the requested configuration.
+    #            functionality.
     def configure_user_search_strategy(strategy)
       @user_search_strategy = begin
         case strategy.to_s
