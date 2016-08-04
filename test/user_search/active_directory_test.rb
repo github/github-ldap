@@ -38,6 +38,8 @@ class GitHubLdapActiveDirectoryUserSearchTests < GitHub::Ldap::Test
 
     auth = global_catalog.instance_variable_get(:@auth)
     assert_equal :simple, auth[:method]
+    assert_equal "uid=admin,dc=github,dc=com", auth[:username]
+    assert_equal "passworD1", auth[:password]
     assert_equal "127.0.0.1", global_catalog.host
     assert_equal 3268, global_catalog.port
     assert_equal "MockInstrumentationService", instrumentation_service.class.name

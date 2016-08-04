@@ -15,6 +15,6 @@ class GitHubLdapActiveDirectoryUserSearchTests < GitHub::Ldap::Test
       base: "CN=HI,CN=McDunnough",
       filter: kind_of(Net::LDAP::Filter)
     ))
-    results = @default_user_search.perform("","CN=HI,CN=McDunnough","",{})
+    @default_user_search.perform("","CN=HI,CN=McDunnough","",{})
   end
 end
