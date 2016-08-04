@@ -300,7 +300,6 @@ module GitHub
         end
     end
 
-<<<<<<< 96ba488c1e07d7a1f95f1287414805c3b0493b4c
     # Internal:  Set the user search strategy that will be used by
     #            Domain#user?.
     #
