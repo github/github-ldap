@@ -17,21 +17,30 @@ module GitHub
         # See: https://technet.microsoft.com/en-us/library/cc728188(v=ws.10).aspx
         #
         def global_catalog_connection
-          @global_catalog_connection ||= Net::LDAP.new({
-            host: ldap.instance_variable_get(:@host),
-            auth: {
-              method: :simple,
-              username: ldap.instance_variable_get(:@admin_user),
-              password: ldap.instance_variable_get(:@admin_password)
-            },
-            instrumentation_service: ldap.instrumentation_service,
-            port: 3268,
-          })
+          GlobalCatalog.connection(ldap)
         end
+      end
 
-        private
+      class GlobalCatalog < Net::LDAP
+        STANDARD_GC_PORT = 3268
+        LDAPS_GC_PORT = 3269
 
-        attr_reader :ldap
+        def self.connection(ldap)
+          @global_catalog_instance ||= begin
+            netldap = ldap.connection
+            # This is ugly, but Net::LDAP doesn't expose encryption or auth
+            encryption = netldap.instance_variable_get(:@encryption)
+            auth = netldap.instance_variable_get(:@auth)
+
+            new({
+              host: ldap.instance_variable_get(:@host),
+              instrumentation_service: ldap.instrumentation_service,
+              port: encryption ? LDAPS_GC_PORT : STANDARD_GC_PORT,
+              auth: auth,
+              encryption: encryption
+            })
+          end
+        end
       end
     end
   end

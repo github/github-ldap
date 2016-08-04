@@ -45,7 +45,8 @@ module GitHub
                 :membership_validator,
                 :member_search_strategy,
                 :instrumentation_service,
-                :user_search_strategy
+                :user_search_strategy,
+                :connection
 
     # Build a new GitHub::Ldap instance
     #
