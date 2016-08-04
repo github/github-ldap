@@ -15,7 +15,7 @@ module GitHub
         def perform(login, base_name, uid, search_options)
           search_options[:filter] = login_filter(uid, login)
           search_options[:base] = base_name
-          search(search_options.merge(options))
+          search(options.merge(search_options))
         end
 
         def search(options)
