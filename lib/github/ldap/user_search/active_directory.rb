@@ -37,7 +37,7 @@ module GitHub
             auth = netldap.instance_variable_get(:@auth)
 
             new({
-              host: ldap.instance_variable_get(:@host),
+              host: ldap.host,
               instrumentation_service: ldap.instrumentation_service,
               port: encryption ? LDAPS_GC_PORT : STANDARD_GC_PORT,
               auth: auth,

@@ -43,6 +43,7 @@ module GitHub
     #
     # Returns the return value of the block.
     def_delegator :@connection, :open
+    def_delegator :@connection, :host
 
     attr_reader :uid, :search_domains, :virtual_attributes,
                 :membership_validator,

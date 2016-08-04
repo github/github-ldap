@@ -4,7 +4,7 @@ require 'mocha/mini_test'
 class GitHubLdapActiveDirectoryUserSearchTests < GitHub::Ldap::Test
 
   def setup
-    @ldap = GitHub::Ldap.new(options)
+    @ldap = GitHub::Ldap.new(options.merge(host: 'ghe.dev'))
     @ad_user_search = GitHub::Ldap::UserSearch::ActiveDirectory.new(@ldap)
   end
 
@@ -33,14 +33,14 @@ class GitHubLdapActiveDirectoryUserSearchTests < GitHub::Ldap::Test
   end
 
   def test_global_catalog_default_settings
-    global_catalog = @ad_user_search.global_catalog_connection
+    global_catalog = GitHub::Ldap::UserSearch::GlobalCatalog.connection(@ldap)
     instrumentation_service = global_catalog.instance_variable_get(:@instrumentation_service)
 
     auth = global_catalog.instance_variable_get(:@auth)
     assert_equal :simple, auth[:method]
     assert_equal "uid=admin,dc=github,dc=com", auth[:username]
     assert_equal "passworD1", auth[:password]
-    assert_equal "127.0.0.1", global_catalog.host
+    assert_equal "ghe.dev", global_catalog.host
     assert_equal 3268, global_catalog.port
     assert_equal "MockInstrumentationService", instrumentation_service.class.name
   end
