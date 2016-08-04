@@ -12,7 +12,6 @@ require 'github/ldap/member_search'
 require 'github/ldap/membership_validators'
 require 'github/ldap/user_search/default'
 require 'github/ldap/user_search/active_directory'
-require 'github/ldap/connection_pool'
 require 'github/ldap/connection_cache'
 require 'github/ldap/referral_chaser'
 require 'github/ldap/url'
@@ -374,7 +373,5 @@ module GitHub
     def active_directory_capability?
       capabilities[:supportedcapabilities].include?(ACTIVE_DIRECTORY_V51_OID)
     end
-
-    attr_reader :admin_user, :admin_password
   end
 end
