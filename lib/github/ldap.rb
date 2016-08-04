@@ -362,9 +362,6 @@ module GitHub
         end
     end
 
-
-    private
-
     # Internal: Detect whether the LDAP host is an ActiveDirectory server.
     #
     # See: http://msdn.microsoft.com/en-us/library/cc223359.aspx.
@@ -373,5 +370,6 @@ module GitHub
     def active_directory_capability?
       capabilities[:supportedcapabilities].include?(ACTIVE_DIRECTORY_V51_OID)
     end
+    private :active_directory_capability?
   end
 end
