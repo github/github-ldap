@@ -44,7 +44,8 @@ module GitHub
     attr_reader :uid, :search_domains, :virtual_attributes,
                 :membership_validator,
                 :member_search_strategy,
-                :instrumentation_service
+                :instrumentation_service,
+                :user_search_strategy
 
     # Build a new GitHub::Ldap instance
     #
@@ -103,6 +104,9 @@ module GitHub
 
       # configure both the membership validator and the member search strategies
       configure_search_strategy(options[:search_strategy])
+
+      # configure both the membership validator and the member search strategies
+      configure_user_search_strategy(options[:global_catalog_user_search])
 
       # enables instrumenting queries
       @instrumentation_service = options[:instrumentation_service]
@@ -313,6 +317,16 @@ module GitHub
             GitHub::Ldap::MembershipValidators::Recursive
           end
         end
+    end
+
+    def configure_user_search_strategy(global_catalog_user_search)
+      @user_search_strategy = begin
+        if global_catalog_user_search && active_directory_capability?
+          GitHub::Ldap::UserSearch::ActiveDirectory.new(self)
+        else
+          GitHub::Ldap::UserSearch::Default.new(self)
+        end
+      end
     end
 
     # Internal: Configure the member search strategy.

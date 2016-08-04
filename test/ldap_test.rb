@@ -115,6 +115,12 @@ module GitHubLdapTestCases
     assert_equal GitHub::Ldap::MemberSearch::Recursive,         @ldap.member_search_strategy
   end
 
+  def test_user_search_strategy_active_directory_when_configured_and_has_capability
+    @ldap.configure_user_search_strategy true
+    @ldap.stubs(:active_directory_capability).returns(false)
+    assert_equal GitHub::Ldap::UserSearch::Default, @ldap.user_search_strategy.class
+  end
+
   def test_capabilities
     assert_kind_of Net::LDAP::Entry, @ldap.capabilities
   end

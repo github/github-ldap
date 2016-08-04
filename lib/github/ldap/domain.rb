@@ -115,7 +115,7 @@ module GitHub
       # Returns the user if the login matches any `uid`.
       # Returns nil if there are no matches.
       def user?(login, search_options = {})
-        @ldap.ldap_user_search_strategy.perform(login, @base_name, @uid, search_options)
+        @ldap.user_search_strategy.perform(login, @base_name, @uid, search_options).first
       end
 
       # Check if a user can be bound with a password.
