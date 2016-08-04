@@ -9,8 +9,7 @@ module GitHub
           Array(global_catalog_connection.search(search_options.merge(options)))
         end
 
-        # Returns a memoized connection to an Active Directory Global Catalog
-        # if the server is an Active Directory instance, otherwise returns nil.
+        # Returns a connection to the Active Directory Global Catalog
         #
         # See: https://technet.microsoft.com/en-us/library/cc728188(v=ws.10).aspx
         #
