@@ -128,10 +128,8 @@ end
 
 class GitHubLdapTest < GitHub::Ldap::Test
   include GitHubLdapTestCases
-  include GitHubLdapAuthenticatedTestCases
 end
 
 class GitHubLdapUnauthenticatedTest < GitHub::Ldap::UnauthenticatedTest
   include GitHubLdapTestCases
-  include GitHubLdapUnauthenticatedTestCases
 end

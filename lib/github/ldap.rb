@@ -203,34 +203,6 @@ module GitHub
       end
     end
 
-    # Public - Search entries in the configured Active Directory Global Catalog
-    #
-    # options: is a hash with the same options that Net::LDAP::Connection#search supports.
-    # block: is an optional block to pass to the search.
-    #
-    # see: http://msdn.microsoft.com/en-us/library/cc223359.aspx.
-    #
-    # Returns an Array of Net::LDAP::Entry.
-    def global_catalog_search(options, &block)
-      Array(global_catalog_connection.search(options, &block))
-    end
-
-    # Returns a memoized connection to an Active Directory Global Catalog
-    # if the server is an Active Directory instance, otherwise returns nil.
-    #
-    # See: https://technet.microsoft.com/en-us/library/cc728188(v=ws.10).aspx
-    #
-    def global_catalog_connection
-      if active_directory_capability?
-        @global_catalog_connection ||= Net::LDAP.new({
-          host: @connection.host,
-          auth: {method: :simple, username: admin_user, password: admin_password},
-          instrumentation_service: instrumentation_service,
-          port: 3268,
-        })
-      end
-    end
-
     # Public: Searches the host LDAP server's Root DSE for capabilities and
     # extensions.
     #
