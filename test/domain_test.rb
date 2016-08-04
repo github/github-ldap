@@ -132,14 +132,6 @@ module GitHubLdapDomainTestCases
     assert_equal [:dn, :cn], entry.attribute_names
   end
 
-  def test_user_returns_subset_of_attributes_for_global_catalog_search
-    @ldap.stubs(:active_directory_capability?).returns(true)
-    @ldap.configure_user_search_strategy(true)
-    assert_equal GitHub::Ldap::UserSearch::ActiveDirectory, @ldap.user_search_strategy.class
-    assert entry = @domain.user?('user1', :attributes => [:cn])
-    assert_equal [:dn, :cn], entry.attribute_names
-  end
-
   def test_auth_binds
     assert user = @domain.user?('user1')
     assert @domain.auth(user, 'passworD1'), 'Expected user to bind'
