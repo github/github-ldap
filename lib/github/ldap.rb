@@ -204,7 +204,7 @@ module GitHub
       end
     end
 
-    # Public: Searches the host LDAP server's Root DSE for capabilities and
+    # Internal: Searches the host LDAP server's Root DSE for capabilities and
     # extensions.
     #
     # Returns a Net::LDAP::Entry object.
@@ -292,6 +292,18 @@ module GitHub
         end
     end
 
+    # Internal:  Set the user search strategy that will be used by
+    #            Domain#user?.
+    #
+    # strategy - Can be either 'default' or 'global_catalog'.
+    #            'default' strategy will search the configured
+    #            domain controller with a search base relative
+    #            to the controller's domain context.
+    #            'global_catalog' will search the entire forest
+    #            using Active Directory's Global Catalog
+    #            functionality. If the server is not an Active
+    #            Directory, will use the default strategy regardless
+    #            of the requested configuration.
     def configure_user_search_strategy(strategy)
       @user_search_strategy = begin
         case strategy.to_s
