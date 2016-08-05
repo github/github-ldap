@@ -6,7 +6,7 @@ class GitHubLdapReferralChaserTestCases < GitHub::Ldap::Test
     @mock_connection = GitHub::Ldap.new({
         admin_user: "Joe",
         admin_password: "passworD1",
-        port: 888
+        port: 389
     })
     @chaser = GitHub::Ldap::ReferralChaser.new(@mock_connection)
   end
@@ -18,7 +18,7 @@ class GitHubLdapReferralChaserTestCases < GitHub::Ldap::Test
     referral.stubs(:search).returns([])
 
     GitHub::Ldap::ReferralChaser::Referral.expects(:new)
-      .with("referral string", "Joe", "passworD1", 888)
+      .with("referral string", "Joe", "passworD1", 389)
       .returns(referral)
 
     @chaser.search({})
