@@ -49,14 +49,18 @@ module GitHub
       #      ldap://dc4.ghe.local:456/CN=Maggie,DC=dc4,DC=ghe,DC=local?cn,mail?base?(cn=Charlie)
       #
       def initialize(url_string)
-        @uri = URI(url_string)
-        unless ["ldap", "ldaps"].include?(@uri.scheme)
-          raise InvalidSchemeException.new("Invalid scheme: #{@uri.scheme}")
+        if !self.class.valid?(url_string)
+          raise InvalidLdapURLException.new("Invalid LDAP URL: #{url_string}")
         end
+        @uri = URI(url_string)
         @dn = URI.unescape(@uri.path.sub(/^\//, ""))
         if @uri.query
           @attributes, @scope, @filter = @uri.query.split("?")
         end
+      end
+
+      def self.valid?(url_string)
+        url_string =~ URI::regexp && ["ldap", "ldaps"].include?(URI(url_string).scheme)
       end
 
       # Maps the returned scope value from the URL to one of Net::LDAP::Scopes
@@ -76,7 +80,7 @@ module GitHub
         Net::LDAP::SearchScopes[SCOPES[scope]]
       end
 
-      class InvalidSchemeException < Exception; end
+      class InvalidLdapURLException < Exception; end
     end
   end
 end

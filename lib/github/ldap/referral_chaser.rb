@@ -53,11 +53,13 @@ module GitHub
         unless referral_entries.empty?
           entry = referral_entries.first
           referral_string = entry[:search_referrals].first
-          referral = Referral.new(referral_string, admin_user, admin_password, port)
-          search_results = referral.search(options)
+          if GitHub::Ldap::URL.valid?(referral_string)
+            referral = Referral.new(referral_string, admin_user, admin_password, port)
+            search_results = referral.search(options)
+          end
         end
 
-        search_results
+        Array(search_results)
       end
 
       private

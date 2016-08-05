@@ -8,13 +8,13 @@ class GitHubLdapReferralChaserTestCases < GitHub::Ldap::Test
   end
 
   def test_creates_referral_with_connection_credentials
-    @ldap.expects(:search).yields({ search_referrals: ["referral string"]}).returns([])
+    @ldap.expects(:search).yields({ search_referrals: ["ldap://dc1.ghe.local/"]}).returns([])
 
     referral = mock("GitHub::Ldap::ReferralChaser::Referral")
     referral.stubs(:search).returns([])
 
     GitHub::Ldap::ReferralChaser::Referral.expects(:new)
-      .with("referral string", "uid=admin,dc=github,dc=com", "passworD1", options[:port])
+      .with("ldap://dc1.ghe.local/", "uid=admin,dc=github,dc=com", "passworD1", options[:port])
       .returns(referral)
 
     @chaser.search({})
@@ -79,6 +79,13 @@ class GitHubLdapReferralChaserTestCases < GitHub::Ldap::Test
 
     results = @chaser.search({})
     assert_equal(["result", "result"], results)
+  end
+
+  def test_handle_blank_url_string_in_referral
+    @mock_connection.expects(:search).yields({ search_referrals: [""] })
+
+    results = @chaser.search({})
+    assert_equal([], results)
   end
 
   def test_returns_referral_search_results

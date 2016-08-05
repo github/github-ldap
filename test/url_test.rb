@@ -35,10 +35,17 @@ class GitHubLdapURLTestCases < GitHub::Ldap::Test
   end
 
   def test_invalid_scheme
-    ex = assert_raises(GitHub::Ldap::URL::InvalidSchemeException) do
+    ex = assert_raises(GitHub::Ldap::URL::InvalidLdapURLException) do
       GitHub::Ldap::URL.new("http://dc4.ghe.local")
     end
-    assert_equal("Invalid scheme: http", ex.message)
+    assert_equal("Invalid LDAP URL: http://dc4.ghe.local", ex.message)
+  end
+
+  def test_invalid_url
+    ex = assert_raises(GitHub::Ldap::URL::InvalidLdapURLException) do
+      GitHub::Ldap::URL.new("not a url")
+    end
+    assert_equal("Invalid LDAP URL: not a url", ex.message)
   end
 
   def test_parse_dn
