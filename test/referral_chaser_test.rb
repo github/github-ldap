@@ -82,7 +82,7 @@ class GitHubLdapReferralChaserTestCases < GitHub::Ldap::Test
   end
 
   def test_handle_blank_url_string_in_referral
-    @mock_connection.expects(:search).yields({ search_referrals: [""] })
+    @ldap.expects(:search).yields({ search_referrals: [""] })
 
     results = @chaser.search({})
     assert_equal([], results)
