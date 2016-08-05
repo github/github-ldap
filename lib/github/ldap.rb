@@ -12,6 +12,9 @@ require 'github/ldap/member_search'
 require 'github/ldap/membership_validators'
 require 'github/ldap/user_search/default'
 require 'github/ldap/user_search/active_directory'
+require 'github/ldap/connection_cache'
+require 'github/ldap/referral_chaser'
+require 'github/ldap/url'
 
 module GitHub
   class Ldap
@@ -40,13 +43,17 @@ module GitHub
     #
     # Returns the return value of the block.
     def_delegator :@connection, :open
+    def_delegator :@connection, :host
 
     attr_reader :uid, :search_domains, :virtual_attributes,
                 :membership_validator,
                 :member_search_strategy,
                 :instrumentation_service,
                 :user_search_strategy,
-                :connection
+                :connection,
+                :admin_user,
+                :admin_password,
+                :port
 
     # Build a new GitHub::Ldap instance
     #
@@ -76,6 +83,7 @@ module GitHub
       # Keep a reference to these as default auth for a Global Catalog if needed
       @admin_user = options[:admin_user]
       @admin_password = options[:admin_password]
+      @port = options[:port]
 
       @connection = Net::LDAP.new({
         host: options[:host],
@@ -106,7 +114,7 @@ module GitHub
       # configure both the membership validator and the member search strategies
       configure_search_strategy(options[:search_strategy])
 
-      # configure both the membership validator and the member search strategies
+      # configure the strategy used by Domain#user? to look up a user entry for login
       configure_user_search_strategy(options[:user_search_strategy])
 
       # enables instrumenting queries
@@ -340,9 +348,6 @@ module GitHub
         end
     end
 
-
-    private
-
     # Internal: Detect whether the LDAP host is an ActiveDirectory server.
     #
     # See: http://msdn.microsoft.com/en-us/library/cc223359.aspx.
@@ -351,7 +356,6 @@ module GitHub
     def active_directory_capability?
       capabilities[:supportedcapabilities].include?(ACTIVE_DIRECTORY_V51_OID)
     end
-
-    attr_reader :admin_user, :admin_password
+    private :active_directory_capability?
   end
 end

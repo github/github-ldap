@@ -2,7 +2,7 @@
 
 Gem::Specification.new do |spec|
   spec.name          = "github-ldap"
-  spec.version       = "1.9.0"
+  spec.version       = "1.10.0"
   spec.authors       = ["David Calavera", "Matt Todd"]
   spec.email         = ["david.calavera@gmail.com", "chiology@gmail.com"]
   spec.description   = %q{LDAP authentication for humans}
@@ -15,7 +15,7 @@ Gem::Specification.new do |spec|
   spec.test_files    = spec.files.grep(%r{^(test|spec|features)/})
   spec.require_paths = ["lib"]
 
-  spec.add_dependency 'net-ldap', '~> 0.11.0'
+  spec.add_dependency 'net-ldap', '~> 0.15.0'
 
   spec.add_development_dependency "bundler", "~> 1.3"
   spec.add_development_dependency 'ladle'

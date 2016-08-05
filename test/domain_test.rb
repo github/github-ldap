@@ -1,5 +1,4 @@
 require_relative 'test_helper'
-require 'mocha/mini_test'
 
 module GitHubLdapDomainTestCases
   def setup
@@ -143,8 +142,8 @@ module GitHubLdapDomainTestCases
   end
 
   def test_user_search_returns_first_entry
-    entry = Object.new
-    search_strategy = Object.new
+    entry = mock("Net::Ldap::Entry")
+    search_strategy = mock("GitHub::Ldap::UserSearch::Default")
     search_strategy.stubs(:perform).returns([entry])
     @ldap.expects(:user_search_strategy).returns(search_strategy)
     user = @domain.user?('user1', :attributes => [:cn])

@@ -1,5 +1,4 @@
 require_relative 'test_helper'
-require 'mocha/mini_test'
 
 module GitHubLdapTestCases
   def setup
