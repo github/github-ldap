@@ -311,7 +311,7 @@ module GitHub
     #            using Active Directory's Global Catalog
     #            functionality.
     def configure_user_search_strategy(strategy)
-      @user_search_strategy = begin
+      @user_search_strategy =
         case strategy.to_s
         when "default"
           GitHub::Ldap::UserSearch::Default.new(self)
@@ -320,7 +320,6 @@ module GitHub
         else
           GitHub::Ldap::UserSearch::Default.new(self)
         end
-      end
     end
 
     # Internal: Configure the member search strategy.
