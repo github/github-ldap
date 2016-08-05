@@ -4,7 +4,7 @@ class GitHubLdapReferralChaserTestCases < GitHub::Ldap::Test
 
   def setup
     @mock_connection = GitHub::Ldap.new({
-        admin_user: "Joe",
+        admin_user: "uid=admin,dc=github,dc=com",
         admin_password: "passworD1",
         port: 389
     })
@@ -18,7 +18,7 @@ class GitHubLdapReferralChaserTestCases < GitHub::Ldap::Test
     referral.stubs(:search).returns([])
 
     GitHub::Ldap::ReferralChaser::Referral.expects(:new)
-      .with("referral string", "Joe", "passworD1", 389)
+      .with("referral string", "uid=admin,dc=github,dc=com", "passworD1", 389)
       .returns(referral)
 
     @chaser.search({})
@@ -26,7 +26,7 @@ class GitHubLdapReferralChaserTestCases < GitHub::Ldap::Test
 
   def test_creates_referral_with_default_port
     mock_connection = GitHub::Ldap.new({
-        admin_user: "Joe",
+        admin_user: "uid=admin,dc=github,dc=com",
         admin_password: "passworD1"
     })
     mock_connection.expects(:search).yields({
@@ -57,7 +57,11 @@ class GitHubLdapReferralChaserTestCases < GitHub::Ldap::Test
     referral.stubs(:search).returns([])
 
     GitHub::Ldap::ReferralChaser::Referral.expects(:new)
-      .with("ldap://dc1.ghe.local/CN=Maggie%20Mae,CN=Users,DC=dc4,DC=ghe,DC=local", "Joe", "passworD1", 888)
+      .with(
+        "ldap://dc1.ghe.local/CN=Maggie%20Mae,CN=Users,DC=dc4,DC=ghe,DC=local",
+        "uid=admin,dc=github,dc=com",
+        "passworD1",
+        389)
       .returns(referral)
 
     @chaser.search({})
