@@ -3,11 +3,7 @@ require_relative 'test_helper'
 class GitHubLdapReferralChaserTestCases < GitHub::Ldap::Test
 
   def setup
-    @mock_connection = GitHub::Ldap.new({
-        admin_user: "uid=admin,dc=github,dc=com",
-        admin_password: "passworD1",
-        port: 389
-    })
+    @mock_connection = GitHub::Ldap.new(options)
     @chaser = GitHub::Ldap::ReferralChaser.new(@mock_connection)
   end
 
@@ -18,25 +14,21 @@ class GitHubLdapReferralChaserTestCases < GitHub::Ldap::Test
     referral.stubs(:search).returns([])
 
     GitHub::Ldap::ReferralChaser::Referral.expects(:new)
-      .with("referral string", "uid=admin,dc=github,dc=com", "passworD1", 389)
+      .with("referral string", "uid=admin,dc=github,dc=com", "passworD1", options[:port])
       .returns(referral)
 
     @chaser.search({})
   end
 
   def test_creates_referral_with_default_port
-    mock_connection = GitHub::Ldap.new({
-        admin_user: "uid=admin,dc=github,dc=com",
-        admin_password: "passworD1"
-    })
-    mock_connection.expects(:search).yields({
+    @mock_connection.expects(:search).yields({
       search_referrals: ["ldap://dc1.ghe.local/CN=Maggie%20Mae,CN=Users,DC=dc4,DC=ghe,DC=local"]
     }).returns([])
 
     stub_referral_connection = mock("GitHub::Ldap")
     stub_referral_connection.stubs(:search).returns([])
-    GitHub::Ldap::ConnectionCache.expects(:get_connection).with(has_entry(port: 389)).returns(stub_referral_connection)
-    chaser = GitHub::Ldap::ReferralChaser.new(mock_connection)
+    GitHub::Ldap::ConnectionCache.expects(:get_connection).with(has_entry(port: options[:port])).returns(stub_referral_connection)
+    chaser = GitHub::Ldap::ReferralChaser.new(@mock_connection)
     chaser.search({})
   end
 
@@ -61,7 +53,7 @@ class GitHubLdapReferralChaserTestCases < GitHub::Ldap::Test
         "ldap://dc1.ghe.local/CN=Maggie%20Mae,CN=Users,DC=dc4,DC=ghe,DC=local",
         "uid=admin,dc=github,dc=com",
         "passworD1",
-        389)
+        options[:port])
       .returns(referral)
 
     @chaser.search({})
