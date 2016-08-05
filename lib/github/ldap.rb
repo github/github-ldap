@@ -114,7 +114,7 @@ module GitHub
       # configure both the membership validator and the member search strategies
       configure_search_strategy(options[:search_strategy])
 
-      # configure both the membership validator and the member search strategies
+      # configure the strategy used by Domain#user? to look up a user entry for login
       configure_user_search_strategy(options[:user_search_strategy])
 
       # enables instrumenting queries
