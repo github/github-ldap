@@ -7,6 +7,12 @@ env:
   - TESTENV=openldap
   - TESTENV=apacheds
 
+# https://docs.travis-ci.com/user/hosts/
+addons:
+  hosts:
+    - ad1.ghe.dev
+    - ad2.ghe.dev
+
 install:
   - if [ "$TESTENV" = "openldap" ]; then ./script/install-openldap; fi
   - bundle install
