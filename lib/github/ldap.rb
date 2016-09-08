@@ -10,6 +10,11 @@ require 'github/ldap/virtual_attributes'
 require 'github/ldap/instrumentation'
 require 'github/ldap/member_search'
 require 'github/ldap/membership_validators'
+require 'github/ldap/user_search/default'
+require 'github/ldap/user_search/active_directory'
+require 'github/ldap/connection_cache'
+require 'github/ldap/referral_chaser'
+require 'github/ldap/url'
 
 module GitHub
   class Ldap
@@ -38,11 +43,17 @@ module GitHub
     #
     # Returns the return value of the block.
     def_delegator :@connection, :open
+    def_delegator :@connection, :host
 
     attr_reader :uid, :search_domains, :virtual_attributes,
                 :membership_validator,
                 :member_search_strategy,
-                :instrumentation_service
+                :instrumentation_service,
+                :user_search_strategy,
+                :connection,
+                :admin_user,
+                :admin_password,
+                :port
 
     # Build a new GitHub::Ldap instance
     #
@@ -71,6 +82,11 @@ module GitHub
     #
     def initialize(options = {})
       @uid = options[:uid] || "sAMAccountName"
+
+      # Keep a reference to these as default auth for a Global Catalog if needed
+      @admin_user = options[:admin_user]
+      @admin_password = options[:admin_password]
+      @port = options[:port]
 
       @connection = Net::LDAP.new({
         host: options[:host],
@@ -101,6 +117,9 @@ module GitHub
 
       # configure both the membership validator and the member search strategies
       configure_search_strategy(options[:search_strategy])
+
+      # configure the strategy used by Domain#user? to look up a user entry for login
+      configure_user_search_strategy(options[:user_search_strategy])
 
       # enables instrumenting queries
       @instrumentation_service = options[:instrumentation_service]
@@ -282,6 +301,28 @@ module GitHub
           else
             GitHub::Ldap::MembershipValidators::Recursive
           end
+        end
+    end
+
+    # Internal:  Set the user search strategy that will be used by
+    #            Domain#user?.
+    #
+    # strategy - Can be either 'default' or 'global_catalog'.
+    #            'default' strategy will search the configured
+    #            domain controller with a search base relative
+    #            to the controller's domain context.
+    #            'global_catalog' will search the entire forest
+    #            using Active Directory's Global Catalog
+    #            functionality.
+    def configure_user_search_strategy(strategy)
+      @user_search_strategy =
+        case strategy.to_s
+        when "default"
+          GitHub::Ldap::UserSearch::Default.new(self)
+        when "global_catalog"
+          GitHub::Ldap::UserSearch::ActiveDirectory.new(self)
+        else
+          GitHub::Ldap::UserSearch::Default.new(self)
         end
     end
 

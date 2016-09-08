@@ -129,6 +129,17 @@ module GitHubLdapTestCases
     assert_equal GitHub::Ldap::MemberSearch::Recursive,         @ldap.member_search_strategy
   end
 
+  def test_user_search_strategy_global_catalog_when_configured
+    @ldap.configure_user_search_strategy("global_catalog")
+    assert_kind_of GitHub::Ldap::UserSearch::ActiveDirectory, @ldap.user_search_strategy
+  end
+
+  def test_user_search_strategy_default_when_configured
+    @ldap.configure_user_search_strategy("default")
+    refute_kind_of GitHub::Ldap::UserSearch::ActiveDirectory, @ldap.user_search_strategy
+    assert_kind_of GitHub::Ldap::UserSearch::Default, @ldap.user_search_strategy
+  end
+
   def test_capabilities
     assert_kind_of Net::LDAP::Entry, @ldap.capabilities
   end

@@ -140,6 +140,15 @@ module GitHubLdapDomainTestCases
     assert user = @domain.user?('user1')
     refute @domain.auth(user, 'foo'), 'Expected user not not bind'
   end
+
+  def test_user_search_returns_first_entry
+    entry = mock("Net::Ldap::Entry")
+    search_strategy = mock("GitHub::Ldap::UserSearch::Default")
+    search_strategy.stubs(:perform).returns([entry])
+    @ldap.expects(:user_search_strategy).returns(search_strategy)
+    user = @domain.user?('user1', :attributes => [:cn])
+    assert_equal entry, user
+  end
 end
 
 class GitHubLdapDomainTest < GitHub::Ldap::Test

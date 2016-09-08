@@ -24,15 +24,23 @@ module GitHub
           # Sets the entry to the base and scopes the search to the base,
           # according to the source documentation, found here:
           # http://msdn.microsoft.com/en-us/library/aa746475(v=vs.85).aspx
-          matched = ldap.search \
+          #
+          # Use ReferralChaser to chase any potential referrals for an entry that may be owned by a different
+          # domain controller.
+          matched = referral_chaser.search \
             filter: membership_in_chain_filter(entry),
             base:   entry.dn,
             scope:  Net::LDAP::SearchScope_BaseObject,
+            return_referrals: true,
             attributes: ATTRS
 
           # membership validated if entry was matched and returned as a result
           # Active Directory DNs are case-insensitive
-          matched.map { |m| m.dn.downcase }.include?(entry.dn.downcase)
+          Array(matched).map { |m| m.dn.downcase }.include?(entry.dn.downcase)
+        end
+
+        def referral_chaser
+          @referral_chaser ||= GitHub::Ldap::ReferralChaser.new(@ldap)
         end
 
         # Internal: Constructs a membership filter using the "in chain"
