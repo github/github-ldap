@@ -9,6 +9,21 @@ module GitHubLdapTestCases
     assert @ldap.test_connection, "Ldap connection expected to succeed"
   end
 
+  def test_connection_with_list_of_hosts_with_one_valid_host
+    ldap = GitHub::Ldap.new(options.merge(hosts: [["localhost", options[:port]]]))
+    assert ldap.test_connection, "Ldap connection expected to succeed"
+  end
+
+  def test_connection_with_list_of_hosts_with_first_valid
+    ldap = GitHub::Ldap.new(options.merge(hosts: [["localhost", options[:port]], ["invalid.local", options[:port]]]))
+    assert ldap.test_connection, "Ldap connection expected to succeed"
+  end
+
+  def test_connection_with_list_of_hosts_with_first_invalid
+    ldap = GitHub::Ldap.new(options.merge(hosts: [["invalid.local", options[:port]], ["localhost", options[:port]]]))
+    assert ldap.test_connection, "Ldap connection expected to succeed"
+  end
+
   def test_simple_tls
     assert_equal :simple_tls, @ldap.check_encryption(:ssl)
     assert_equal :simple_tls, @ldap.check_encryption('SSL')

@@ -28,6 +28,7 @@ There are a few configuration options required to use this adapter:
 
 * host: is the host address where the ldap server lives.
 * port: is the port where the ldap server lives.
+* hosts: (optional) an enumerable of pairs of hosts and corresponding ports with which to attempt opening connections (default [[host, port]]). Overrides host and port if set.
 * encryption: is the encryption protocol, disabled by default. The valid options are `ssl` and `tls`.
 * uid: is the field name in the ldap server used to authenticate your users, in ActiveDirectory this is `sAMAccountName`.
 
