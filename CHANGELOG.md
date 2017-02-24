@@ -1,5 +1,9 @@
 # CHANGELOG
 
+# v1.10.1
+
+* Bump net-ldap to 0.16.0
+
 # v1.10.0
 
 * Bump net-ldap to 0.15.0 [#92](https://github.com/github/github-ldap/pull/92)
