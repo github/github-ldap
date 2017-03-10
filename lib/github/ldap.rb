@@ -103,7 +103,7 @@ module GitHub
         @connection.encryption(encryption)
       end
 
-      configure_virtual_attributes(options[:virtual_attributes])
+      configure_virtual_attributes(options)
 
       # enable fallback recursive group search unless option is false
       @recursive_group_search_fallback = (options[:recursive_group_search_fallback] != false)
@@ -250,17 +250,14 @@ module GitHub
     end
 
     # Internal - Configure virtual attributes for this server.
-    # If the option is `true`, we'll use the default virual attributes.
-    # If it's a Hash we'll map the attributes in the hash.
-    #
-    # attributes: is the option set when Ldap is initialized.
+    # options: configuration options during initialization
+    #   - :virtual_attributes - boolean - to toggle support
+    #   - :virtual_membership - string - attribute name on the user's object to check group membership
     #
     # Returns a VirtualAttributes.
-    def configure_virtual_attributes(attributes)
-      @virtual_attributes = if attributes == true
-        VirtualAttributes.new(true)
-      elsif attributes.is_a?(Hash)
-        VirtualAttributes.new(true, attributes)
+    def configure_virtual_attributes(options={})
+      @virtual_attributes = if options[:virtual_attributes] == true
+        VirtualAttributes.new(true, { :virtual_membership => options[:virtual_membership]})
       else
         VirtualAttributes.new(false)
       end
