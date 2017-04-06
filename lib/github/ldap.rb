@@ -88,10 +88,13 @@ module GitHub
       @admin_password = options[:admin_password]
       @port = options[:port]
 
+      encryption = check_encryption(options[:encryption])
+
       @connection = Net::LDAP.new({
         host: options[:host],
         port: options[:port],
         hosts: options[:hosts],
+        encryption: encryption,
         instrumentation_service: options[:instrumentation_service]
       })
 
@@ -99,7 +102,7 @@ module GitHub
         @connection.authenticate(options[:admin_user], options[:admin_password])
       end
 
-      if encryption = check_encryption(options[:encryption])
+      if encryption.is_a? String
         @connection.encryption(encryption)
       end
 
@@ -240,6 +243,7 @@ module GitHub
     # Returns the real encryption type.
     def check_encryption(encryption)
       return unless encryption
+      return encryption if encryption.is_a? Hash
 
       case encryption.downcase.to_sym
       when :ssl, :simple_tls
