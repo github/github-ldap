@@ -25,15 +25,30 @@ module GitHubLdapTestCases
   end
 
   def test_simple_tls
-    assert_equal :simple_tls, @ldap.check_encryption(:ssl)
-    assert_equal :simple_tls, @ldap.check_encryption('SSL')
-    assert_equal :simple_tls, @ldap.check_encryption(:simple_tls)
+    expected = { method: :simple_tls, tls_options: {} }
+    assert_equal expected, @ldap.check_encryption(:ssl)
+    assert_equal expected, @ldap.check_encryption('SSL')
+    assert_equal expected, @ldap.check_encryption(:simple_tls)
   end
 
   def test_start_tls
-    assert_equal :start_tls, @ldap.check_encryption(:tls)
-    assert_equal :start_tls, @ldap.check_encryption('TLS')
-    assert_equal :start_tls, @ldap.check_encryption(:start_tls)
+    expected = { method: :start_tls, tls_options: {} }
+    assert_equal expected, @ldap.check_encryption(:tls)
+    assert_equal expected, @ldap.check_encryption('TLS')
+    assert_equal expected, @ldap.check_encryption(:start_tls)
+  end
+
+  def test_tls_validation
+    assert_equal({ method: :start_tls, tls_options: OpenSSL::SSL::VERIFY_PEER },
+                 @ldap.check_encryption(:tls, true))
+    assert_equal({ method: :start_tls, tls_options: {} },
+                 @ldap.check_encryption(:tls, false))
+    assert_equal({ method: :start_tls, tls_options: {} },
+                 @ldap.check_encryption(:tls, nil))
+    assert_equal({ method: :start_tls, tls_options: {} },
+                 @ldap.check_encryption(:tls, 'true'))
+    assert_equal({ method: :start_tls, tls_options: {} },
+                 @ldap.check_encryption(:tls))
   end
 
   def test_search_delegator
