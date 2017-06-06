@@ -245,6 +245,7 @@ module GitHub
     def check_encryption(encryption, tls_options = {})
       return unless encryption
 
+      tls_options ||= {}
       case encryption.downcase.to_sym
       when :ssl, :simple_tls
         { method: :simple_tls, tls_options: tls_options }

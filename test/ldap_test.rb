@@ -45,6 +45,8 @@ module GitHubLdapTestCases
                  @ldap.check_encryption(:tls, verify_mode: OpenSSL::SSL::VERIFY_NONE))
     assert_equal({ method: :start_tls, tls_options: { cert_store: "some/path" } },
                  @ldap.check_encryption(:tls, cert_store: "some/path"))
+    assert_equal({ method: :start_tls, tls_options: {} },
+                 @ldap.check_encryption(:tls, nil))
   end
 
   def test_search_delegator
