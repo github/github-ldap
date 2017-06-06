@@ -65,7 +65,9 @@ module GitHub
     #   which to attempt opening connections (default [[host, port]]). Overrides
     #   host and port if set.
     # encryption: optional string. `ssl` or `tls`. nil by default
-    # tls_options: optional hash with TLS options for encrypted connections. Empty by default.
+    # tls_options: optional hash with TLS options for encrypted connections.
+    #   Empty by default. See http://ruby-doc.org/stdlib/libdoc/openssl/rdoc/OpenSSL/SSL/SSLContext.html
+    #   for available values
     # admin_user: optional string ldap administrator user dn for authentication
     # admin_password: optional string ldap administrator user password
     #
@@ -237,7 +239,7 @@ module GitHub
     # Internal - Determine whether to use encryption or not.
     #
     # encryption: is the encryption method, either 'ssl', 'tls', 'simple_tls' or 'start_tls'.
-    # validate: is true to enable certificate validation
+    # tls_options: is the options hash for tls encryption method
     #
     # Returns the real encryption type.
     def check_encryption(encryption, tls_options = {})
