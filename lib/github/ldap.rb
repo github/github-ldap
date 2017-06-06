@@ -65,7 +65,7 @@ module GitHub
     #   which to attempt opening connections (default [[host, port]]). Overrides
     #   host and port if set.
     # encryption: optional string. `ssl` or `tls`. nil by default
-    # validate_encryption: optional boolean. nil by default
+    # tls_options: optional hash with TLS options for encrypted connections. Empty by default.
     # admin_user: optional string ldap administrator user dn for authentication
     # admin_password: optional string ldap administrator user password
     #
@@ -100,7 +100,7 @@ module GitHub
         @connection.authenticate(options[:admin_user], options[:admin_password])
       end
 
-      if encryption = check_encryption(options[:encryption], options[:validate_encryption])
+      if encryption = check_encryption(options[:encryption], options[:tls_options])
         @connection.encryption(encryption)
       end
 
@@ -240,10 +240,9 @@ module GitHub
     # validate: is true to enable certificate validation
     #
     # Returns the real encryption type.
-    def check_encryption(encryption, validate = false)
+    def check_encryption(encryption, tls_options = {})
       return unless encryption
 
-      tls_options = { verify_mode: (validate == true ? OpenSSL::SSL::VERIFY_PEER : OpenSSL::SSL::VERIFY_NONE) }
       case encryption.downcase.to_sym
       when :ssl, :simple_tls
         { method: :simple_tls, tls_options: tls_options }
