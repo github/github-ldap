@@ -25,14 +25,14 @@ module GitHubLdapTestCases
   end
 
   def test_simple_tls
-    expected = { method: :simple_tls, tls_options: {} }
+    expected = { method: :simple_tls, tls_options:  { verify_mode: OpenSSL::SSL::VERIFY_NONE } }
     assert_equal expected, @ldap.check_encryption(:ssl)
     assert_equal expected, @ldap.check_encryption('SSL')
     assert_equal expected, @ldap.check_encryption(:simple_tls)
   end
 
   def test_start_tls
-    expected = { method: :start_tls, tls_options: {} }
+    expected = { method: :start_tls, tls_options: { verify_mode: OpenSSL::SSL::VERIFY_NONE } }
     assert_equal expected, @ldap.check_encryption(:tls)
     assert_equal expected, @ldap.check_encryption('TLS')
     assert_equal expected, @ldap.check_encryption(:start_tls)
