@@ -39,7 +39,7 @@ module GitHubLdapTestCases
   end
 
   def test_tls_validation
-    assert_equal({ method: :start_tls, tls_options: OpenSSL::SSL::VERIFY_PEER },
+    assert_equal({ method: :start_tls, tls_options: { verify_mode: OpenSSL::SSL::VERIFY_PEER } },
                  @ldap.check_encryption(:tls, true))
     assert_equal({ method: :start_tls, tls_options: {} },
                  @ldap.check_encryption(:tls, false))
