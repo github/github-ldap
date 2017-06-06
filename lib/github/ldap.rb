@@ -243,7 +243,7 @@ module GitHub
     def check_encryption(encryption, validate = false)
       return unless encryption
 
-      tls_options = { verify_mode: (validate == true ? OpenSSL::SSL::VERIFY_PEER : OpenSSL::SSL::VERIFY_NONE }
+      tls_options = { verify_mode: (validate == true ? OpenSSL::SSL::VERIFY_PEER : OpenSSL::SSL::VERIFY_NONE) }
       case encryption.downcase.to_sym
       when :ssl, :simple_tls
         { method: :simple_tls, tls_options: tls_options }
