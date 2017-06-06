@@ -25,14 +25,14 @@ module GitHubLdapTestCases
   end
 
   def test_simple_tls
-    expected = { method: :simple_tls, tls_options:  { verify_mode: OpenSSL::SSL::VERIFY_NONE } }
+    expected = { method: :simple_tls, tls_options:  { } }
     assert_equal expected, @ldap.check_encryption(:ssl)
     assert_equal expected, @ldap.check_encryption('SSL')
     assert_equal expected, @ldap.check_encryption(:simple_tls)
   end
 
   def test_start_tls
-    expected = { method: :start_tls, tls_options: { verify_mode: OpenSSL::SSL::VERIFY_NONE } }
+    expected = { method: :start_tls, tls_options: { } }
     assert_equal expected, @ldap.check_encryption(:tls)
     assert_equal expected, @ldap.check_encryption('TLS')
     assert_equal expected, @ldap.check_encryption(:start_tls)
@@ -40,15 +40,11 @@ module GitHubLdapTestCases
 
   def test_tls_validation
     assert_equal({ method: :start_tls, tls_options: { verify_mode: OpenSSL::SSL::VERIFY_PEER } },
-                 @ldap.check_encryption(:tls, true))
+                 @ldap.check_encryption(:tls, verify_mode: OpenSSL::SSL::VERIFY_PEER))
     assert_equal({ method: :start_tls, tls_options: { verify_mode: OpenSSL::SSL::VERIFY_NONE } },
-                 @ldap.check_encryption(:tls, false))
-    assert_equal({ method: :start_tls, tls_options: { verify_mode: OpenSSL::SSL::VERIFY_NONE } },
-                 @ldap.check_encryption(:tls, nil))
-    assert_equal({ method: :start_tls, tls_options: { verify_mode: OpenSSL::SSL::VERIFY_NONE } },
-                 @ldap.check_encryption(:tls, 'true'))
-    assert_equal({ method: :start_tls, tls_options: { verify_mode: OpenSSL::SSL::VERIFY_NONE } },
-                 @ldap.check_encryption(:tls))
+                 @ldap.check_encryption(:tls, verify_mode: OpenSSL::SSL::VERIFY_NONE))
+    assert_equal({ method: :start_tls, tls_options: { cert_store: "some/path" } },
+                 @ldap.check_encryption(:tls, cert_store: "some/path"))
   end
 
   def test_search_delegator
