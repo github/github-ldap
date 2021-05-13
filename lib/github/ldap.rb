@@ -228,7 +228,7 @@ module GitHub
         instrument "capabilities.github_ldap" do |payload|
           begin
             @connection.search_root_dse
-          rescue Net::LDAP::LdapError => error
+          rescue Net::LDAP::Error => error
             payload[:error] = error
             # stubbed result
             Net::LDAP::Entry.new
