@@ -3,7 +3,8 @@ require_relative '../test_helper'
 class GitHubLdapActiveDirectoryMembershipValidatorsStubbedTest < GitHub::Ldap::Test
   # Only run when AD integration tests aren't run
   def run(*)
-    self.class.test_env != "activedirectory" ? super : self
+    return super if self.class.test_env != "activedirectory"
+    Minitest::Result.from(self)
   end
 
   def setup
@@ -72,7 +73,8 @@ end
 class GitHubLdapActiveDirectoryMembershipValidatorsIntegrationTest < GitHub::Ldap::Test
   # Only run this test suite if ActiveDirectory is configured
   def run(*)
-    self.class.test_env == "activedirectory" ? super : self
+    return super if self.class.test_env == "activedirectory"
+    Minitest::Result.from(self)
   end
 
   def setup

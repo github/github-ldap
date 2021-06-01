@@ -20,7 +20,7 @@ class GitHubLdapActiveDirectoryUserSearchTests < GitHub::Ldap::Test
     mock_global_catalog_connection = mock("GitHub::Ldap::UserSearch::GlobalCatalog")
     stub_entry = mock("Net::LDAP::Entry")
 
-    mock_global_catalog_connection.expects(:search).returns(stub_entry)
+    mock_global_catalog_connection.expects(:search).returns([stub_entry])
     ad_user_search.expects(:global_catalog_connection).returns(mock_global_catalog_connection)
 
     results = ad_user_search.perform("login", "CN=Joe", "uid", {})

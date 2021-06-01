@@ -236,7 +236,8 @@ end
 
 class GitHubLdapActiveDirectoryGroupsTest < GitHub::Ldap::Test
   def run(*)
-    self.class.test_env == "activedirectory" ? super : self
+    return super if self.class.test_env == "activedirectory"
+    Minitest::Result.from(self)
   end
 
   def test_filter_groups
