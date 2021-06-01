@@ -13,6 +13,10 @@ addons:
     - ad1.ghe.dev
     - ad2.ghe.dev
 
+before_install:
+  - echo "deb http://ftp.br.debian.org/debian stable main" | sudo tee -a /etc/apt/sources.list
+  - sudo apt-get update
+
 install:
   - if [ "$TESTENV" = "openldap" ]; then ./script/install-openldap; fi
   - bundle install
