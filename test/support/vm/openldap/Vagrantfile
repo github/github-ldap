@@ -13,8 +13,8 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
   config.ssh.forward_agent = true
 
-  # config.vm.provision "shell", inline: "apt-get update; exec env /vagrant_data/script/install-openldap"
-  config.vm.provision "shell", inline: 'echo "HIIIIIII"', run: "always"
+  # If install the openldap with apt-get failed, you can comment this line.
+  config.vm.provision "shell", inline: "apt-get update; exec env /vagrant_data/script/install-openldap"
 
   config.vm.synced_folder "../../../..", "/vagrant_data"
 
