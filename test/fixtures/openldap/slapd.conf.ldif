@@ -33,7 +33,7 @@ dn: cn=module{0},cn=config
 objectClass: olcModuleList
 cn: module{0}
 olcModulePath: /usr/lib/ldap
-olcModuleLoad: back_hdb
+olcModuleLoad: back_mdb
 
 dn: olcBackend=hdb,cn=config
 objectClass: olcBackendConfig
