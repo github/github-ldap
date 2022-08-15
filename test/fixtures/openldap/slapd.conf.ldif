@@ -35,14 +35,14 @@ cn: module{0}
 olcModulePath: /usr/lib/ldap
 olcModuleLoad: back_mdb
 
-dn: olcBackend=hdb,cn=config
+dn: olcBackend=mdb,cn=config
 objectClass: olcBackendConfig
-olcBackend: hdb
+olcBackend: mdb
 
-dn: olcDatabase=hdb,cn=config
+dn: olcDatabase=mdb,cn=config
 objectClass: olcDatabaseConfig
-objectClass: olcHdbConfig
-olcDatabase: hdb
+objectClass: olcMdbConfig
+olcDatabase: mdb
 olcDbCheckpoint: 512 30
 olcDbConfig: set_cachesize 1 0 0
 olcDbConfig: set_lk_max_objects 1500
