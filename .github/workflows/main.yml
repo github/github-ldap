@@ -23,8 +23,6 @@ jobs:
           ruby-version: '3.1' # Not needed with a .ruby-version file
           bundler-cache: true
       - run: 'if [ "$TESTENV" = "openldap" ]; then ./script/install-openldap; fi'
-        env: &ref_0
-          TESTENV: '${{ matrix.TESTENV }}'
       - run: bundle install
       - run: ./script/cibuild-$TESTENV
-        env: *ref_0
+
