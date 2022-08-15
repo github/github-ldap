@@ -37,6 +37,6 @@ sudo /etc/init.d/slapd start
 # /vagrant/services/ldap/openldap/seed.rb | sudo slapadd -F /etc/ldap/slapd.d
 cat $SEED_PATH/seed.ldif |
   /usr/bin/time sudo ldapadd -x -D "cn=admin,dc=github,dc=com" -w passworD1 \
-               -h localhost -p 389
+               -H ldap://localhost:389
 
 sudo rm -rf $TMPDIR
