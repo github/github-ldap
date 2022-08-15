@@ -17,6 +17,7 @@ jobs:
             TESTENV: openldap
           - os: ubuntu-22.04
             TESTENV: apacheds
+      fail-fast: false
     steps:
       - uses: actions/checkout@v3
       - uses: ruby/setup-ruby@v1
