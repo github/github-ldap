@@ -22,6 +22,7 @@ jobs:
         with:
           ruby-version: '3.1' # Not needed with a .ruby-version file
           bundler-cache: true
+      - run: gem install bundler:1.17.3
       - run: 'if [ "$TESTENV" = "openldap" ]; then ./script/install-openldap; fi'
       - run: bundle install
       - run: ./script/cibuild-$TESTENV
