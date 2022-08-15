@@ -44,10 +44,6 @@ objectClass: olcDatabaseConfig
 objectClass: olcMdbConfig
 olcDatabase: mdb
 olcDbCheckpoint: 512 30
-olcDbConfig: set_cachesize 1 0 0
-olcDbConfig: set_lk_max_objects 1500
-olcDbConfig: set_lk_max_locks 1500
-olcDbConfig: set_lk_max_lockers 1500
 olcLastMod: TRUE
 olcSuffix: dc=github,dc=com
 olcDbDirectory: /var/lib/ldap
