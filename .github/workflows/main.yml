@@ -24,7 +24,6 @@ jobs:
         with:
           ruby-version: ${{ matrix.ruby }}
           bundler-cache: true
-      - run: 'if [ "${{ env.TESTENV }}" = "openldap" ]; then ./script/install-openldap; fi'
+      - run: 'if [ "${{ matrix.TESTENV }}" = "openldap" ]; then ./script/install-openldap; fi'
       - run: bundle install
-      - run: ./script/cibuild-${{ env.TESTENV }}
-
+      - run: ./script/cibuild-${{ matrix.TESTENV }}
