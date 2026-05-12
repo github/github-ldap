@@ -20,9 +20,10 @@ jobs:
 
     - name: Checkout Drive
       id: checkout-drive
-      uses: github/github-drives/checkout@main
+      uses: github/github-drives/checkout@v0.1.0
       with:
-        drive-name: ${{ github.event.inputs.driveName }}
+        drive-name: "default"
+        path: "drive"  # optional; relative to $GITHUB_WORKSPACE
         
     - name: Check out repo
       uses: actions/checkout@v4
@@ -30,10 +31,10 @@ jobs:
         ref: ${{ github.ref }}
 
     - name: Commit Drive
-      id: commit-drive
-      uses: github/github-drives/commit@main
+      uses: github/github-drives/commit@v0.1.0
       with:
-        drive-name: ${{ github.event.inputs.driveName }}
+        drive-name: "default"
+        path: "drive"  # must match checkout
 
     - name: Log Drive Commit Results
       run: |
@@ -46,9 +47,9 @@ jobs:
 
     - name: Checkout Drive
       id: checkout-drive
-      uses: github/github-drives/checkout@main
+      uses: github/github-drives/checkout@v0.1.0
       with:
-        drive-name: ${{ github.event.inputs.driveName }}
+        drive-name: "default"
 
     - name: Log Drive Checkout Result
       run: |
