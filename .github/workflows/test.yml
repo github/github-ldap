@@ -1,0 +1,57 @@
+name: 'GitHub Drives Example: seed and consume a Drive test'
+
+on:
+  push:
+  workflow_dispatch:
+    inputs:
+      driveName:
+        description: "Drive name"
+        required: false
+
+permissions:
+  contents: read
+
+
+jobs:
+  seed-drive:
+    runs-on: ubuntu-latest
+
+    steps:
+
+    - name: Checkout Drive
+      id: checkout-drive
+      uses: github/github-drives/checkout@main
+      with:
+        drive-name: ${{ github.event.inputs.driveName }}
+        
+    - name: Check out repo
+      uses: actions/checkout@v4
+      with:
+        ref: ${{ github.ref }}
+
+    - name: Commit Drive
+      id: commit-drive
+      uses: github/github-drives/commit@main
+      with:
+        drive-name: ${{ github.event.inputs.driveName }}
+
+    - name: Log Drive Commit Results
+      run: |
+        echo "Commit output: ${{ toJSON(steps.commit-drive.outputs) }}"
+  consume-drive:
+    runs-on: ubuntu-latest
+    needs: seed-drive
+
+    steps:
+
+    - name: Checkout Drive
+      id: checkout-drive
+      uses: github/github-drives/checkout@main
+      with:
+        drive-name: ${{ github.event.inputs.driveName }}
+
+    - name: Log Drive Checkout Result
+      run: |
+        echo "Checkout output: ${{ toJSON(steps.checkout-drive.outputs) }}"
+    - name: List workspace contents
+      run: ls -la
